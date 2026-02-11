@@ -1,0 +1,1248 @@
+# Crsociety.org has been down for a few months
+URL: https://www.rapamycin.news/t/crsociety-org-has-been-down-for-a-few-months/14486
+Total posts: 116
+
+--- Post #1 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-13T17:36:30.007Z] ---
+I’m starting to really get concerned
+
+--- Post #2 by John_Hemming (John Hemming) [2024-06-13T17:52:45.781Z] ---
+It looks like no-one has updated the DNS. Alternatively it could be that it has been stolen by someone. It looks as if it is registered at the moment.
+
+--- Post #3 by John_Hemming (John Hemming) [2024-06-13T17:56:40.528Z] ---
+Domain Name: [CRSOCIETY.ORG](http://CRSOCIETY.ORG)
+
+Registry Domain ID: db0f89a046d24c4cba3b787c333b34f5-LROR
+
+Registrar WHOIS Server: [whois.godaddy.com](http://whois.godaddy.com)
+
+Registrar URL: [https://www.godaddy.com](https://www.godaddy.com)
+
+Updated Date: 2024-04-16T14:15:47Z
+
+Creation Date: 2002-04-15T05:35:48Z
+
+Registrar Registration Expiration Date: 2025-04-15T05:35:48Z
+
+Registrar: [GoDaddy.com](http://GoDaddy.com), LLC
+
+Registrar IANA ID: 146
+
+Registrar Abuse Contact Email: [abuse@godaddy.com](mailto:abuse@godaddy.com)
+
+Registrar Abuse Contact Phone: +1.4806242505
+
+Domain Status: clientTransferProhibited [https://icann.org/epp#clientTransferProhibited](https://icann.org/epp#clientTransferProhibited)
+
+Domain Status: clientUpdateProhibited [EPP Status Codes | What Do They Mean, and Why Should I Know? - ICANN](https://icann.org/epp#clientUpdateProhibited)
+
+Domain Status: clientRenewProhibited [EPP Status Codes | What Do They Mean, and Why Should I Know? - ICANN](https://icann.org/epp#clientRenewProhibited)
+
+Domain Status: clientDeleteProhibited [EPP Status Codes | What Do They Mean, and Why Should I Know? - ICANN](https://icann.org/epp#clientDeleteProhibited)
+
+Registry Registrant ID: CR768678825
+
+Registrant Name: Registration Private
+
+Registrant Organization: Domains By Proxy, LLC
+
+Registrant Street: [DomainsByProxy.com](http://DomainsByProxy.com)
+
+Registrant Street: 100 S. Mill Ave, Suite 1600
+
+Registrant City: Tempe
+
+Registrant State/Province: Arizona
+
+Registrant Postal Code: 85281
+
+Registrant Country: US
+
+Registrant Phone: +1.4806242599
+
+Registrant Phone Ext:
+
+Registrant Fax:
+
+Registrant Fax Ext:
+
+Registrant Email: Select Contact Domain Holder link at [https://www.godaddy.com/whois/results.aspx?domain=CRSOCIETY.ORG](https://www.godaddy.com/whois/results.aspx?domain=CRSOCIETY.ORG)
+
+--- Post #5 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-15T18:05:48.800Z] ---
+I asked someone to get an admin to look into it, but its admin team is dwindling down
+
+I’m getting moderately concerned - there was so much unique good content on the site and it could at least be maintained without much effort
+
+--- Post #6 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-16T06:44:46.799Z] ---
+I just used google’s [cached versions](https://www.semrush.com/blog/google-cached-pages/) + archive.is to save/download some of my better threads there (though still not all of them).
+
+[archive.ph](https://archive.ph/www.crsociety.org)
+
+[www.crsociety.org: Contact the CR Society - CR Society Forum](https://archive.ph/www.crsociety.org) 
+
+webcache.googleusercontent.com
+
+crsociety cannot die - it’s tragic that forums are being killed in favor of gatekeeping/un-longform platforms like slack and discord and telegram, it’s a dark age of the Internet. it has maintained consistently high quality even as [longecity.org](http://longecity.org) went to trash
+
+--- Post #7 by A_User [2024-06-16T08:12:09.349Z] ---
+> 
+crsociety cannot die - it’s tragic that forums are being killed in favor of gatekeeping platforms like slack and discord, it’s a dark age of the Internet.
+
+What happened then with the forum?
+
+--- Post #8 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-16T08:30:21.605Z] ---
+People in the facebook group guess it could be a forum upgrade or some DNS issue.
+
+But a previous webmaster died, and much of the original [crsociety.org](http://crsociety.org) team died or had health issues, which means that the person who maintains the forums keeps changing. The maintainers are also not the ones who are most actively posting on the forums [there has to be a way to transfer ownership of the hosting domain, and this has to be done through family members, and I don’t know what domain is storing the data].
+
+There are also old [crsociety.org](http://crsociety.org) mailing list archives (which are a true treasure) - someone has a backup of them but I don’t know when these will go anywhere…
+
+There was an old community from 10 years ago that has largely dispersed, which is sad b/c longevity/CR is one of the pet issues that guarantees non-drift/you never leave from. Still, [crsociety.org](http://crsociety.org) was active enough to be useful
+
+--- Post #9 by A_User [2024-06-16T08:52:40.479Z] ---
+> 
+and much of the original [crsociety.org](http://crsociety.org) team died or had health issues
+
+I’ve seen people on CR have health problems, is this diet really good? Is there any retrospective studies on long term CR in humans?
+
+[CR Vitality – 13 Mar 23](https://www.crvitality.com/2023/01/update-on-my-health-whats-new/)
+
+[Update On My Health: What's New?](https://www.crvitality.com/2023/01/update-on-my-health-whats-new/) 
+
+Hi all! First of all, I want to say a huge thank you to everyone who has donated so far, I appreciate it so much. It has allowed me to start testing and allowed me
+
+Est. reading time: 8 minutes
+
+--- Post #10 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-16T08:56:33.280Z] ---
+[en.wikipedia.org](https://en.wikipedia.org/wiki/CRON-diet)
+
+[CRON-diet](https://en.wikipedia.org/wiki/CRON-diet) 
+
+The CRON-diet (Calorie Restriction with Optimal Nutrition) is a nutrient-rich, reduced calorie diet developed by Roy Walford, Lisa Walford, and Brian M. Delaney. The CRON-diet involves calorie restriction in the hope that the practice will improve health and retard aging, while still attempting to provide the recommended daily amounts of various nutrients. Other names include CR-diet, Longevity diet, and Anti-Aging Plan. The Walfords and Delaney, among others, founded the CR Society Inte There is...
+
+CALERIE study
+
+The basic issue is that most people cannot conform to it for long periods of time (but crsociety used to have a much more vibrant community and regular conferences!!). Michael Rae can do it successfully. We also don’t have strong definitions of CR biomarkers… It’s just not getting new blood the way that, say, Bryan Johnson’s movement is. Which is still sad, b/c forums are far better for long content than any other platform.
+
+There’s also [LivingTheCRWay.com](http://LivingTheCRWay.com) (a splinter community) that also hasn’t gotten much in the way of new blood
+
+It seems that CR diets attract way less attention before. Rapamycin is one reason why. However, semaglutide+canagliflozin makes intermittent CR way easier than before (and ADHD meds can also help reduce appetite).
+
+Some people (eg @repligate or [https://www.linkedin.com/in/mariaentraigues/](https://www.linkedin.com/in/mariaentraigues/)) have naturally low appetites and are just CR’d by nature. I’m jealous of them.
+
+It is an interesting observation that many CRONites in the cr community seem to not be… thriving for one reason or another…
+
+I’ve never met an older CRONite who seemed especially robust for their age. Their biomarkers (blood pressure, cholesterol, etc) tend to be really good but these are only the basic biomarkers, none which are the most important for longevity (LDL is in fact very mildly correlated with slower epigenetic aging).
+
+FYI Matt Kaeberlein was a huge defender of CR diets back when CR diets had faced substantial criticism
+
+CR was seen as “weird”/fringe for a long time, and also attracted weirdness points because it took A LOT of sacrifice to truly do it (at least it mostly had purists rather than people who tried hard but failed). Most people I know in CR societies are pretty far from normal in some way (though not as outlier as I am, or as much as some of the early SL4/transhumanists/extropians/lesswrong were…) And weird in a way that didn’t make others want to be like them.
+
+rapamycin is now way less weird than CR - the social sacrifices are minimal. Bryan Johnson has also made his thing way less weird.
+
+--- Post #11 by A_User [2024-06-16T09:18:28.824Z] ---
+I think CR diet are lucrative for numerous irrational reasons. First of all I think they might feel good in the short term, from my own experience and based on evolutionary reasons. Second there are studies in overweight individuals where biomarkers improve and people generalize this to normal weight individuals without evidence if I would guess. Third, CR diet improve longevity in other animal models. CR participants might be self selected based on genotype where calorie restriction is preferred, like in my first point, a high polygenic score for anorexia for example (they might not be anorexic, but the high genetic load might give them positive valence for restricting calories).
+
+In the real world, I would guess you need adequate calories for optimal immune function, muscle mass, bone mass, tendons, and upstream from that for androgens and other hormones. Basically it is a diet that on paper, theoretically is well, but it has not been proven in humans and now we see people on CR diet either dying, abandoning it, or have difficult health issues. I don’t want to deal with resistant UTI’s, neither do I want my hip to snap in half when I am 50.
+
+Bryan Johnson has decreased his CR to 10%, this seems so small. I’ll have to read the CALERIE study. Maybe the level of CR matters. I also remember a vegan who eat whole food plant based, like 100 gram fiber a day who had his appendix burst. It’s those things that makes me think “what if…?” “what’s the evidence?”
+
+It’s my belief that life-long calorie restriction (from age 20-30) is the most powerful way to reach centenarian status. The only problem we face is understanding how much CR is enough and is too much CR damaging and life-shortening. 
+
+By objectively monitoring health biomarkers as well as being mindful of subjective well-being, it might be possible to ‘adjust’ CR over time as you learn more about how you are responding to the diet (this is generally not possible in animal studies).
+
+[ 
+1280×1080 356 KB 
+
+](https://www.rapamycin.news/uploads/default/f5ace742840819076682ae17a7abcf2dffcb4644)
+
+(CR monkey is C/D).
+
+[CR Vitality – 11 Sep 23](https://www.crvitality.com/benefits-of-calorie-restriction/)
+
+[Benefits of Calorie Restriction](https://www.crvitality.com/benefits-of-calorie-restriction/) 
+
+The benefits of a calorie restriction diet are profound when it comes to improving health and longevity. It's currently one of the most effective methods to not only prevent the diseases of aging but also
+
+Est. reading time: 21 minutes
+
+--- Post #12 by A_User [2024-06-16T09:29:18.337Z] ---
+> 
+I’ve never met an older CRONite who seemed especially robust for their age. Their biomarkers (blood pressure, cholesterol, etc) tend to be really good but these are only the basic biomarkers, none which are the most important for longevity.
+
+Thriving and robustness are probably way more important as you can’t control it in other ways, while the biomarkers you can control with pharmaceuticals.
+
+First of all you should be thriving, then you should be robust, and with it your standard biomarkers should be optimal.
+
+In the end I would guess you would kind of look like Peter Attia, if you were thriving and robust as a male, or a female I don’t know what the example would be, but similar, kind of athletic FBI or CIA build. You would also be on a mission with such a build, with a purpose, so thriving. You can see pretty quickly who is just lost and wandering?
+
+[ 
+57dc6ceca3afc9679bc3af8b1b04997d 736×903 69.7 KB 
+
+](https://www.rapamycin.news/uploads/default/ec20fb55bcfd362339fc1d3b2cc947fb113af6d8)
+
+--- Post #13 by Neo [2024-06-16T15:36:47.198Z] ---
+> 
+Bryan Johnson has decreased his CR to 10%, this seems so small. I’ll have to read the CALERIE study.
+
+I think there is something here. But that it really should be done as CRON and not just as CR - so CR with optimal nutrition. Also think it needs to be combined with solid resistance training program.
+
+The Yale CALERIE studies are def worth a read and reflection. Including the one in Nature Aging or something on epigenetic profiles and clocks.
+
+One question is if it is better to cycle in and out of CR status (combined with optimal cycles of increased resistance training).
+
+And a key other question is how to think about this vs or and with somewhat frequent fasting.
+
+--- Post #14 by Neo [2024-06-16T15:39:45.619Z] ---
+> 
+In the end I would guess you would kind of look like Peter Attia, if you were thriving and robust as a male
+
+My guess is that Peter Attia has passed the point that is optimal for longevity, even if he perhaps is around what is good for current/near term health. For longevity, it seems that something between where Michael Lustgarden and Bryan Johnson are might be better.
+
+--- Post #15 by A_User [2024-06-16T16:29:28.934Z] ---
+> 
+I think there is something here. But that it really should be done as CRON and not just as CR - so CR with optimal nutrition. Also think it needs to be combined with solid resistance training program.
+
+I am getting a bit sold on optimal nutrition, but can you explain what that is and how you learned what that is. For example which association study did you use to show what to eat and within each category? If you’ve chosen to include vegetables, how do you determine what vegetables to eat? Do you eat whole grains? What whole grains do you eat? Can you break down your diet in calories?
+
+Walter Willett suggest following prioritized in calories:
+
+Most calories from:
+
++Whole grains
+
++Healthy fats (Olive oil, canola oil, soybean oil)
+
+Plenty of fruits and vegetables and wide variety
+
+Protein:
+
+Emphasizing plant protein sources,
+
+Nuts, legumes and beans, soy products
+
+Modest amount of poultry is okay
+
+Fish a couple times a week is a good idea (because of Omega-3)
+
+He does not seem to include other parameters like what type of plant protein source, whole grain, etc.
+
+--- Post #16 by A_User [2024-06-16T17:14:54.443Z] ---
+I just noticed this presentation, uploaded a few days ago, of a centenarian nutritionist, check out that tie [@AlexKChen](/u/alexkchen)
+
+[ 
+image 813×704 29.9 KB 
+
+](https://www.rapamycin.news/uploads/default/41dfc55e9a740a5cd8215348177d49b2839b9923)
+
+[
+
+](https://www.youtube.com/watch?v=RGy3jhiPqD0)
+
+[Michelle Cen](https://www.michellecen.com/)
+
+[Michelle Cen](https://www.michellecen.com/) 
+
+Michelle Cen is a Stanford University graduate, creative soul, and lifelong learner. She shares her writing, art, videos, interests, and experiences here.
+
+I think it’s pretty clear there isn’t any evidence yet what within each category is healthiest, i.e what vegetable, what fruit, what berry, etc. So the eye for detail as Bryan does it, nope.
+
+--- Post #17 by Neo [2024-06-17T03:13:42.373Z] ---
+> 
+
+> 
+should be done as CRON and not just as CR - so CR with optimal nutrition. Also think it needs to be combined with solid resistance training program.
+
+I am getting a bit sold on optimal nutrition, but can you explain what that is and how you learned what that is.
+
+Above I meant “optimal” in the sense of CRON vs any CR (see eg classical books and paper by Prof Roy Walford).
+
+CRON means that one is extra careful about eating nutrient rich and complete as there is less leeway / it’s easier to end up with shortages of certain vitamins, minerals, etc when eating less calories overall.
+
+—
+
+Re optimal nutrition in general - I think three things are true here at the same time
+
+- striving towards optimal nutrition can have a massive difference in our health and longevity when compounded over the decades 
+- the data for exactly what to do is less clean and clear vs eg many pharmaceuticals with MR of targets and large, randomized clinical trials 
+- taking and approach that tries to think through a lens of the “totally of data and totally of mechanistic understanding” together with frequent individual assessment and testing provides a ton of ground for many, many good benefit/risk decisions 
+
+—
+
+The third bullet above means that optimal nutrition will likely vary from person to person - sometimes very substantially
+
+Eg for someone with big metabolic issues, eating more protein (combined with more resistance training) might on the margin be a bigger component vs for someone that has a big family and personal risk for cancer, etc, that may want to cut down on more on (certain) amino acids and up regulation of growth pathways like mTOR, etc.
+
+Someone with bad metabolic health, may want to use a higher (“good” fat diet), while someone in great metabolic health may want to include more complex carbs and less fat.
+
+—
+
+Not sure how helpful, but:
+
+For me personally, I landed on a vegan + occasionally fish diet. It’s generally low on “bad for longevity aminos” (as long as I still retain/build muscle), whole foods, organic, a lot of legumes, leafy greens, broccoli, cauliflower, low on fast carbs, but not low on complex carbs, lots of berries, some, but less fruit, overall try for a lot of variation to support gut microbiome, relatively low sodium, try to prepare with low glucagon in mind, on days with lower fiber (generally a high fiber diet) I add some insulin).
+
+Nothing is black and white for above, but I try to match current my read of good principles based on worlds current understanding and will continue to update as time goes on.
+
+I try for a perceived approx 10% CR (via/combined with time restriction) much or the year, but less during a few months when I focus more on strength/resistance training.
+
+I supplement with “food close” supplements like Omega 3, Vit D/K, B vitamins, Magnesium, etc based on blood work and also try to add a bit extra protein via seemingly high quality protein powders + some creatine, especially during lifting days/periods. Also manage selenium (via Brazil nuts) and other things via blood work.
+
+Also have recently been experimenting with some microbiome enhancing measures (with subjective and microbiome data suggesting it’s going in a good direction).
+
+Drink wise, I almost only drink water and sometimes tea. (Besides the protein shakes).
+
+(Also fast occasionally, originally FMD/Prolon, more recently water + electrolytes only)
+
+I think that a lot of the principles - not just the data per se, but also their holistic integration of how things work and their intuitions - of Drs. Valter Longo, Luigi Fontana, Roy Walford, Dean Ornish and Michael Lustgarden (and to some extent Blueprint, but think more variation can be beneficial) - make sense and triangulate well with my understanding. While the massive protein, including methionine and other “growth” aminos approach that Peter Attia and other suggest seems more like a look good and feel good now (that easier build large followers), even if not optimal from young age and through middle age. I think resistance training and sufficient protein is important, but for most people Attia’s ultra high protein recommendations overdo it and will be revving up nutrient sensing and growth pathways in ways inconsistent and that go against what we know about optimal aging and longevity phenotypes.
+
+--- Post #18 by RapAdmin [2024-06-17T05:49:11.610Z] ---
+More info for [@A_User](/u/A_User)
+
+[en.wikipedia.org](https://en.wikipedia.org/wiki/CRON-diet)
+
+[CRON-diet](https://en.wikipedia.org/wiki/CRON-diet) 
+
+The CRON-diet (Calorie Restriction with Optimal Nutrition) is a nutrient-rich, reduced calorie diet developed by Roy Walford, Lisa Walford, and Brian M. Delaney. The CRON-diet involves calorie restriction in the hope that the practice will improve health and retard aging, while still attempting to provide the recommended daily amounts of various nutrients. Other names include CR-diet, Longevity diet, and Anti-Aging Plan. The Walfords and Delaney, among others, founded the CR Society Inte There is...
+
+[en.wikipedia.org](https://en.wikipedia.org/wiki/Roy_Walford)
+
+[Roy Walford](https://en.wikipedia.org/wiki/Roy_Walford) 
+
+Roy Lee Walford, M. D. (June 29, 1924 – April 27, 2004) was a professor of pathology at University of California, Los Angeles School of Medicine, a leading advocate of calorie restriction for life extension and health improvement, and a crew member of Biosphere 2.
+Walford is credited with significantly furthering aging research by his discovery that laboratory mice, when fed a diet that restricted their caloric intake by 50% yet maintaining nutritional requirements, almost doubled their expect...
+
+--- Post #19 by A_User [2024-06-17T11:07:29.554Z] ---
+> 
+taking and approach that tries to think through a lens of the “totally of data and totally of mechanistic understanding” together with frequent individual assessment and testing provides a ton of ground for many, many good benefit/risk decisions
+
+Considering mechanistic data that way I don’t think I will use as a parameter, first of all then you’d have to consider that relatively junk data in other domains as well unless there’s a reason for why you only do that in nutritition. You also open up the decision space and the information you can gather, leading to possibly information overload, decision fatigue, and influence from all kinds of charlatans which reduce the most important decisions that has a much more precise benefit/risk calculation. Until more evidence I will stick to the categorically considered optimal nutrition most of the time and not pay much attention to the best within each category. There is probably a case for variety within each category but I have not looked for this data specifically.
+
+Categories: Whole grains, healthy fats, vegetables, fruit, etc.
+
+--- Post #20 by Neo [2024-06-17T14:06:49.443Z] ---
+> 
+I don’t think I will use as a parameter
+
+Intentionally not explicitly considering such data and understanding still means that you are taking it into account, you are deciding to weigh it at zero value.
+
+leading to possibly information overload, decision fatigue
+
+It does not have to be all or nothing. Eg approaching it with - I’m going to weigh clinical and MR data higher than mechanistic understanding and hence spend more time understanding the former types and approach the last category in an 80/20 type of way - should enable better decision making than 100% valuing the last source as zero.
+
+—
+
+The other thing is that there often is an asymmetric nature to decision around diet, sleep and exercise vs strong pharmaceutical molecules where the downsides can be more severe quite quickly. Not always in by any means, but occasionally. If you eg look at the list of my decision above, I’d love to hear if you think any of the things I listed are high risk (except perhaps the fasting).
+
+—
+
+Question for you
+
+- do you take care to be careful when crossing in busy area? 
+- do you think and act upon prioritizing getting a meaningful amount of sleep? 
+- do you think that resistance training, some form of zone 1/2 cardio training and some form of higher intensity cardio training are good for health and longevity?
+
+--- Post #21 by Neo [2024-06-17T14:08:50.417Z] ---
+> 
+Until more evidence I will stick to the categorically considered optimal nutrition most of the time and not pay much attention to the best within each category
+
+How did you determine those categories though? Did that not reply on some form looking at data and understanding more broadly/in totality?
+
+--- Post #22 by A_User [2024-06-17T14:38:57.734Z] ---
+> 
+uestion for you
+
+- do you take care to be careful when crossing in busy area? 
+- do you think and act upon prioritizing getting a meaningful amount of sleep? 
+- do you think that resistance training, some form of zone 1/2 cardio training and some form of higher intensity cardio training are good for health and longevity? 
+
+- Yes. 2. Depends on definition of meaningful, but yes. 3. Yes. 
+
+Large observational studies, replicated over and over with adjustments for a bunch of confounding factors, cohort designs, etc.
+
+- 
+[Observational studies](https://lpi.oregonstate.edu/mic/glossary#observational-study) have found that diets rich in whole grains are associated with reduced [risks](https://lpi.oregonstate.edu/mic/glossary#risk) of type 2 [diabetes mellitus](https://lpi.oregonstate.edu/mic/glossary#diabetes-mellitus) and [cardiovascular disease](https://lpi.oregonstate.edu/mic/glossary#cardiovascular-disease) compared to diets high in refined grains. [ (More information) ](https://lpi.oregonstate.edu/mic/food-beverages/whole-grains#type-2-diabetes-prevention)
+
+- Although the protective effects of whole grains against [cancer](https://lpi.oregonstate.edu/mic/glossary#cancer) are not as well established as those against cardiovascular disease and type 2 diabetes mellitus, some [prospective cohort studies](https://lpi.oregonstate.edu/mic/glossary#prospective-cohort-study) have found whole-grain intake to be associated with a decreased risk of [esophageal](https://lpi.oregonstate.edu/mic/glossary#esophagus) and [colorectal cancers](https://lpi.oregonstate.edu/mic/glossary#colorectal-cancer). [ (More information) ](https://lpi.oregonstate.edu/mic/food-beverages/whole-grains#cancer-prevention)
+
+- Results from large prospective cohort studies showed that whole-grain consumption was [inversely correlated](https://lpi.oregonstate.edu/mic/glossary#inverse-association) with all-cause mortality and mortality from several conditions, including cardiovascular disease, cancer, type 2 diabetes mellitus, respiratory disease, and infections. [ (More information) ](https://lpi.oregonstate.edu/mic/food-beverages/whole-grains#mortality)
+
+The data for evidence within each category is more sparse.
+
+--- Post #23 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-18T07:34:58.208Z] ---
+The hosting is probably under Invision Power Board, I’ve emailed them to ask if they still might have them/not permanently delete boards that have lapsed for 7 days (they manage forums so I hope they’re better than linode in not perma-deleting content that lapses for even one day…)
+
+--- Post #25 by Neo [2024-06-19T00:52:40.276Z] ---
+[@AnUser](/u/anuser) I’ll give it some thought and share some reflections. What are you thinking re exercise protocols?
+
+--- Post #27 by Neo [2024-06-19T20:39:17.504Z] ---
+[@AnUser](/u/anuser) Still owe you some thoughts. I’m the meanwhile you may like this new paper in Nature Aging out today
+
+[@AlexKChen](/u/alexkchen) [@Joseph_Lavelle](/u/joseph_lavelle) and [@RapAdmin](/u/rapadmin) may like to take a look too:
+
+> 
+Another paper in Nature Aging out today, June 19, 2024 on that even mild CR seems good for longevity: 
+[[IMG_7896]](https://www.rapamycin.news/uploads/default/95e4eab85c7422bdf002a704580a05a82857ef47) 
+[[IMG_7897]](https://www.rapamycin.news/uploads/default/1a7d07c6d213efcf9ebd4b2e05c712a173d79858) 
+[https://www.nature.com/articles/s43587-024-00646-8](https://www.nature.com/articles/s43587-024-00646-8) 
+See also
+
+--- Post #28 by Virilius [2024-06-19T20:49:36.365Z] ---
+After nutrition, exercise, sleep, supplements/medications and lifestyle in general are covered, there’s only gene/hormone therapy left.
+
+--- Post #29 by A_User [2024-06-19T21:09:22.621Z] ---
+> 
+gene/hormone therapy left.
+
+Gene therapy like follistatin? Why would hormone therapy help with longevity or healthspan?
+
+--- Post #30 by Virilius [2024-06-19T21:15:15.402Z] ---
+TRT could help with building and maintaining muscle mass.
+
+--- Post #31 by Neo [2024-06-20T03:14:34.191Z] ---
+Ok, here are some thoughts. High level I would consider
+
+- 
+Getting amazing sleep, optimal exercise, some degree of CRON (see also new paper out total and my reply to Joe L on that chain), some form of fasting on some schedule and trying to optimize nutrition at the same order of magnitude level of importance as the things in your category 1.
+
+- 
+I would also add bucket high up in importance, perhaps around #2 on “find your individual risks” & “assess that nothing already is wrong. By this/these categories I means doing an as rich family medical history as possible, understand at least your main genetic risks factors, do a lot of base testing, this means somewhat regulator broad and deep blood works across health categories, as you can afford at some point begin using imaging modalities like brain and whole body MRI, at a certain age (before guidelines) start screening for main cancers in a broad way, etc. This is where your plan becomes customized to you and not just one size fits all.
+
+- 
+Lastly, I think you are 100% right in wanting to prioritize and create a hiarchy of value of evidence. Where I think you decrease the power of decision making is if you in areas where the higher categories of evidence are not available simplify say - ok, then I will not have an option and will not make any decision. That in itself is making a decision - but one that ignores the evidence that is available. In those areas I often use a risk reward framework. If the risks is low, upside is meaningful, I will make a decision to do something even if evidence is limited. If risks is high and benefit not low, I’ll pick the conservative path until there potentially is very strong evidence of positive expected value, but even then may stay conservative. Where it is trickiest is where reward and risks are high…
+
+- 
+Actually lastly, and your age and even mine if think we any to try and skate to where the puck will be (and not to where it is now). By this I mean forming some form of sense on what are likely and what massively impactful scenarios of how science, technology and medicine will evolve over the next decades and how do those scenarios play into how to think about todays decisions. If seen you do this when you for instance say that you’ll do statins now while planning to lower them and add PCSK9i and/or BA as those come down in price. That type of thinking on an even bigger scale. What aspects of health will might with a meaningful probability be solved in the coming decades (for me with many decades until I probabilistically become frail, I’m less worried about sarkopenia (I work on keeping an excellent body composition) but I’m more worried about cancers not being curable (and hence don’t over muscle and do Peter Attia level of protein). Similarly, I prioritize more things that are more pro longevity than pro current/medium term health when there is a trade-off when I can choose (not seeking high IGF-1, high testosterone, low SHBG, protein/certain aminos driven higher mTOR, etc) since I think that increases probability of reaching longevity escape velocity or at least the probability of being able to intercept new therapies, technology and knowledge that can add healthy decades to my life.
+
+--- Post #32 by Neo [2024-06-20T03:16:12.364Z] ---
+> 
+TRT could help with building and maintaining muscle mass.
+
+In some cases maybe. In many cases it could decrease longevity by putting body in a constant growth mode instead of longevity/protect/ration/recycle mode.
+
+--- Post #33 by Joseph_Lavelle (Joseph Lavelle) [2024-06-20T14:35:53.431Z] ---
+Yes. It’s a concern. Natural testosterone is pulsatile and varies naturally over time. One of the potential issues with TRT is losing out on this variation. This is one of the reasons I am chasing a boost in my natural T production instead of direct supplementation. And I’m not chasing free T as bioavailable T includes T bound to albumin.
+
+--- Post #34 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-22T05:13:32.877Z] ---
+Ok looks like they might be able to (slowly) figure out how to transfer accounts. Maybe Invisionboard doesn’t seem to delete forums when their payments lapse.
+
+the cached links don’t work anymore today
+
+- What if I let my license expire? 
+
+Standard: If we host your community and your license expires, your community will no longer be online until the invoice is brought up-to-date. Please reach out to us if you need help accessing the invoice.
+
+Self-hosted: If you host your community and your license expires, your community will no longer have access to our support forums or software updates. In the event something breaks, or a critical security/platform update is issued, your invoice must be paid prior to you re-gaining entry into the support community or getting access to updates.
+
+Please keep your license active to remain in good standing and protect your community.
+
+--- Post #35 by RapAdmin [2024-06-22T05:38:51.267Z] ---
+Have you spoken with anyone at the CR society to find out why they are having site problems?
+
+--- Post #36 by AlexKChen (LORD OF MICROPLASTICS) [2024-06-22T06:33:15.674Z] ---
+yes, prev webmaster died, the treasurer died, they have to figure out how to transfer ownership for account payment
+
+--- Post #37 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T11:14:21.223Z] ---
+Fuck, they may delete after 1 month (there is no definite time), URGENT CAN SOMEONE FIND Timothy J Calmeyn’S OLD EMAIL? [that’s what they need to trace waht forum it was associated with][
+
+this is the person who died: [https://www.legacy.com/obituaries/name/timothy-calmeyn-obituary?pid=203904754](https://www.legacy.com/obituaries/name/timothy-calmeyn-obituary?pid=203904754)
+
+here is the last remaining google cache
+
+--- Post #38 by A_User [2024-07-11T11:18:38.545Z] ---
+Call with a phone, whichever company hosted the forums.
+
+--- Post #39 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T11:24:44.951Z] ---
+[Invision Community](https://invisioncommunity.com/contact-us/)
+
+[Contact Us](https://invisioncommunity.com/contact-us/) 
+
+there is no phone number…
+
+--- Post #40 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T11:48:14.882Z] ---
+Ok, FOR NOW there is a GoDaddy DNS issue for the [crsociety.org](http://crsociety.org) domain to point at the InvisionForum servers that the forums were hosted [the forums were still in good standing with InvisionForum as of last month, though new admins would still have to be added to the InvisionForum account]… [The thing is, we really need to contact GoDaddy to be able to log into the account of the deceased person and figure out how to get access, or at minimum , to not let it expire]…
+
+--- Post #41 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T11:59:38.654Z] ---
+ech Email: Select Contact Domain Holder link at [https://www.godaddy.com/whois/results.aspx?domain=CRSOCIETY.ORG](https://www.godaddy.com/whois/results.aspx?domain=CRSOCIETY.ORG)
+
+Name Server: [NS1.FABRICATIONSPECIALTIES.COM](http://NS1.FABRICATIONSPECIALTIES.COM)
+
+Name Server: [NS2.FABRICATIONSPECIALTIES.COM](http://NS2.FABRICATIONSPECIALTIES.COM)
+
+DNSSEC: unsigned
+
+you missed an important few lines here. The nameservers should be switched to GoDaddy rather than fabricationspecialties
+
+--- Post #42 by A_User [2024-07-11T12:01:13.938Z] ---
+[godaddy.com](https://www.godaddy.com/help/how-to-gain-access-to-domains-or-accounts-after-account-holders-death-8356)
+
+[GoDaddy - How to gain access to domains or accounts after account holder's death](https://www.godaddy.com/help/how-to-gain-access-to-domains-or-accounts-after-account-holders-death-8356) 
+
+Submit documentation to regain access to domains or account if the owner is deceased.
+
+Call here:
+
+[godaddy.com](https://www.godaddy.com/help/contact-us)
+
+[GoDaddy Help Center - Contact Us](https://www.godaddy.com/help/contact-us) 
+
+GoDaddy Help Center - Contact Us
+
+--- Post #43 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T12:04:38.545Z] ---
+Thanks!
+
+[Organization of the CR Society - CR Society Forum](https://web.archive.org/web/20230608154350/https://www.crsociety.org/about/organization/)
+
+President & Director: 
+
+Brian M. Delaney
+
+Managing Director/Board of Directors Chair: 
+
+Bob Cavanaugh
+
+Vice President for Research & Director: 
+
+Michael Rae
+
+Treasurer & Director: 
+
+David Stern
+
+Chief Information Officer & Director: 
+
+Tim Calmeyn
+
+Director: 
+
+Robert Krikorian
+
+Director Emeritus: 
+
+Nick Colby
+
+Director Emeritus: 
+
+Lisa Walford
+
+How to gain access to domains or accounts after account holder’s death 
+To access a domain or an account after the death of the account holder, you must be the Estate Administrator or next of kin of the deceased. You need to submit a request with the following documentation:
+
+- A properly completed request to the [Regain Access To My Account](https://supportcenter.secureserver.net/accountrecovery) form with the Estate Administrator listed as the requestor. 
+- Legal documentation listing the name of the Estate Administrator. 
+- A copy of the Death Certificate of the deceased. 
+- Photo identification for the requestor/Estate Administrator. We require the government-issued photo identification be a color copy, scan or digital picture containing the pictured person, name, signature and expiration date clearly identifiable. 
+
+Required: You must include all four of these items with your access request, or your request will not be considered.
+
+Please allow up to 72 hours for initial correspondence. Once this documentation is received, we will inform you that your request has been completed or if there is any additional information needed to process your request.
+
+^This is the difficult part. But if the data is still on invisionforum servers, could there be a way to just point a separate domain DNS to the invisionforum forums?
+
+--- Post #44 by A_User [2024-07-11T12:35:19.922Z] ---
+> 
+could there be a way to just point a separate domain DNS to the invisionforum forums?
+
+I would imagine that if you had access to the server, where all the data is, then you can just get a new domain and point it to it.
+
+--- Post #45 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T12:39:04.714Z] ---
+[Invision Community](https://invisioncommunity.com/4guides/client-services/how-to-apply-your-own-domain-or-sub-domain-to-a-cloud-community-r231/)
+
+[How to apply your own Domain or Sub Domain to a Cloud Community](https://invisioncommunity.com/4guides/client-services/how-to-apply-your-own-domain-or-sub-domain-to-a-cloud-community-r231/) 
+
+After purchasing your cloud community, or anytime you would like to change your domain or sub domain of your cloud account, you can see the below steps. Our cloud communities only support a Root domain (domain.com) or a sub domain (sub.domain.com) so...
+
+--- Post #46 by A_User [2024-07-11T12:41:24.306Z] ---
+If the forum is running, can’t you get the I.P and get to the forum that way (and point new domain to the I.P)?
+
+--- Post #47 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T12:43:55.475Z] ---
+Maybe, I emailed InvisionForum support. Without additional information, there might be a limited extent to which they can discuss pre-existing forums [though I know they were in good standing as of 6/18]
+
+Also they have to approve authorizing additional account admins for the boards, idk how that’s done for forums where the admins are dead.
+
+--- Post #48 by A_User [2024-07-11T12:49:50.125Z] ---
+Why does it say this, last updated on 2024-06-10, and expires on 2025-04-15?
+
+Name Server: [NS1.FABRICATIONSPECIALTIES.COM](http://NS1.FABRICATIONSPECIALTIES.COM)
+
+Name Server: [NS2.FABRICATIONSPECIALTIES.COM](http://NS2.FABRICATIONSPECIALTIES.COM)
+
+--- Post #49 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T12:50:45.025Z] ---
+They originally pointed at it. Not anymore though
+
+The CRS website is likely down because of DNS problems. It doesn’t look like the DNS was ever switched over to GoDaddy. Instead, it’s still on the old [fabricationspecialties.com](http://fabricationspecialties.com/) name servers. Testing this results in failed connections to those servers, so I’d start by updating the DNS in the GoDaddy account.
+
+==
+
+Relevant: [https://www.reddit.com/r/DataHoarder/comments/18trmtr/owneronly_moderator_of_a_forum_suddenly_passed/](https://www.reddit.com/r/DataHoarder/comments/18trmtr/owneronly_moderator_of_a_forum_suddenly_passed/)
+
+--- Post #50 by A_User [2024-07-11T12:54:39.600Z] ---
+.	0	OPT	[{Extended_DNS_Error: NO_REACHABLE_AUTHORITY: at delegation [crsociety.org](http://crsociety.org).}, {Extended_DNS_Error: NETWORK_ERROR: 67.43.5.27:53 timed out for [crsociety.org](http://crsociety.org) A}] ; payload 1232, xrcode 0, version 0, flags 0
+
+Template Error: The template file must be given (or the template could not be opened)
+
+[http://67.43.5.27/cgi-sys/defaultwebpage.cgi](http://67.43.5.27/cgi-sys/defaultwebpage.cgi)
+
+This error seems related to Jomla forum?
+
+--- Post #51 by AlexKChen (LORD OF MICROPLASTICS) [2024-07-11T12:55:55.573Z] ---
+why jomla? It’s invision power board…
+
+--- Post #52 by A_User [2024-07-11T12:57:05.291Z] ---
+[http://67.43.5.27/cgi-sys/](http://67.43.5.27/cgi-sys/)
+
+[ 
+image 759×36 2.03 KB 
+
+](https://www.rapamycin.news/uploads/default/ca917b56c0ebbe03c8a4ff692a561ae71a44b4fe)
+
+[tjc@diethacker.com](mailto:tjc@diethacker.com)?
+
+--- Post #53 by A_User [2024-07-11T13:38:52.423Z] ---
+2020 the domain was registered to Calorie Restriction Society:
+
+[ 
+image 833×525 57.1 KB 
+
+](https://www.rapamycin.news/uploads/default/754c8a299858b94d8ade89ad53a3d11beaa7e34b)
+
+[whoisfreaks.com](https://whoisfreaks.com/tools/whois/history/lookup/crsociety.org)
+
+[Whois History Lookup crsociety.org](https://whoisfreaks.com/tools/whois/history/lookup/crsociety.org) 
+
+Access comprehensive historical Whois records for detailed insights into evolution of crsociety.org - WhoisFreaks
+
+Earlier ones can be found here:[https://www.bigdomaindata.com/whois-history/crsociety.org](https://www.bigdomaindata.com/whois-history/crsociety.org)
+
+I think the best tool for historical WHOIS is [Whois History - Historical Whois Lookup - DomainTools](https://research.domaintools.com/research/whois-history/) but it’s a paid service, and I don’t know for sure if it’s the best one.
+
+The name servers has always been the same it looks like to me.
+
+If I would guess something on the server side broke.
+
+--- Post #54 by Nowhere (Nowhere) [2024-07-31T22:51:42.555Z] ---
+Any updates on [crsociety.org](http://crsociety.org)?
+
+It seemed like it was a thriving group with plenty of users. There must be someone who can bring it back.
+
+--- Post #55 by AlexKChen (LORD OF MICROPLASTICS) [2024-08-01T01:13:10.656Z] ---
+People are anxious, so I’ll send some snippets of the emails:
+
+““The CRS forums can easily be brought back online, and technically they are currently online just not accessible without modifying the DNS at GoDaddy. The current issue is more of an annoyance and lack of access rather than being concerned about data loss. Thanks for your interest in this and being willing to help. I’ll let you know if there’s anything that comes up that I think you could do, but we’re currently waiting to hear back about a few details related to bank, GoDaddy, and Invision account access.””
+
+“REDACTED is doing his best to ressurect the forum. Apparently the forum is still “live” at Innovision, but something about the DNS info is messed up at Godaddy (where [CRSociety.org](http://CRSociety.org) is hosted), so the link to the forum no longer works. REDACTED is trying to get the login credentials for our Godaddy account so he can update it, but nobody seems to have it. If nobody knows it, the CR Society needs to send an official letter (probably from REDACTED, the president) with a death certificate for (REDACTED) to get the account transferred so REDACTED can update it. REDACTED reached out to see if either somebody knows the Godaddy login or can draft such a letter.”
+
+--- Post #56 by Nowhere (Nowhere) [2024-08-03T18:33:04.733Z] ---
+Thanks for the update [AlexKChen](https://www.rapamycin.news/u/AlexKChen)
+
+I’ve been reading the crsociety forum for a while and it’s been really informative. It’d be a real loss if it died.
+
+--- Post #57 by AlexKChen (LORD OF MICROPLASTICS) [2024-08-04T17:26:22.489Z] ---
+There’s some progress made… Still will take some time
+
+--- Post #58 by HappyFunBall (Igor Divjak) [2024-08-09T10:52:57.414Z] ---
+The problem right now is at [fabricationspecialties.com](http://fabricationspecialties.com) which hosts the dns entries. That’s a real company with a real phone number so you might be able to talk to them about it.
+
+--- Post #59 by AlexKChen (LORD OF MICROPLASTICS) [2024-08-10T18:03:59.256Z] ---
+“We are working through the process of transferring account ownership from a recently deceased CRS board member so we can update the DNS record. The forum itself is funded and functioning. We just need to update the DNS record to make it accessible.”
+
+(This part shared with permission
+
+--- Post #60 by Nowhere (Nowhere) [2024-08-30T18:39:37.285Z] ---
+The forum is still unreachable. Is there any new information?
+
+--- Post #61 by CronosTempi [2024-08-30T18:50:14.640Z] ---
+According to this thread, it’ll be a few more days. I think it’ll be up again just as soon as we get usable fusion power, which as I remember from my childhood (I’m 66) we have been assured is just around the corner. So now the question is, if we take all possible life extension measures, including rapamycin, will anybody from around here be still alive to witness that glorious event. In summary, a few more days.
+
+--- Post #62 by mccoy [2024-08-30T19:52:05.478Z] ---
+> 
+In summary, a few more days.
+
+A few more days of which planet?
+
+Venus has the longest day of any planet in our solar system. It completes one rotation every 243 Earth days
+
+--- Post #63 by AlexKChen (LORD OF MICROPLASTICS) [2024-08-30T23:56:54.228Z] ---
+I’ll ask for updates.
+
+[Crsociety.org](http://Crsociety.org) has always been less “overwhelmed” than rapamycin.news/latest, you don’t get these massive 300+ comment threads, so easier to organize content there. I’ve had to switch to posting here, but miss some of my content (esp the content about microplastics, which have become more relevant again)
+
+--- Post #64 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-07T13:14:36.309Z] ---
+How does one provide proof of ownership documents?
+
+We may have to bypass GoDaddy and go straight for Invisionboard (which seems to be more cooperative)
+
+--- Post #65 by DeStrider (Chris) [2024-09-07T14:02:40.512Z] ---
+(Post Deleted By Author.)
+
+--- Post #66 by Phillipe [2024-09-07T14:22:50.355Z] ---
+Interests, topics as well as people mature and tend to fizzle out. Maybe it played out its evolution to extinction. I was involved with it many years ago about when Wolford’s book came out. Met some good folks in the Bay Area (SF) at local meet up back then started by a fellow named Warren (can’t remember last name). Followed the approach for about three years, now, I’m here.
+
+--- Post #67 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-07T21:24:43.111Z] ---
+There’s LivingTheCRWay too, but it doesn’t have much activity
+
+--- Post #68 by Phillipe [2024-09-08T00:33:27.742Z] ---
+Yes, I remember Paul and Meredith from long ago. I actually bought some powdered longevity product from them which they were using before it was produced commercially. Paul was involved in setting up software, I believe, for Life Extension as a start up. Gosh, can’t remember what it was I got from them.
+
+--- Post #69 by Neo [2024-09-08T15:48:25.670Z] ---
+> 
+I hate to point out the obvious,
+
+If we go for a decade or two there will be a ton of people doing rapa that have died
+
+It’s like saying that because Blagosklonny got cancer people on rapa for a long time get cancer
+
+The totally of data for CRON and mild CRON in health and longevity is arguable at least as good as it is for rapa.
+
+See eg the human clinical trial that Yale and the NIH finished just a few years ago and from which there are a handful papers in top journals on
+
+I knows meds are easy and even mild CRON is more of a hassle, but let’s not be biased as to what the totally of data suggests
+
+(If you want anecdotes - a lot of Michael Lustgarten and Bryan Johnson’s successes have by themselves been attributed to their non-extreme CR)
+
+--- Post #70 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-12T21:35:37.305Z] ---
+> 
+favor
+
+does not show up under [https://archive.ph/http://www.crsociety.org/](https://archive.ph/http://www.crsociety.org/)*
+
+--- Post #71 by Neo [2024-09-13T02:17:54.112Z] ---
+> 
+not
+
+“Not” or “now”? Not sure I understood your post
+
+--- Post #72 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-16T19:18:33.496Z] ---
+[archive.org](http://archive.org) has a few threads archived (but far from complete) - there are only 18 captures of chit-chat, the latest which dates to February: [https://web.archive.org/web/20240206030701/https://www.crsociety.org/forum/9-chitchat/](https://web.archive.org/web/20240206030701/https://www.crsociety.org/forum/9-chitchat/)
+
+if you go to 3rd page, only 3 of [Chitchat - Page 3 - CR Society Forum](https://web.archive.org/web/20210924153311/https://www.crsociety.org/forum/9-chitchat/?page=3)
+
+Only a single backup copy of [General Health and Longevity - Page 2 - CR Society Forum](https://web.archive.org/web/20210620125644/https://www.crsociety.org/forum/6-general-health-and-longevity/?page=2) … [page 2]
+
+invisionforum gives admins the ability to back up forums easily/for cheap. If only someone could get access to the admin panel…
+
+[and if not that, [https://www.youtube.com/@JohnWatsonRooney](https://www.youtube.com/@JohnWatsonRooney) has some tutorials on web scraping. I’ve used httrack before, and this is the forum that httrack wouldn’t work so badly on, if only had I known this forum was at risk, and I had a premonition it was, but I didn’t know it would end up like this ]
+
+It’s really tragic that almost no one cared as much as I cared.
+
+--- Post #73 by Jay (Jay Orman) [2024-09-17T18:22:08.873Z] ---
+AlexKChen, I assume you’re aware of the group CRSociety on Facebook? This is the link:
+
+[Facebook](https://www.facebook.com/groups/CRSociety/)
+
+[Log into Facebook](https://www.facebook.com/groups/CRSociety/) 
+
+Log into Facebook to start sharing and connecting with your friends, family, and people you know.
+
+In addition, is Kenton shown below a founding member of the CR Society? If so, his Facebook link is shown. Maybe you could talk to him?
+
+[ 
+CRSociety Founding Member 1308×677 153 KB 
+
+](https://www.rapamycin.news/uploads/default/83c1fab664e3aedada6325deb92ce46041e5e8a6)
+
+--- Post #74 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-17T20:49:50.364Z] ---
+Thanks for the pointer. I really really want to still feel hope that we can get invisionforum to let us change the DNS for the sake of preserving the health of people in the community (it should be such an easy tradeoff, it encourages people to eat healthy like no other community did).
+
+==
+
+I emailed invisionforum support and they said this:
+
+Hello,
+
+Someone who is a formal member of the society and can furnish any payment or documents that they have paid for the community or next of kin with a documentation from the original owner stating that it is owned by the society or the deceased wishes for it to be passed to the society. Otherwise, we are unable to perform any action from anyone against the community.
+
+--- Post #75 by mccoy [2024-09-18T07:34:24.758Z] ---
+> 
+Someone who is a formal member of the society and can furnish any payment or documents that they have paid for the community or next of kin with a documentation from the original owner stating that it is owned by the society or the deceased wishes for it to be passed to the society. Otherwise, we are unable to perform any action from anyone against the community.
+
+I don’t know if my reading of English is correct, but they are basically saying that the dead person should be resuscitated, then should release a statement, then let to rest in peace again
+
+--- Post #76 by mccoy [2024-09-18T07:41:35.076Z] ---
+> 
+stating that it is owned by the society or the deceased wishes for it to be passed to the society.
+
+[@AlexKChen](/u/alexkchen) : have you tried to get in touch with Dean Pomerlau? He should be present on social media. I canceled my Facebook account and have no other social media accounts.
+
+--- Post #77 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-18T14:05:53.896Z] ---
+So I think you may have missed out on the OR operator. The former (which invisionforum allows) is way easier to get than the latter. The latter is where the snafu arises with GoDaddy.
+
+--- Post #78 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-18T14:06:15.338Z] ---
+Dean is not a formal member of the society. And yes, I have already gotten in touch.
+
+The relevant members are the people on the list I’ve mentioned above… Brian Delaney and Michael Rae have had the most high-profile presences. Brian was v. responsive to emails a few months ago, but I don’t know what happened to him now (he might be locally dealing with more than usual, I don’t know)
+
+I don’t know if funding is a snafu, but maybe it’s possible if we could try to raise some funds to show people how much we still care about the forum integrity?
+
+===
+
+Long-termism should be the goal of crsociety, as should any longevity group be (there is SO MUCH HISTORY captured by crsociety that so few other associations have captured), and it’s so tragic that crsociety is even failing at its basic task of long-termism. If they care about their own longevity, maintaining the forums is a basic minimum because otherwise they’re basically at risk of disappearing from the entire Internet (which also limits their ability to reach out to newer generations, which also matters for longevity)
+
+--- Post #79 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-18T14:08:46.346Z] ---
+Ok, he has LinkedIn on [https://www.linkedin.com/in/kentonmullins/](https://www.linkedin.com/in/kentonmullins/) , maybe I could message him there.
+
+==
+
+Brian Delaney is also co-admin of [Welcome to the Age Reversal Forum! - Announcements - Age Reversal Forum](https://forum.age-reversal.net/t/k91tmk/welcome-to-the-age-reversal-forum) …
+
+Ok, it’s confirmed that Brian is going through a lot right now (but he’ll be more available in not long), I think the forums are still saveable…
+
+==
+
+Someone reached out to me thanking me for my efforts to resurrect the forum. It does mean a lot to me.
+
+--- Post #80 by AlexKChen (LORD OF MICROPLASTICS) [2024-09-24T17:15:48.695Z] ---
+FYI Invisionforum does have an option for making forum exports available, but AGAIN, someone needs admin access for this to work
+
+Fuck, I’m really starting to lose sleep over this
+
+--- Post #81 by Nowhere (Nowhere) [2024-10-01T22:36:20.285Z] ---
+I just tried it, still dead. Crazy.
+
+--- Post #82 by AlexKChen (LORD OF MICROPLASTICS) [2024-10-09T16:50:28.922Z] ---
+IT’S BACK ONLINE!! I hope I’m not seeing things… Now figure out how to properly back it up just in case…
+
+--- Post #83 by mccoy [2024-10-09T20:54:08.851Z] ---
+Resurrection confirmed, not a hallucination (unless a massive one).
+
+--- Post #84 by Nowhere (Nowhere) [2024-10-14T15:55:48.988Z] ---
+It’s still not loading for me. Can you point me to the link you are using?
+
+--- Post #85 by mccoy [2024-10-14T19:17:44.831Z] ---
+[https://www.crsociety.org/](https://www.crsociety.org/)
+
+--- Post #86 by AlexKChen (LORD OF MICROPLASTICS) [2024-10-19T21:09:27.372Z] ---
+[
+
+](https://www.youtube.com/watch?v=V0d_Q3Gq3-Q)
+
+might be a way to scrape
+
+I’ve used winhttrack before to scrape forums but I’m rusty on it (still will use it at some point) but I have too much going on to properly scrape near-term
+
+If someone is willing to put in the effort to scrape crsociety (it’s not much effort, really), I can pay you. It’ll have to be a recurring effort, though not too much of one b/c crsociety doesn’t get updated too often.
+
+it’s a very useful counterpart forum to rapamycin.news b/c it’s easier to organize and there’s less noise (and rapamycin.news runs a high risk of having too many people)
+
+[
+
+](https://www.youtube.com/watch?v=lEnWgRfCN4o)
+
+--- Post #88 by AlexKChen (LORD OF MICROPLASTICS) [2024-12-17T01:55:49.549Z] ---
+the website doesn’t load up… again…
+
+[https://archive.ph/https://www.crsociety.org/*](https://archive.ph/https://www.crsociety.org/*)
+
+I got archivebot to WARC it and I did get httrack on it, but the httrack couldn’t download the images and attached files (and some 6-page threads will have missing pages)
+
+[https://wiki.archiveteam.org/index.php/ArchiveBot](https://wiki.archiveteam.org/index.php/ArchiveBot)
+
+WARC file: [Domain www.crsociety.org - ArchiveBot Viewer](https://archive.fart.website/archivebot/viewer/domain/www.crsociety.org)
+
+[if someone could download this and confirm it has archived images and attachments, that would give me a lot of peace of mind]. I know the archivebot operation went after external links and downloaded images, but attachments are hard…
+
+I did get the httrack to go archive its private forums (which don’t contain any sensitive content)
+
+--- Post #89 by AlexKChen (LORD OF MICROPLASTICS) [2024-12-20T06:04:40.614Z] ---
+[news.ycombinator.com](https://news.ycombinator.com/item?id=35255802)
+
+[](https://news.ycombinator.com/item?id=35255802) 
+
+ArchiveTeam are planning on working on one, they probably welcome help:<p><a href="https://wiki.archiveteam.org/index.php/DPReview" rel="nofollow">https://wiki.archiveteam.org/index.php/DPReview</a>
+
+[pabs3](https://news.ycombinator.com/user?id=pabs3) —
+[2:03 AM - 22 Mar 2023](https://news.ycombinator.com/item?id=35255802)
+
+Not sure if archivebot will get it scraped to [archive.org](http://archive.org). It’s also not 100% clear if archivebot made it past the captchas.
+
+[gwern.net](https://gwern.net/llm-writing)
+
+[Writing for LLMs So They Listen](https://gwern.net/llm-writing) 
+
+Speculation about what sort of ordinary human writing is most relevant and useful to future AI systems.
+
+I’m sad that almost no one cares as much as I did (CR people just have no “life” in them - they ALL lost their zest for life, kind of similar to quora except that at least adam d’angelo does care about forever even if quora is at low maintenance), but at least it was a miracle that it did go back up for 1.5 months, giving me the opportunity to finally archive it. The second time it went down, and no one cried again…
+
+What’s more, Google took down its cache in the meantime, so you can’t rescue links like this anytime from cache in the future.
+
+--- Post #90 by CronosTempi [2024-12-20T06:35:25.886Z] ---
+Very sad. There were a lot of resources accumulated over many years, tons of valuable discussions and insight, lived experiences and unique community. A real loss to the life extension world. RIP.
+
+--- Post #91 by John_Hemming (John Hemming) [2024-12-20T06:44:39.899Z] ---
+Which does raise a question for [@RapAdmin](/u/rapadmin) as to what archiving of rapamycin.news there is. It would be relatively easy to set up an automated archiving system of some form.
+
+--- Post #92 by CronosTempi [2024-12-20T06:58:09.756Z] ---
+Good point.
+
+20 characters.
+
+--- Post #93 by RapAdmin [2024-12-20T07:00:31.849Z] ---
+The system is backed up every day. I don’t think there is too much to worry about unless the backups get corrupted or something. I’ll check the system and make sure we’re covered.
+
+--- Post #94 by John_Hemming (John Hemming) [2024-12-20T07:03:58.112Z] ---
+Sadly, however, on a forum dedicated to longevity there is a question as to what happens if the forum admin is run over by a bus.
+
+--- Post #95 by RapAdmin [2024-12-20T07:05:37.064Z] ---
+Ah - we have coverage for that situation also… [@rberger](/u/rberger) does have full access to the software and root access to the server if I ever get taken out by the proverbial bus
+
+--- Post #96 by DeStrider (Chris) [2024-12-20T11:06:09.892Z] ---
+Just make sure you both don’t walk in front of the same bus.
+
+--- Post #97 by mccoy [2024-12-20T14:40:23.405Z] ---
+> 
+if I ever get taken out by the proverbial bus
+
+The above reminds me of the redesigning of a road in front of the government office where I work. The redesign implied a reserved bus lane where the buses go full speed. Distraction may be fatal, especially so when the configuration of the street has changed; plus now there are four lanes with directions different from the previous two lanes. I taught myself to be terrorized by such a situation and to concentrate before crossing the road like if I had to figure out a difficult problem.
+
+The proverbial bus, which can be extrapolated to all vehicles, is something which we should and can avoid at all costs.
+
+--- Post #98 by Beth (Beth) [2024-12-20T15:04:00.309Z] ---
+On that note, a month or two ago, the system was down and I had a panic attack when I couldn’t access the site! You all are my new favorite online hobby and POOF, just like that, you all were gone
+
+--- Post #99 by rberger (RBerger) [2024-12-20T19:33:39.935Z] ---
+We will do our best to avoid that situation
+
+--- Post #100 by AlexKChen (LORD OF MICROPLASTICS) [2024-12-20T19:54:19.398Z] ---
+More updates after Christmas
+
+--- Post #101 by AlexKChen (LORD OF MICROPLASTICS) [2025-01-10T19:50:28.989Z] ---
+content.invisioncnc images are still up
+
+(fill out that spreadsheet by Monday)
+
+eg
+
+[
+
+](https://content.invisioncic.com/h253353/monthly_2024_03/Screenshot_20240327_140405.jpg.a40a769c46cfa0e0c3b13f812f2b35eb.jpg)
+
+--- Post #102 by AlexKChen (LORD OF MICROPLASTICS) [2025-01-11T05:12:47.600Z] ---
+[Unbelievabuns](https://unbelievabuns.com/)
+
+[High Protein, Low Carb Keto Bread Buns](https://unbelievabuns.com/) 
+
+UnbelievaBuns are the world's first great tasting, high protein, low carb burger bun–only 1.8 net carbs and 17 grams of protein. Our breads are perfect for Keto, Atkins, and Weight Watchers programs, and are diabetic and vegan friendly.
+
+AND IT’S BACK UP AGAIN
+
+--- Post #103 by AlexKChen (LORD OF MICROPLASTICS) [2025-02-14T05:21:33.754Z] ---
+It was up again for slightly over a month…
+
+Hmm. We’re having trouble finding that site.
+
+We can’t connect to the server at [www.crsociety.org](http://www.crsociety.org).
+
+If you entered the right address, you can:
+
+Try again later
+Check your network connection
+Check that Firefox has permission to access the web (you might be connected but behind a firewall)
+
+[
+
+CR Society Forum
+
+https://www.crsociety.org › topic › 18797-visceral-fat-re…
+
+](https://www.crsociety.org/topic/18797-visceral-fat-removal-extends-lifespan-which-factors-may-reduce-visceral-fat/)
+
+2 days ago — CR Society Forum … Visceral Fat Removal Extends Lifespan: Which Factors May Reduce Visceral Fat? Mike Lustgarten . By Mike Lustgarten 
+
+[
+
+General Health and Longevity - Forums 
+[image]
+
+CR Society Forum
+
+[https://www.crsociety.org](https://www.crsociety.org) › forum › 6-general-health-an…
+
+]([https://www.crsociety.org/forum/6-general-health-and-longevity/](https://www.crsociety.org/forum/6-general-health-and-longevity/))
+
+By Mike Lustgarten , yesterday at 11:52 AM. 4 replies; 43 views. Mike Lustgarten · 3 hours ago · Reducing Immunoglobulin G Improves Metabolic Health …
+
+If more of us can help email Brian Delaney to help prod him to restore the site, we would really really appreciate it. It has been more than half a year since last June, and I now have some concerns that the Invisionforum might not be properly paid for… [though he says on a FB group that his going through things is ongoing, updates in March]. [though he previously said “updates later” in December, and then crsociety suddenly went up again, prolly w/o him needing to do anything]
+
+MEANWHILE, use [Visualping: #1 Website change detection, monitoring and alerts](https://visualping.io/jobs/6235115) (AND openai operator) for changedetection
+
+--- Post #104 by AlexKChen (LORD OF MICROPLASTICS) [2025-02-18T20:11:16.058Z] ---
+less than 2 months left to claim the godaddy domain…
+
+Expires On
+
+2025-04-15T05:35:48Z
+
+--- Post #105 by AlexKChen (LORD OF MICROPLASTICS) [2025-02-19T03:12:28.102Z] ---
+starting to get more anxious, so here’s the backup/archive i did in late december (with some gaps for 5-6 page threads)
+
+===
+
+[CR Society Forum](https://web.archive.org/web/20241213142625/https://www.crsociety.org/forum/9-chitchat/)
+
+[Chitchat](https://web.archive.org/web/20241213142625/https://www.crsociety.org/forum/9-chitchat/) 
+
+Anything goes: birdwatching, music, etc. Imagine you're at dinner after a CR conference: Let's get to know one another! (Anything goes: CR isn't excluded.)
+
+[https://web.archive.org/web/20241202095431/https://www.crsociety.org/forum/6-general-health-and-longevity/](https://web.archive.org/web/20241202095431/https://www.crsociety.org/forum/6-general-health-and-longevity/)
+
+[CR Society Forum](https://web.archive.org/web/20230321175258/https://www.crsociety.org/topic/18197-have-you-gotten-a-retinal-eye-exam-or-optical-coherence-tomography-oct-what-is-your-retinal-nerve-fiber-layer-thickness-rnfl-and-how-has-it-changed-over-time/)
+
+[Have you gotten a retinal eye exam or Optical coherence tomography (OCT)?...](https://web.archive.org/web/20230321175258/https://www.crsociety.org/topic/18197-have-you-gotten-a-retinal-eye-exam-or-optical-coherence-tomography-oct-what-is-your-retinal-nerve-fiber-layer-thickness-rnfl-and-how-has-it-changed-over-time/) 
+
+https://www.rapamycin.news/t/alex-k-chen-metabolic-cgm-progress-my-everything-in-longevity-thread/466/293?u=alexkchen...
+
+[CR Society Forum](https://web.archive.org/web/20241202095935/https://www.crsociety.org/topic/17558-all-my-lab-resultsblood-tests-here-alex-k-chen/)
+
+[All my lab results/blood tests here (Alex K. Chen)](https://web.archive.org/web/20241202095935/https://www.crsociety.org/topic/17558-all-my-lab-resultsblood-tests-here-alex-k-chen/) 
+
+Rapamycin logs: I ordered my first 100 1mg pills in March 2019, and then 400 1mg pills in November 2019. 400 1mg pills in June 2020. 845 1mg pills on May 2021 (with 1/4 of the pills for someone else). Then 400 1mg pills from Kachhela on October 2022....
+
+[CR Society Forum](https://web.archive.org/web/20241106214545/https://www.crsociety.org/topic/17558-all-my-lab-resultsblood-tests-here-alex-k-chen/page/2/#comments)
+
+[All my lab results/blood tests here (Alex K. Chen)](https://web.archive.org/web/20241106214545/https://www.crsociety.org/topic/17558-all-my-lab-resultsblood-tests-here-alex-k-chen/page/2/#comments)
+
+--- Post #106 by IgorF [2025-02-24T08:02:55.577Z] ---
+When it was available I captured the nslookup and now I used hosts file to enter the ip addresses resolved previously. Perhaps sni for tls makes it work - despite I am talking to the cloudflare’s endpoint close to me while asking for [www.crsociety.org](http://www.crsociety.org) I am served correctly and can access the forums, except the authoritative dns all other things are working.
+
+But this is definitely is not the way to go for the most of the users. The problem is with these authoritative dns servers, they are not responding with dns service right now, perhaps something is not ok with them. Unless somebody will either make them work or the owner re-register and reconfigure the name resolution configuration of the domain things will not work normally - cloudflare’s resolver wants to have an authoritative answer before it will also resolve it (a dns proxy service of cf).
+
+It is easy to cross-check what I mean with dns - use dig @1.1.1.1 or a tool @ [https://freedns.afraid.org/](https://freedns.afraid.org/)
+
+For the cf’s endpoint close to the user maybe any other cf’-served site (there is a plethora of them) could be resolved and pasted to local hosts file
+
+Br,
+
+Igor
+
+--- Post #107 by AlexKChen (LORD OF MICROPLASTICS) [2025-03-03T21:26:41.904Z] ---
+He says update when he has free time perhaps by early March
+
+--- Post #108 by AlexKChen (LORD OF MICROPLASTICS) [2025-03-15T01:44:36.472Z] ---
+It’s early Mach, still no update (I know he’s still dealing with things, but if this indefinitely happens the site will be gone)
+
+the whois also mentioned…
+
+" Site Status
+
+Status
+
+Inactive
+
+Server Type"
+
+[](#crsocietyorg32x32httpst2gstaticcomfaviconv2clientsocialtypefaviconfallback_optstypesizeurlurlhttpscrsocietyorgsize32-crsocietyorg-1) [Crsociety.org](http://Crsociety.org)
+
+[](#domain-summary-2)Domain Summary 
+
+[](#what-is-the-traffic-rank-for-crsocietyorg-3)What is the traffic rank for [Crsociety.org](http://Crsociety.org)? 
+• [Crsociety.org](http://Crsociety.org) ranks #5 ,396,401 globally on HypeStat.
+
+[](#what-percent-of-global-internet-users-visit-crsocietyorg-4)What percent of global Internet users visit [Crsociety.org](http://Crsociety.org)? 
+• 2.5E-5% of global Internet users visit [Crsociety.org](http://Crsociety.org)
+
+[](#how-many-people-visit-crsocietyorg-each-day-5)How many people visit [Crsociety.org](http://Crsociety.org) each day? 
+• [Crsociety.org](http://Crsociety.org) receives approximately 90 visitors and 130 page impressions per day.
+
+[](#which-countries-does-crsocietyorg-receive-most-of-its-visitors-from-6)Which countries does [Crsociety.org](http://Crsociety.org) receive most of its visitors from? 
+• [Crsociety.org](http://Crsociety.org) is mostly visited by people located in United States .
+
+[](#how-much-crsocietyorg-can-earn-7)How much [Crsociety.org](http://Crsociety.org) can earn? 
+• [Crsociety.org](http://Crsociety.org) should earn about $0.63 /day from advertising revenue.
+
+[](#what-is-crsocietyorg-estimated-value-8)What is [Crsociety.org](http://Crsociety.org) estimated value? 
+• Estimated value of [Crsociety.org](http://Crsociety.org) is $585.84 .
+
+[](#what-ip-addresses-does-crsocietyorg-resolve-to-9)What IP addresses does [Crsociety.org](http://Crsociety.org) resolve to? 
+• [Crsociety.org](http://Crsociety.org) resolves to the IP addresses [52.72.110.195](https://ipsnoop.com/52.72.110.195).
+
+[](#where-are-crsocietyorg-servers-located-in-10)Where are [Crsociety.org](http://Crsociety.org) servers located in? 
+• [Crsociety.org](http://Crsociety.org) has servers located in Ashburn, Virginia, 20149, United States .
+
+--- Post #109 by AlexKChen (LORD OF MICROPLASTICS) [2025-04-08T18:05:01.787Z] ---
+Gordo says [on longecity] it very briefly went up and back down
+
+There is not much time left before April 15… Maybe it’ll auto renew but who knows
+
+Sent Brian Delaney a new email. So far, his needing to put things off has not been of too much consequence and he has gotten more time he needs for his emergency, but we do not know how much time crsociety has left, it is now closely approaching almost a year…
+
+[getting it back, at some point, is one of these actions that will matter eternally]
+
+fwiw I visited Pittsburgh for a few days last week, I know some people on the forums came from there. No meetups tho.
+
+--- Post #110 by AlexKChen (LORD OF MICROPLASTICS) [2025-04-11T04:47:58.994Z] ---
+taking way way longer than ideal, but there’s still hope (they are…slowly… trying to fix it now) [them saying this is still not a guarantee]
+
+1. Use a Free Website Monitor 
+
+- 
+[UptimeRobot](https://uptimerobot.com/) (free tier monitors a site every 5 minutes) 
+- 
+[Better Uptime](https://betteruptime.com/) (good free alerts too) 
+- 
+[Distill.io](https://distill.io/) (can monitor changes too, not just “up/down”) 
+
+Set it to monitor [https://crsociety.org](https://crsociety.org) .
+
+It’ll email or SMS you immediately when the site comes back online.
+
+--- Post #111 by AlexKChen (LORD OF MICROPLASTICS) [2025-04-15T14:40:23.885Z] ---
+Domain Information 
+
+- Name: [crsociety.org](http://crsociety.org)
+
+- Internationalized Domain Name: [crsociety.org](http://crsociety.org)
+
+- Registry Domain ID: db0f89a046d24c4cba3b787c333b34f5-LROR 
+- Domain Status: [ clientDeleteProhibited ](https://icann.org/epp#clientDeleteProhibited) [ clientRenewProhibited ](https://icann.org/epp#clientRenewProhibited) [ clientTransferProhibited ](https://icann.org/epp#clientTransferProhibited) [ clientUpdateProhibited ](https://icann.org/epp#clientUpdateProhibited) [ autoRenewPeriod ](https://icann.org/epp#autoRenewPeriod)
+
+- Nameservers: [ns1.fabricationspecialties.com](http://ns1.fabricationspecialties.com) [ns2.fabricationspecialties.com](http://ns2.fabricationspecialties.com)
+
+Dates
+
+- Registry Expiration: 2026-04-15 05:35:48 UTC 
+- Updated: 2025-04-15 05:36:15 UTC 
+- Created: 2002-04-15 05:35:48 UTC
+
+--- Post #112 by AlexKChen (LORD OF MICROPLASTICS) [2025-05-11T20:34:03.018Z] ---
+Posting what chatgpt deep research thinks
+
+[](#current-status-of-the-cr-society-website-and-forums-1) Current Status of the CR Society Website and Forums 
+
+[](#background-and-historical-context-2) Background and Historical Context 
+
+The Calorie Restriction Society International (CR Society) has maintained an online forum ([crsociety.org](http://crsociety.org)) for roughly two decades as a hub for discussions on calorie restriction and longevity. The site accumulated valuable archives of member discussions and scientific exchanges. For many years it was kept running by a volunteer webmaster, Tim Calmeyn, who served as the site’s administrator. In September 2023, CR Society’s board chair Bob Cavanaugh announced the sad news that Tim (the long-time webmaster) had passed away, noting that he had been “the webmaster for the Calorie Restriction Society for over two decades” . This loss would later prove pivotal to the forum’s technical troubles.
+
+Historically, the CR Society forums had been quite stable, with only occasional short outages. However, starting in mid-2024, the site experienced an unprecedented extended downtime due to a combination of technical and administrative issues stemming from the webmaster’s death. What followed was a protracted struggle to regain control of the site’s domain and hosting. The community had to rely on alternate channels for updates and discussion during the outage. Below is a timeline of recent events and an analysis of the current status:
+
+[](#timeline-of-major-events-3) Timeline of Major Events 
+
+- 
+June 2024: The CR Society forum abruptly goes offline. Users report that it “suddenly disappeared for a few days” around June 10–14 . This marks the beginning of a months-long outage. 
+- 
+July–August 2024: The cause of the outage becomes clear – critical accounts were inaccessible because the domain owner (and site administrator) had died. The forum’s domain DNS entries and hosting license were not maintained . Community members reach out to CR Society leaders and the forum’s software provider (Invision) to resolve the issues. During this period, it’s revealed that the forum data is intact and the site could be brought back once administrative hurdles are overcome . 
+- 
+October 2024: After roughly 4 months of downtime , the CR Society forums are finally brought back online . The domain DNS is restored and users regain access to the site. The community celebrates the return of the archives. 
+- 
+March–April 2025: The forums go down again , despite the previous fix. By early April, users note that the site had “come back for a little while” but then became unreachable once more . This second outage coincides with ongoing domain registration issues. However, on April 15, 2025 the domain was auto-renewed to prevent expiration , indicating the CR Society still retained ownership. As of May 2025, the site remains offline pending further fixes, but volunteers and officials are actively working to restore it . 
+
+[](#mid-2024-outage-causes-and-challenges-4) Mid-2024 Outage: Causes and Challenges 
+
+Initial disappearance (June 2024): In mid-June 2024, regular users noticed that [crsociety.org](http://crsociety.org) had abruptly become unreachable . At first, there was confusion about whether this was a temporary server glitch or something more serious. Posts on other forums and social media began asking “What happened to [crsociety.org?”](http://crsociety.org?%E2%80%9D) as the downtime extended from days into weeks.
+
+Root cause – loss of admin access: It soon emerged that the outage was not a simple technical fault but rather an administrative lockout. The key individual who managed the site (Tim) was deceased, and no one else had the credentials or account access needed to maintain the domain and hosting . Essentially, the CR Society’s online presence was tied to accounts that were still under the late webmaster’s name. One CR Society board member wrote (via email, as later shared with the community) that the forum was still running on the host but “something about the DNS info is messed up at GoDaddy” – they couldn’t update the DNS because the account belonged to the deceased person . In other words, the domain registration and DNS settings could not be managed until ownership was transferred through the proper legal process (requiring proof of death, etc.) .
+
+Compounding the problem, the forum’s software license/hosting fee had lapsed around the same time . The CR Society forum runs on the Invision Community platform (hosted in the cloud by Invision). After Tim’s death, the annual invoice for the forum hosting was not paid , so by mid-June the host likely suspended service. Normally Invision gives a grace period (they “host for roughly a month after [the] invoice expires”) . Indeed, by about one month after the last payment (which presumably had been due in May 2024), the site went offline. One community member, Alex K. (InquilineKea), noted in late June: “They still host [the forum] for roughly a month after [the] invoice expires but it has been one month and we still haven’t gotten transfer of ownership. … I’ll pay for the new year [if needed]” . This shows that the only obstacle to paying the bill was that no one had access to the account to do so .
+
+Data not lost: The good news was that the content and database of the forum were not lost – they were still stored on Invision’s servers, just taken offline pending payment and DNS resolution. In early emails, CR Society insiders reassured everyone that “The CRS forums can easily be brought back online, and technically they are currently online just not accessible without modifying the DNS at GoDaddy” . They were “not concerned about data loss” , calling the issue “more of an annoyance and lack of access” . In other words, the forum was sitting on the host, ready to go, if they could just update the domain to point to it and settle the account. This distinction was critical: the situation was a technical lockout rather than a deliberate shutdown.
+
+DNS and domain issues: Another challenge was the domain’s DNS service. The domain [crsociety.org](http://crsociety.org) was, at the time, using nameservers that were configured by Tim (reportedly through a company/domain called [fabricationspecialties.com](http://fabricationspecialties.com) , which he controlled) . After Tim’s passing, it appears those nameservers stopped functioning properly. By June 2024, no DNS lookup for [crsociety.org](http://crsociety.org) would succeed , meaning browsers could not find the server. Community members troubleshooting the issue confirmed that “authoritative DNS servers [for [crsociety.org](http://crsociety.org)] are not responding” . Thus, even though the domain was still registered (it hadn’t expired) and the forum software was ready on Invision’s end, the world couldn’t reach the site because the DNS entries weren’t resolving . This made transferring the GoDaddy account (which held the domain registration) an urgent priority , so that someone at CR Society could log in and update the nameserver records or point the domain to a new DNS host .
+
+Administrative hurdles: Gaining control of the domain was easier said than done. GoDaddy’s policy (like most registrars) requires formal proof and legal documents to transfer an account from a deceased owner . By late June, CR Society’s leadership (notably President Brian M. Delaney and others) were made aware of the situation, but progress was slow. The process required locating or resetting account credentials, or else going through GoDaddy’s estate transfer procedure (providing a death certificate, proof of estate executor, etc.) . As Alex K. summarized: “If nobody knows [the GoDaddy login], the CR Society needs to send an official letter (probably from [the CR Society president]) with a death certificate for [Tim] to get the account transferred” . This “difficult part” was a bureaucratic slog that would take time. In the meantime, the CR Society forum essentially remained in limbo , unreachable but not gone.
+
+Throughout July 2024, members on external sites continued to express concern and tried to assist. The CR Society’s volunteer admin team was described as “dwindling down” and stretched thin . There was no official web announcement (since their own site was down), so the community pieced together information on their own.
+
+[](#restoration-efforts-and-temporary-return-late-2024-5) Restoration Efforts and Temporary Return (Late 2024) 
+
+Faced with the prolonged outage, CR Society board members and tech-savvy volunteers coordinated behind the scenes to restore the forums . Key objectives were: (1) regaining domain control , (2) paying the Invision hosting invoice , and (3) updating DNS records so that [crsociety.org](http://crsociety.org) once again pointed to the live forum.
+
+By late July 2024, there were signs of progress. On an external longevity forum, Alex K. shared snippets of communications from CR Society officials indicating that work was underway. Notably, one update stated: “We are working through the process of transferring account ownership from a recently deceased CRS board member so we can update the DNS record. The forum itself is funded and functioning. We just need to update the DNS record to make it accessible.” . This mid-August message (shared with the community’s permission) was very reassuring: it confirmed that the forum hosting was paid for (“funded and functioning”) and that the only remaining step was fixing DNS . Indeed, by that point someone had managed to pay or renew the Invision license, resolving the payment issue. (It’s unclear if a CR Society board member or possibly a community member like Alex ended up paying the invoice, but the important part is that the host was paid and kept the site data online.)
+
+Meanwhile, the domain [crsociety.org](http://crsociety.org) itself was kept active . Records show that the domain, which had a renewal date in April 2024, was successfully renewed for another year (to April 15, 2025) . This renewal likely happened automatically shortly after the site went down (the Updated Date: 2024-04-16 in WHOIS suggests an auto-renew) , and the domain status remained locked (protected from transfer/delete) during the ordeal . In short, the domain never expired in 2024 – it stayed under CR Society’s ownership , even though no changes could be made to it until the account issue was resolved.
+
+One tricky part was the nameserver update . If the old nameservers (Tim’s) were non-functional, the CR Society team would need to either fix those or switch to new nameservers. A community member identified [fabricationspecialties.com](http://fabricationspecialties.com) as the domain of the DNS host and even suggested calling the company directly . It’s not publicly documented how this was resolved, but presumably once GoDaddy granted account access to a CR Society representative (after verifying the request), they could update the domain’s DNS settings . By replacing the nameservers or A-records with the correct information for the Invision-hosted forum, the site would become reachable again.
+
+Return of the forums (Oct 2024): After a long summer of communication and waiting, the effort succeeded in the fall. Around early October 2024, the CR Society forums finally came back online. According to an ArchiveTeam summary, “Site went down for 4 months then went back up in October 2024.” . Users on Reddit and other platforms confirmed the revival: one Reddit post dated around that time announced that CR Society’s forums were accessible again after a ~3–4 month outage . The thread titled “[crsociety.org](http://crsociety.org) finally got back online after 4 months” appeared on the forum itself, indicating someone on the site marked the occasion. Indeed, a CR Society member on Reddit wrote: “The site is now back online. Kudos to Alex K. Chen and others for their efforts in resurrecting it.” . This implies Alex and possibly other volunteers (or board members like Brian) managed to solve the technical roadblocks by that time.
+
+For the remainder of 2024, the CR Society forum operated normally . All the previously inaccessible content was available again, and members resumed using the site. The crisis seemed to be resolved , albeit after a significant delay. However, it became clear that the site’s maintenance was fragile – it still relied on a small number of volunteers/board members to keep things updated. The community was warned that if administrative attention lapsed, the site could go down again , a point noted by ArchiveTeam: “We still don’t know if it may go down again, given that the administrators have gone out of contact and the original person paying for [crsociety.org](http://crsociety.org) died.” .
+
+[](#renewed-outage-in-early-2025-6) Renewed Outage in Early 2025 
+
+Unfortunately, the worries about a relapse proved prescient. In the spring of 2025, the CR Society forums fell offline once more . On April 8, 2025, users on the LongeCity forum reported that [crsociety.org](http://crsociety.org) was down yet again , after having been up for a few months. “Well it came back for a little while [and is] now gone again. Is it permanently gone this time?” one user asked . The outage appeared to have started a few days or weeks earlier (possibly in late March 2025), as regular readers noticed they could no longer reach the site.
+
+Cause of second outage: The circumstances of this second downtime are similar to the first: it appears to be an unresolved technical/domain configuration issue , rather than an intentional shutdown. By April 2025, the domain’s DNS was again the culprit . The nameservers for [crsociety.org](http://crsociety.org) stopped responding to queries, so the domain was not resolving to an IP address . One tech-savvy member described how no authoritative DNS answer was being given for the domain, causing even services like Cloudflare’s DNS to fail in finding the site . In effect, the domain “disappeared” from the internet’s phone book. However, that member also discovered that the forum was actually still accessible by forcing his computer to use the last-known IP addresses (via a hosts file). Using that workaround, he could connect to the forums through Cloudflare’s CDN endpoint, confirming that the forum content was indeed still on the server and up-to-date . This strongly suggests that the Invision-hosted forum was still running, but the DNS misconfiguration made it unreachable to normal users – a scenario very much like what happened in 2024.
+
+One might suspect the outage was related to the domain’s expiration date (April 15, 2025). Importantly, the domain did not expire. On April 15, 2025, [crsociety.org](http://crsociety.org) was auto-renewed for another year , according to both WHOIS info and community observation . A user noted on April 15th, “The domain got autorenewed today.” . This means GoDaddy successfully charged whatever payment method was on file and extended the domain registration to April 2026. The fact that auto-renewal succeeded indicates that CR Society still had the domain under their account control by that time (or at least that the late webmaster’s account had auto-renew enabled and a valid payment source). If the domain had truly lapsed, we would see a redemption period or pending deletion, but that was avoided. So, domain expiration was not the reason for the outage – rather, it was the DNS service not functioning, possibly due to misconfiguration or an outage with the chosen DNS host.
+
+Delayed maintenance: The recurrence of the DNS problem in 2025 may indicate that the underlying issues from 2024 were never fully resolved (perhaps a stop-gap fix was done to bring the site up, but a robust long-term solution was postponed). It’s possible that after getting the site up in October, the team still needed to migrate DNS providers or renew some separate service, which by early 2025 fell through. Another possibility is that the Invision hosting needed renewal again (if only a 6-month courtesy extension was given). However, given that the forum was confirmed “funded” earlier and data was accessible via direct IP in April 2025, the hosting was likely still active. The more likely scenario is a DNS configuration lapse or an issue with the transferred account. We do know that CR Society leadership was aware of the risk : In December 2024 and again in early 2025, President Brian Delaney had been reminded to solidify the site’s status. According to one active member, “He [Brian] said he would look into it, but has been [delaying] – from December, then to early March, then…” . This comment (from April 8, 2025) implies that addressing the site’s technical debt kept getting postponed by the busy volunteer leadership, until the forum went down again.
+
+Response to the second outage: As soon as users noticed [crsociety.org](http://crsociety.org) was offline in April 2025, they once again sounded the alarm in alternate venues. On April 8, 2025, a LongeCity user stated, “I will contact some people familiar with the situation and see if we can bring it back in some form or another.” . InquilineKea (Alex) posted the CR Society president’s email address publicly, urging someone to get in touch and emphasizing the urgency of the situation . There was even discussion of possibly handing over control of the CR Society domain/forum to a more active organization like LongeCity if needed . This shows that the community was considering contingency plans to ensure the forums don’t vanish for good. By April 10, 2025, Alex updated that “Ok, looks like they are working on it.” , suggesting that his prodding elicited a response – likely Brian or another board member confirmed they would attempt to fix the DNS problem. Indeed, within a week, the domain was renewed (as mentioned), and efforts presumably began to restore DNS service. However, as of May 2025 the site is still down , indicating that whatever fix is needed (perhaps moving the DNS to a new provider or updating records) is still in progress or awaiting action.
+
+In summary, the current technical status is: the domain [crsociety.org](http://crsociety.org) is registered and active (new expiration in 2026) , and the forums are still hosted on the Invision platform (data intact) , but the DNS configuration is broken , preventing normal access . No official announcement has been posted by CR Society on the matter (given their site is down, communications have been one-on-one or through community grapevine). The situation in 2025 mirrors that of 2024 – a fix is entirely feasible technically, but it requires someone with the right access to take the needed steps.
+
+[](#community-reactions-and-alternate-platforms-7) Community Reactions and Alternate Platforms 
+
+Throughout these disruptions, the CR Society community did not sit idle. Members have been sharing information and keeping the community spirit alive in alternate online spaces while the official forums are unavailable. Here are the key ways the community stayed connected and informed:
+
+- 
+LongeCity Forum: LongeCity (a life-extension forum) became a gathering place to discuss the CR Society site’s status. In June 2024, as soon as the site first went down, a user (InquilineKea) started a thread titled “Where did [crsociety.org](http://crsociety.org) go?” . This thread became an ongoing log of updates and speculation. Users who had been long-time CR Society forum contributors expressed concern – e.g., “I read and occasionally contributed for 20 years… Nobody knows what happened? This is really odd.” . Over the following months, that thread was updated with news: confirmation of Tim’s passing , discussions of contacting Invision, and calls to action. In April 2025, that same LongeCity thread sprang back to life when the site went down again, with users asking if it was “permanently gone this time” . Crucially, LongeCity members and moderators offered help; one even reached out to contacts in the CR community to nudge a fix . The thread included detailed technical analysis (DNS lookups, etc.) and served as a rallying point to ensure the CR Society forum would not be forgotten. There was even a suggestion (perhaps tongue-in-cheek, perhaps serious) that if CR Society’s team couldn’t manage the site, LongeCity might take over hosting the forums , highlighting how interwoven these communities are. 
+- 
+Rapamycin News Forum: Some CR Society members are also active on the Rapamycin News longevity forum. During the 2024 outage, they created a dedicated thread, “[crsociety.org](http://crsociety.org) has been down for a few months” , to track the situation . This thread functioned like an alternate news bulletin for CR Society forum fans. Alex K. (a CR Society member) posted frequent updates there, sharing insider info from CR Society board emails (as noted earlier) . The Rapamycin forum thread also hosted general discussion about the importance of the CR Society archives and the state of the CR community. In effect, some ongoing CR discussions migrated temporarily to rapamycin.news while the main forum was inaccessible. Alex even noted that he “had to switch to posting [there], but miss[ed] some of [his] content (especially the content about microplastics…)” , emphasizing how he valued the CR Society forum’s organized threads . The Rapamycin forum community was sympathetic; they brainstormed solutions like pointing a new domain to the Invision host and discussed the broader issue of aging forums in the internet age . This cross-posting ensured that knowledge and updates about CR Society’s forum status reached a wider longevity audience. 
+- 
+Reddit: Reddit has several communities interested in biohacking, longevity, and calorie restriction. Users took to Reddit to ask about the CR Society site as well. For instance, one person in r/Biohacking asked “What happened to [crsociety.org](http://crsociety.org)? It’s been down for a few days and has been super useful for longevity content.” . Responses on that thread echoed the information we’ve detailed: one user quoted an update that “the forum itself is funded and functioning” and they just needed to fix a DNS issue after the owner’s death . Later on, after the forum’s return in Oct 2024, another Reddit comment noted “The site is now back online. Kudos to Alex K. Chen and others for their efforts in resurrecting it.” . This indicates that Reddit not only helped spread news of the downtime, but also helped spread the news of its restoration . Similarly, on Reddit’s r/Archiveteam (a group dedicated to preserving at-risk websites), members flagged the CR Society forum outage as something to archive. ArchiveTeam volunteers discussed scraping the site as soon as it came back up, given the uncertainty. One post in July 2024 stated: “The domain owner died some time ago… I’ll try to find a way to scrape them … these forums aren’t too large so they should not take too long to properly archive.” . This shows the broader internet preservation community recognized the historical value of the CR Society forum content and took steps to back it up in case the worst happened. Indeed, we have evidence that some threads and pages have been saved on [Archive.org](http://Archive.org) and other services during the window when the site was online in late 2024. 
+- 
+Other Platforms: The CR Society also has a Facebook group (private membership) where discussions about the site’s status presumably took place. Alex K. mentioned that people in the Facebook group were guessing the cause of the outage early on, suspecting either a forum software upgrade issue or a DNS issue . The CR Society mailing list (an older email list predating the forums) contains a treasure trove of archived discussions, though it’s not active for real-time coordination; some members have backups of those emails . Additionally, there is a “Living The CR Way” community (run by a different CR group) that has its own forums. Alex noted that “There’s LivingTheCRWay too, but it doesn’t have much activity.” . A few CR Society members had accounts there, but it was not a full substitute for the main forums. Overall, the diaspora of CR enthusiasts made use of any and all channels – from Slack/Discord groups to direct emails – to stay in touch. However, the consensus in these spaces was clear: the CR Society’s own forums, with their decades of accumulated knowledge, were irreplaceable . As one member lamented, “crsociety cannot die – it’s tragic that forums are being killed in favor of … slack and discord… It has maintained consistently high quality… [unlike] others” . This sentiment fueled the community’s determination to see the forums restored. 
+
+In summary, the community remained active and resourceful. Alternate forums (LongeCity, Rapamycin News), social media, and Reddit filled the gap during the outages, and a spirit of collaboration emerged to solve the technical problems. This community resilience is a positive sign for the forum’s future – there is clearly a dedicated base of users who care about the site and are willing to mobilize to save it.
+
+[](#assessment-of-current-status-and-outlook-for-recovery-8) Assessment of Current Status and Outlook for Recovery 
+
+As of May 2025, the CR Society forums remain offline to the general public, but the situation is far from hopeless or permanent . All evidence points to the forums being in a state where they can be brought back online – the question is when , not if , assuming the Society’s stewards follow through. Here’s a summary of key evidence and factors influencing the probability of recovery:
+
+- 
+The forum data and hosting are intact. The site is hosted by Invision’s cloud service, and multiple sources have confirmed that the forum is still up on those servers (just inaccessible due to DNS). In mid-2024, CR Society reps stated explicitly that “technically [the forums] are currently online” on the host and that they were not worried about losing any data . In 2025, users were able to access the forum via direct IP hacks, again confirming the content is still there and up-to-date . There is no indication of data loss or corruption – posts and threads should all be preserved once the site is reachable. This greatly increases the chances of full recovery, since no content needs to be rebuilt – it’s a matter of flipping the right switches to unlock access. 
+- 
+The domain name is secured through 2026. A major risk for any downed site is losing the domain (if it expires and someone else grabs it). Thankfully, [crsociety.org](http://crsociety.org) has been kept renewed. After auto-renew in 2024 and again in 2025 (documented on April 15, 2025) , the domain is now valid likely until April 2026. The registrar records also show it is in a protected status (clientTransferProhibited/clientDeleteProhibited etc.) , meaning it’s locked down – no one can easily hijack or transfer it without authorization. This means the CR Society has not lost its web address , and users won’t be forced to find the site at a new URL. It buys the organization many months (if not another full year) to implement a fix before any danger of expiration. Even if the site is down for several more months, as long as the domain is maintained, a restoration remains feasible at any time. 
+- 
+Community and leadership intent to restore: There is strong indication of intent from both the community and CR Society’s leadership to bring the forums back. No one has suggested that the forum should be permanently shut down; on the contrary, all communications imply this is a temporary outage. In August 2024, CR Society officials were actively working to restore access . In April 2025, when the site went down again, multiple people (including presumably board members) responded that they are “working on it” . While execution has been slow, there is no sign of abandonment . The CR Society’s president and board members have been sporadically responsive – e.g., Brian Delaney acknowledged the issue and intended to fix it (though delayed) , and others like Bob C. clearly value the site’s legacy. The fact that someone ensured the domain was renewed in 2025 shows that the organization is taking at least minimal actions to prevent loss . Moreover, the community’s persistent outcry acts as accountability – with threads on external sites and even offers of help, it’s unlikely the CR Society leadership would simply let the forum die quietly. There is peer pressure and encouragement for them to complete the fixes. 
+- 
+Technical feasibility of recovery: From a pure technical standpoint, the remaining issues are solvable . The forum essentially needs a proper DNS configuration. If the CR Society has gained full control of the GoDaddy account (which we assume they did by late 2024 when the site first came back), then the solution might be as straightforward as updating the nameserver entries to a reliable service (for example, pointing to GoDaddy’s default DNS or another provider) and ensuring they have the correct A/CNAME records for the Invision-hosted forum. Invision is likely still hosting the content under either the custom domain or a fallback URL. (Invision communities often have a temporary domain like [something.invisionzone.com](http://something.invisionzone.com) that can be used if needed.) The CR Society could even temporarily point a different domain to the forum as a stop-gap – for instance, using a subdomain of [longecity.org](http://longecity.org) or a new domain, as was debated . This would involve Invision support but is technically possible . All these are routine tasks for IT admins; the challenge is purely getting the right person to execute them. There might also be a need to update the forum’s SSL certificate once the DNS is fixed (to cover the domain), but Invision likely handles that for their hosted clients. No insurmountable technical barrier exists – it’s not like the data was erased or the software destroyed. The forum was revived once already after a long downtime , demonstrating that a comeback is achievable even after months of darkness. 
+- 
+Historical pattern and precedent: The fact that the CR Society forums were successfully resurrected after a 4-month outage in 2024 is a very positive precedent . It shows that even if things look dire, the community and leadership eventually managed to solve the problem. It’s worth noting that during that first outage, some feared the site might never return – yet it did . This makes it easier to believe that the current outage (essentially a repeat scenario) will also be resolved in time. In the forum’s 20+ year history, 2024-2025 has been the only major prolonged downtime . There’s no indication that the organization deliberately wants to shutter the forum; rather, it’s been unfortunate circumstances. The CR Society is a small non-profit run largely by volunteers, so these administrative delays, while frustrating, are not unusual. But once resolved, the pattern is that the site runs fine until another administrative issue crops up. It’s reasonable to expect that once the DNS/hosting issues are fixed this time, they will ensure smoother sailing going forward (perhaps by delegating multiple people to have account access, etc., to avoid a single point of failure again). 
+- 
+Alternate plans if all else fails: In the unlikely scenario that the CR Society leadership cannot get the site back up in a reasonable timeframe, the community has shown willingness to pursue alternatives to preserve the content . For example, ArchiveTeam has likely captured a significant portion of the site’s pages during its up-time in late 2024 . Those archives could be made accessible (albeit read-only) to salvage the knowledge. Additionally, there were discussions about possibly migrating the forum data to a new host or domain under different management (like LongeCity) . Such a move would require cooperation from CR Society (to obtain the database or Invision backup), but it’s a contingency that passionate members might explore if the site appeared truly abandoned. However, as of now there’s no need for that yet – all signs indicate CR Society intends to restore the existing setup. 
+
+Taking all of these points together, the probability that the CR Society forums are not permanently lost is very high . The forums are almost certainly not abandoned – rather, they are in a temporary downtime due to technical admin snafus. The weight of evidence (data intact, domain active, people working on it) suggests that the forums will eventually come back online once those snafus are resolved. It may take some patience; even months more of delay would not be entirely surprising given past experience. But given the value of the content and the active interest from both the community and the Society’s board , it is hard to imagine them simply giving up. In a post on ArchiveTeam’s wiki during the first outage, the situation was summarized with cautious optimism: “Site went down for 4 months then went back up … We still don’t know if it may go down again… [because] the original person paying for [crsociety.org](http://crsociety.org) died.” . This indeed happened (it went down again), but the key part is that it went back up after a long outage once, and the underlying cause (loss of a key person) is being mitigated gradually.
+
+In conclusion , the CR Society forums are currently in a kind of hibernation – inaccessible but not gone . The community has not fragmented or moved on; they are waiting and persistently reminding the leadership to bring the site back. The CR Society’s leadership, for its part, has maintained the domain and indicated willingness to fix the issue. The forum’s trove of information – spanning decades of caloric restriction research discussions – is safe and will very likely be available again. It might require “a few more days” on a geologic timescale (as one commenter joked) , but given the collective effort, the forums should eventually reappear. Stakeholders and interested users should keep an eye on the LongeCity thread and CR Society’s Facebook or other channels for any official announcements. When the forum does come back online, it would be wise for the Society to update everyone and perhaps put in place redundancy (so that the knowledge isn’t so close to being lost again). But as it stands in mid-2025, all signs point to an eventual recovery rather than a permanent loss. The CR Society forums have cheated death once and are poised to do so again. 
+
+Sources: 
+
+- LongeCity Forum – “Where did [crsociety.org](http://crsociety.org) go?” discussion (June 2024 – April 2025) . 
+- Rapamycin News – “[crsociety.org](http://crsociety.org) has been down for a few months” thread (June–Aug 2024) . 
+- Reddit Discussions – r/Biohacking and r/Archiveteam threads (2024) . 
+- ArchiveTeam Wiki – CR Society entry (2024/2025) . 
+- Personal communications summarized by community members (e.g. CR Society board email snippets) .
+
+--- Post #113 by CronosTempi [2025-05-11T21:16:32.291Z] ---
+I’ve been active on the CR Society site for years, and the email list before that. I agree that it’s a valuable reaource with decades of accumulated knowledge. But even I don’t have the superhuman curiosity required to be able to read that whole chatgpt output above. You’re one of a kind, Alex K. Chen!
+
+--- Post #114 by RonPut (Ron Put) [2025-05-17T01:10:49.846Z] ---
+Thanks for keeping this alive, Alex!
+
+I do miss CRSociety, I’ve learned a lot from the other members and have even changed my opinion on a number of issues I haven’t found anything close it, so far.
+
+Grok provided similar info to what Alex posted above, with the addition of an .org email account for Brian, apparently temporary. I assume that Alex and others have it and have already tried it.
+
+I really hope it comes back to life.
+
+--- Post #115 by AlexKChen (LORD OF MICROPLASTICS) [2025-06-08T19:19:13.406Z] ---
+relevant thread [Where did crsociety.org go? - Calorie Restriction - LONGECITY](https://www.longecity.org/forum/topic/118826-where-did-crsocietyorg-go/)
+
+--- Post #116 by A_User [2025-06-08T19:28:31.764Z] ---
+Feel like this is something journalists should write about, it seems so absurd.
+
+From the link above:
+
+Nonprofits are required to have a board of directors. I don’t believe every board member is deceased — though I could be wrong — but if any are still around, their names should be on file somewhere. Maybe someone here knows who they were. In theory, the board should be able to regain access to the funds and either set up autopay for the hosting or coordinate a transfer of the forum to LongeCity — something Dean also mentioned as a possible plan during the brief return of the forum. If all the funds are gone though, its probably not coming back, however it would be nice to know what the cost is, maybe some of us would chip in to keep it going.
+
+--- Post #117 by RapAdmin [2025-06-09T02:46:43.233Z] ---
+There is a little irony that all the people involved with/ or managing the caloric restriction website seem to have died… Perhaps not the best strategy for longevity?
+
+--- Post #121 by egorvj (Егор) [2025-12-25T21:33:41.242Z] ---
+exactly what everyone think including me.
+
+but stay obese is unhealthy anyway, doesn’t matter what
+
+--- Post #122 by Phillipe [2025-12-26T19:19:36.245Z] ---
+I recall speaking with Paul McGlothin many years ago. He, along with Meredith Averill were involved with CRSociety also. Prior to that he was involved with Life Extension company during its founding too I believe. Wonder what happened to them.
+
+--- Post #123 by drew_ab (Adam D) [2026-01-05T11:03:07.526Z] ---
+Both Paul and Meredith are still around and run their own website at: [https://livingthecrway.com/](https://livingthecrway.com/)
