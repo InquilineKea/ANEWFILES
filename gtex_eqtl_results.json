@@ -1,0 +1,77 @@
+{
+  "query": {
+    "variants": {
+      "rs2802292": "chr6_108587315_G_T_b38",
+      "rs4945816": "chr6_108680839_C_T_b38"
+    },
+    "genes": {
+      "FOXO3": "ENSG00000118689.14",
+      "SESN1": "ENSG00000080546.13",
+      "HACE1": "ENSG00000085382.11",
+      "ATG5": "ENSG00000057663.14"
+    },
+    "dataset": "gtex_v8",
+    "endpoint": "singleTissueEqtl",
+    "note": "Returns only significant eQTLs (FDR \u2264 0.05 per tissue)"
+  },
+  "results": {
+    "rs2802292": {
+      "FOXO3": [
+        {
+          "snpId": "rs2802292",
+          "pos": 108587315,
+          "snpIdUpper": "RS2802292",
+          "variantId": "chr6_108587315_G_T_b38",
+          "geneSymbol": "FOXO3",
+          "pValue": 3.369e-05,
+          "geneSymbolUpper": "FOXO3",
+          "datasetId": "gtex_v8",
+          "tissueSiteDetailId": "Pancreas",
+          "ontologyId": "UBERON:0001150",
+          "chromosome": "chr6",
+          "gencodeId": "ENSG00000118689.14",
+          "nes": -0.143682
+        }
+      ],
+      "SESN1": [],
+      "HACE1": [],
+      "ATG5": []
+    },
+    "rs4945816": {
+      "FOXO3": [
+        {
+          "snpId": "rs4945816",
+          "pos": 108680839,
+          "snpIdUpper": "RS4945816",
+          "variantId": "chr6_108680839_C_T_b38",
+          "geneSymbol": "FOXO3",
+          "pValue": 2.61931e-05,
+          "geneSymbolUpper": "FOXO3",
+          "datasetId": "gtex_v8",
+          "tissueSiteDetailId": "Brain_Cerebellar_Hemisphere",
+          "ontologyId": "UBERON:0002037",
+          "chromosome": "chr6",
+          "gencodeId": "ENSG00000118689.14",
+          "nes": -0.201457
+        }
+      ],
+      "SESN1": [],
+      "HACE1": [],
+      "ATG5": []
+    }
+  },
+  "summary": {
+    "rs2802292": {
+      "FOXO3": 1,
+      "SESN1": 0,
+      "HACE1": 0,
+      "ATG5": 0
+    },
+    "rs4945816": {
+      "FOXO3": 1,
+      "SESN1": 0,
+      "HACE1": 0,
+      "ATG5": 0
+    }
+  }
+}
