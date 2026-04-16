@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2301b767dbdc2f5e2cfff2fef97fe3a3 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    
+    
+    <div style="position:fixed;bottom:30px;left:30px;z-index:1000;background:white;
+                padding:12px 16px;border-radius:8px;border:1px solid #ccc;font-size:12px;line-height:1.6">
+      <b>Boston Income × 311</b><br>
+      <span style="background:linear-gradient(to right,#d73027,#ffffbf,#1a9850);
+            display:inline-block;width:120px;height:10px;border-radius:3px"></span><br>
+      <span style="float:left">Low income</span>
+      <span style="float:right">High income</span><br style="clear:both">
+      <br>
+      <span style="color:#3333cc">&#11044;</span> 311 complaint density (bubble = count)<br>
+      <span style="opacity:0.5">&#9632;&#9632;&#9632;</span> Heatmap = raw complaint locations
+    </div>
+    
+            <div class="folium-map" id="map_2301b767dbdc2f5e2cfff2fef97fe3a3" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_2301b767dbdc2f5e2cfff2fef97fe3a3 = L.map(
+                "map_2301b767dbdc2f5e2cfff2fef97fe3a3",
+                {
+                    center: [42.315, -71.07],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_a41e7ee5f9d7b97c17a6821d2df2ec47 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_a41e7ee5f9d7b97c17a6821d2df2ec47.addTo(map_2301b767dbdc2f5e2cfff2fef97fe3a3);
+        
+    
+            var feature_group_cf5309f391298b778896fe534d6261bc = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_9290be8b794f40ce110c02fa2f5fef76 = L.circleMarker(
+                [42.3601, -71.0549],
+                {"bubblingMouseEvents": true, "color": "#006837", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#006837", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_9290be8b794f40ce110c02fa2f5fef76.bindTooltip(
+                `<div>
+                     <b>ZIP 02108</b><br>Median income: $170,379<br>Poverty rate: 14.7%<br>311 complaints: 1
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_38946dba39e43abc63b2dfbd5cf273e6 = L.marker(
+                [42.3601, -71.0549],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_91988312a20b2e152ba3ad57802ee0e4 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02108\u003cbr\u003e$170.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_38946dba39e43abc63b2dfbd5cf273e6.setIcon(div_icon_91988312a20b2e152ba3ad57802ee0e4);
+            
+    
+            var circle_marker_dc01ad985888248bcd39f33c7aa3ae1e = L.circleMarker(
+                [42.3601, -71.0518],
+                {"bubblingMouseEvents": true, "color": "#0f8445", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0f8445", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_dc01ad985888248bcd39f33c7aa3ae1e.bindTooltip(
+                `<div>
+                     <b>ZIP 02109</b><br>Median income: $162,179<br>Poverty rate: 7.1%<br>311 complaints: 4
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_03c08df0d3785e40de249f5c2fabf918 = L.marker(
+                [42.3601, -71.0518],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_05921dd2227c8162b07a58c67112a03a = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02109\u003cbr\u003e$162.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_03c08df0d3785e40de249f5c2fabf918.setIcon(div_icon_05921dd2227c8162b07a58c67112a03a);
+            
+    
+            var circle_marker_60980cb22419765db61eda0619b16de8 = L.circleMarker(
+                [42.3572, -71.0504],
+                {"bubblingMouseEvents": true, "color": "#b5df73", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b5df73", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_60980cb22419765db61eda0619b16de8.bindTooltip(
+                `<div>
+                     <b>ZIP 02110</b><br>Median income: $126,157<br>Poverty rate: 14.8%<br>311 complaints: 0
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_55c85b3e82ed2dee04400289eac74834 = L.marker(
+                [42.3572, -71.0504],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_750fd7448f708447c1236538eedaffd3 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02110\u003cbr\u003e$126.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_55c85b3e82ed2dee04400289eac74834.setIcon(div_icon_750fd7448f708447c1236538eedaffd3);
+            
+    
+            var circle_marker_5b59cf049added07bdb79db61495ab6e = L.circleMarker(
+                [42.363, -71.0596],
+                {"bubblingMouseEvents": true, "color": "#f99555", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f99555", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_5b59cf049added07bdb79db61495ab6e.bindTooltip(
+                `<div>
+                     <b>ZIP 02111</b><br>Median income: $72,321<br>Poverty rate: 27.8%<br>311 complaints: 1
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_9733d6731b7925a621577cde3c8272ec = L.marker(
+                [42.363, -71.0596],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_c859edf638f49d2596cf79327e10128d = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02111\u003cbr\u003e$72.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_9733d6731b7925a621577cde3c8272ec.setIcon(div_icon_c859edf638f49d2596cf79327e10128d);
+            
+    
+            var circle_marker_c9382314fc163f3e6e1b685d54caf333 = L.circleMarker(
+                [42.3658, -71.056],
+                {"bubblingMouseEvents": true, "color": "#f6fbb3", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f6fbb3", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_c9382314fc163f3e6e1b685d54caf333.bindTooltip(
+                `<div>
+                     <b>ZIP 02113</b><br>Median income: $106,625<br>Poverty rate: 11.0%<br>311 complaints: 9
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c5d4e01bcde2cd676ef59434d673ff0c = L.marker(
+                [42.3658, -71.056],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_bc871dd6363a7785daedd829d5d32541 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02113\u003cbr\u003e$106.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_c5d4e01bcde2cd676ef59434d673ff0c.setIcon(div_icon_bc871dd6363a7785daedd829d5d32541);
+            
+    
+            var circle_marker_27bcc8a90ff1e3a931937fe42e81a2ac = L.circleMarker(
+                [42.3614, -71.0706],
+                {"bubblingMouseEvents": true, "color": "#c9e880", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#c9e880", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_27bcc8a90ff1e3a931937fe42e81a2ac.bindTooltip(
+                `<div>
+                     <b>ZIP 02114</b><br>Median income: $121,418<br>Poverty rate: 11.3%<br>311 complaints: 27
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_3f74e8562795f1a21e24177695096e99 = L.marker(
+                [42.3614, -71.0706],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_3f4474ca81d221fc4953cd7d8b30d03a = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02114\u003cbr\u003e$121.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_3f74e8562795f1a21e24177695096e99.setIcon(div_icon_3f4474ca81d221fc4953cd7d8b30d03a);
+            
+    
+            var circle_marker_92ee6b214964be5d08851929bfdaf6df = L.circleMarker(
+                [42.3447, -71.0875],
+                {"bubblingMouseEvents": true, "color": "#d83328", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d83328", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_92ee6b214964be5d08851929bfdaf6df.bindTooltip(
+                `<div>
+                     <b>ZIP 02115</b><br>Median income: $51,454<br>Poverty rate: 33.9%<br>311 complaints: 15
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_51796eb6d4c30b30363570f85d4fc6ef = L.marker(
+                [42.3447, -71.0875],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_c591bff1dfc6e91604c3633e9b8f25b7 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02115\u003cbr\u003e$51.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_51796eb6d4c30b30363570f85d4fc6ef.setIcon(div_icon_c591bff1dfc6e91604c3633e9b8f25b7);
+            
+    
+            var circle_marker_c70c4d81930049316da0a5110a750c35 = L.circleMarker(
+                [42.3508, -71.0757],
+                {"bubblingMouseEvents": true, "color": "#9fd669", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#9fd669", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_c70c4d81930049316da0a5110a750c35.bindTooltip(
+                `<div>
+                     <b>ZIP 02116</b><br>Median income: $131,648<br>Poverty rate: 15.1%<br>311 complaints: 19
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_0a0d2571a273b3892043801460448240 = L.marker(
+                [42.3508, -71.0757],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_239160d3b71c12f817a36982e839ea9d = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02116\u003cbr\u003e$131.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_0a0d2571a273b3892043801460448240.setIcon(div_icon_239160d3b71c12f817a36982e839ea9d);
+            
+    
+            var circle_marker_328490fc11424f66a0181c700cea525e = L.circleMarker(
+                [42.3361, -71.0714],
+                {"bubblingMouseEvents": true, "color": "#fb9f5a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fb9f5a", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_328490fc11424f66a0181c700cea525e.bindTooltip(
+                `<div>
+                     <b>ZIP 02118</b><br>Median income: $74,155<br>Poverty rate: 26.2%<br>311 complaints: 49
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_407c97dea51ff22b6bf9615931869468 = L.marker(
+                [42.3361, -71.0714],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_da33bcef24945a726451238a8f48a49a = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02118\u003cbr\u003e$74.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_407c97dea51ff22b6bf9615931869468.setIcon(div_icon_da33bcef24945a726451238a8f48a49a);
+            
+    
+            var circle_marker_480a0ac009b45717c4643851b43f9c30 = L.circleMarker(
+                [42.3199, -71.0875],
+                {"bubblingMouseEvents": true, "color": "#a50026", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a50026", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_480a0ac009b45717c4643851b43f9c30.bindTooltip(
+                `<div>
+                     <b>ZIP 02119</b><br>Median income: $37,158<br>Poverty rate: 30.9%<br>311 complaints: 12
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_6e5edc681c53719b7d9188962f65cdd7 = L.marker(
+                [42.3199, -71.0875],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_c0b02397dcbcc9e8114fbe77ca15ea27 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02119\u003cbr\u003e$37.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_6e5edc681c53719b7d9188962f65cdd7.setIcon(div_icon_c0b02397dcbcc9e8114fbe77ca15ea27);
+            
+    
+            var circle_marker_53a9599551900e5c47994d89fbe9ff4f = L.circleMarker(
+                [42.3308, -71.0931],
+                {"bubblingMouseEvents": true, "color": "#d83328", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d83328", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_53a9599551900e5c47994d89fbe9ff4f.bindTooltip(
+                `<div>
+                     <b>ZIP 02120</b><br>Median income: $51,698<br>Poverty rate: 38.8%<br>311 complaints: 3
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a4612c9d0665fc1ae723dab60a8ccf9b = L.marker(
+                [42.3308, -71.0931],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_697e36f07d4ff14152a290926a86c2f9 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02120\u003cbr\u003e$51.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_a4612c9d0665fc1ae723dab60a8ccf9b.setIcon(div_icon_697e36f07d4ff14152a290926a86c2f9);
+            
+    
+            var circle_marker_a41fa68573bdac8971254ff7f66c83df = L.circleMarker(
+                [42.3077, -71.0864],
+                {"bubblingMouseEvents": true, "color": "#b81226", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b81226", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_a41fa68573bdac8971254ff7f66c83df.bindTooltip(
+                `<div>
+                     <b>ZIP 02121</b><br>Median income: $42,411<br>Poverty rate: 24.5%<br>311 complaints: 2
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_14d0fe0f234cfaca7219db4c1eef8188 = L.marker(
+                [42.3077, -71.0864],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_26d540835a97cb0c99e695f8b9d6eaca = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02121\u003cbr\u003e$42.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_14d0fe0f234cfaca7219db4c1eef8188.setIcon(div_icon_26d540835a97cb0c99e695f8b9d6eaca);
+            
+    
+            var circle_marker_a458099f4d41cc10a3033054bd93d6df = L.circleMarker(
+                [42.2993, -71.0691],
+                {"bubblingMouseEvents": true, "color": "#fdbc6d", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fdbc6d", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_a458099f4d41cc10a3033054bd93d6df.bindTooltip(
+                `<div>
+                     <b>ZIP 02122</b><br>Median income: $81,025<br>Poverty rate: 14.8%<br>311 complaints: 13
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e6f06f380caafc03b9676b3115a96d77 = L.marker(
+                [42.2993, -71.0691],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_c3945cb87b354a9c3de279ac6b1e1de5 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02122\u003cbr\u003e$81.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_e6f06f380caafc03b9676b3115a96d77.setIcon(div_icon_c3945cb87b354a9c3de279ac6b1e1de5);
+            
+    
+            var circle_marker_3a2d8f35cc826df7d90fee143d425739 = L.circleMarker(
+                [42.2935, -71.0797],
+                {"bubblingMouseEvents": true, "color": "#f99555", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f99555", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_3a2d8f35cc826df7d90fee143d425739.bindTooltip(
+                `<div>
+                     <b>ZIP 02124</b><br>Median income: $72,189<br>Poverty rate: 17.6%<br>311 complaints: 12
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_e652673115a8b5dee3164ed347bc89bb = L.marker(
+                [42.2935, -71.0797],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_5aabd9153b9d5ff6e9ea3adea346258f = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02124\u003cbr\u003e$72.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_e652673115a8b5dee3164ed347bc89bb.setIcon(div_icon_5aabd9153b9d5ff6e9ea3adea346258f);
+            
+    
+            var circle_marker_50dcc966ad7bf17092b8934112aa83c4 = L.circleMarker(
+                [42.3077, -71.0704],
+                {"bubblingMouseEvents": true, "color": "#f47245", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f47245", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_50dcc966ad7bf17092b8934112aa83c4.bindTooltip(
+                `<div>
+                     <b>ZIP 02125</b><br>Median income: $64,983<br>Poverty rate: 23.5%<br>311 complaints: 19
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_725d714d33bd8dd8448e823ad9f4e1e3 = L.marker(
+                [42.3077, -71.0704],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_99221d069291a9aa4fcf02e2b7088776 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02125\u003cbr\u003e$64.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_725d714d33bd8dd8448e823ad9f4e1e3.setIcon(div_icon_99221d069291a9aa4fcf02e2b7088776);
+            
+    
+            var circle_marker_ea7c597d53d85db5f6314c136dbe70d7 = L.circleMarker(
+                [42.2801, -71.1003],
+                {"bubblingMouseEvents": true, "color": "#f57948", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f57948", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_ea7c597d53d85db5f6314c136dbe70d7.bindTooltip(
+                `<div>
+                     <b>ZIP 02126</b><br>Median income: $66,689<br>Poverty rate: 18.7%<br>311 complaints: 6
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_da23f3a1be0c5491fe7f5182226cd891 = L.marker(
+                [42.2801, -71.1003],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_07f2003f905320d4ed44ae855899021b = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02126\u003cbr\u003e$66.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_da23f3a1be0c5491fe7f5182226cd891.setIcon(div_icon_07f2003f905320d4ed44ae855899021b);
+            
+    
+            var circle_marker_a3344cfaa2a955d44f35c80325c14a62 = L.circleMarker(
+                [42.3341, -71.0376],
+                {"bubblingMouseEvents": true, "color": "#5db860", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5db860", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_a3344cfaa2a955d44f35c80325c14a62.bindTooltip(
+                `<div>
+                     <b>ZIP 02127</b><br>Median income: $145,357<br>Poverty rate: 10.5%<br>311 complaints: 12
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_0b0c028c014d6e67aee1ed44f8d76417 = L.marker(
+                [42.3341, -71.0376],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_56cccae582f5eb4802b013f35288e56f = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02127\u003cbr\u003e$145.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_0b0c028c014d6e67aee1ed44f8d76417.setIcon(div_icon_56cccae582f5eb4802b013f35288e56f);
+            
+    
+            var circle_marker_4fd14e81e40f2c2ed49d529b40edf609 = L.circleMarker(
+                [42.37, -71.0155],
+                {"bubblingMouseEvents": true, "color": "#fdc877", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fdc877", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_4fd14e81e40f2c2ed49d529b40edf609.bindTooltip(
+                `<div>
+                     <b>ZIP 02128</b><br>Median income: $84,023<br>Poverty rate: 14.2%<br>311 complaints: 18
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_4dbcf829cb81d52d0e28fdafbbcb6ad7 = L.marker(
+                [42.37, -71.0155],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_d52938ac41b23240493e414666f91024 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02128\u003cbr\u003e$84.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_4dbcf829cb81d52d0e28fdafbbcb6ad7.setIcon(div_icon_d52938ac41b23240493e414666f91024);
+            
+    
+            var circle_marker_a86b1f81acecd4c398dae93b34613bee = L.circleMarker(
+                [42.3839, -71.0576],
+                {"bubblingMouseEvents": true, "color": "#54b45e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#54b45e", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_a86b1f81acecd4c398dae93b34613bee.bindTooltip(
+                `<div>
+                     <b>ZIP 02129</b><br>Median income: $146,815<br>Poverty rate: 8.4%<br>311 complaints: 7
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_f85fcf18551b4f8bc74383f6dbce1287 = L.marker(
+                [42.3839, -71.0576],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_2962a94d10034f6533502510fd132fd0 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02129\u003cbr\u003e$146.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_f85fcf18551b4f8bc74383f6dbce1287.setIcon(div_icon_2962a94d10034f6533502510fd132fd0);
+            
+    
+            var circle_marker_0a8a6117909733a82842dfa16b15d13e = L.circleMarker(
+                [42.3096, -71.1148],
+                {"bubblingMouseEvents": true, "color": "#def193", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#def193", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_0a8a6117909733a82842dfa16b15d13e.bindTooltip(
+                `<div>
+                     <b>ZIP 02130</b><br>Median income: $114,933<br>Poverty rate: 12.3%<br>311 complaints: 7
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_ce801b21a78a0cab025e7ed012c21329 = L.marker(
+                [42.3096, -71.1148],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_1b776dbaeb59597de1ef4e5c6412ff98 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02130\u003cbr\u003e$114.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_ce801b21a78a0cab025e7ed012c21329.setIcon(div_icon_1b776dbaeb59597de1ef4e5c6412ff98);
+            
+    
+            var circle_marker_b36ee954f515ba5db75ba3814481dcf8 = L.circleMarker(
+                [42.2906, -71.1249],
+                {"bubblingMouseEvents": true, "color": "#fef9b5", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fef9b5", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_b36ee954f515ba5db75ba3814481dcf8.bindTooltip(
+                `<div>
+                     <b>ZIP 02131</b><br>Median income: $101,566<br>Poverty rate: 10.0%<br>311 complaints: 12
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c99dc7385f7e8940843b370f7bb0fa4e = L.marker(
+                [42.2906, -71.1249],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_949cb1b06e25ff471df3517004cb484a = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02131\u003cbr\u003e$101.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_c99dc7385f7e8940843b370f7bb0fa4e.setIcon(div_icon_949cb1b06e25ff471df3517004cb484a);
+            
+    
+            var circle_marker_1fa7e818a7b105fe566a41653d1411a9 = L.circleMarker(
+                [42.2786, -71.1519],
+                {"bubblingMouseEvents": true, "color": "#9ad468", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#9ad468", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_1fa7e818a7b105fe566a41653d1411a9.bindTooltip(
+                `<div>
+                     <b>ZIP 02132</b><br>Median income: $132,457<br>Poverty rate: 4.1%<br>311 complaints: 9
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_91c53386f338861d0175e87aa99ffb26 = L.marker(
+                [42.2786, -71.1519],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_9b9aeb56736b7e524e13f9a8389fef53 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02132\u003cbr\u003e$132.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_91c53386f338861d0175e87aa99ffb26.setIcon(div_icon_9b9aeb56736b7e524e13f9a8389fef53);
+            
+    
+            var circle_marker_6e05ca4281a5e0e6c05029241b48c8ea = L.circleMarker(
+                [42.3508, -71.1102],
+                {"bubblingMouseEvents": true, "color": "#fdb86a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fdb86a", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_6e05ca4281a5e0e6c05029241b48c8ea.bindTooltip(
+                `<div>
+                     <b>ZIP 02134</b><br>Median income: $80,027<br>Poverty rate: 21.4%<br>311 complaints: 11
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_7f6a58fceb2b53fcb3dff7de7a5fba62 = L.marker(
+                [42.3508, -71.1102],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_8536c24720cea4b2e5469a886be45264 = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02134\u003cbr\u003e$80.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_7f6a58fceb2b53fcb3dff7de7a5fba62.setIcon(div_icon_8536c24720cea4b2e5469a886be45264);
+            
+    
+            var circle_marker_c9124bf4f36ceeb90ee1e02e571d0e20 = L.circleMarker(
+                [42.3536, -71.1502],
+                {"bubblingMouseEvents": true, "color": "#fdd481", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fdd481", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28, "stroke": true, "weight": 3}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            circle_marker_c9124bf4f36ceeb90ee1e02e571d0e20.bindTooltip(
+                `<div>
+                     <b>ZIP 02135</b><br>Median income: $87,603<br>Poverty rate: 19.2%<br>311 complaints: 12
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_79cffd0b00bc31448e821983115a266d = L.marker(
+                [42.3536, -71.1502],
+                {
+}
+            ).addTo(feature_group_cf5309f391298b778896fe534d6261bc);
+        
+    
+            var div_icon_e1f55ade493a0c425f9512c42053045d = L.divIcon({
+  "html": "\u003cdiv style=\"font-size:8px;font-weight:bold;color:#111;text-align:center;margin-top:10px\"\u003e02135\u003cbr\u003e$87.0k\u003c/div\u003e",
+  "iconSize": [60, 30],
+  "iconAnchor": [30, 15],
+  "className": "empty",
+});
+        
+    
+                marker_79cffd0b00bc31448e821983115a266d.setIcon(div_icon_e1f55ade493a0c425f9512c42053045d);
+            
+    
+            feature_group_cf5309f391298b778896fe534d6261bc.addTo(map_2301b767dbdc2f5e2cfff2fef97fe3a3);
+        
+    
+            var heat_map_7ef594500c70c8603fe8f06c56a86925 = L.heatLayer(
+                [[42.35082366, -71.09147291], [42.29497087, -71.120326], [42.32566457, -71.0526453], [42.336055, -71.07505], [42.33527053, -71.05133996], [42.35307386, -71.07630227], [42.35439372, -71.07468758], [42.36535416, -71.05703553], [42.3463189, -71.08925221], [42.36068692, -71.06601672], [42.34092935, -71.07698894], [42.34307722, -71.08245316], [42.33437688, -71.03738892], [42.37812401, -71.03463695], [42.26553005, -71.09973136], [42.27125176, -71.16741609], [42.3368614, -71.07375823], [42.34208881, -71.08546505], [42.33673183, -71.07275748], [42.28213431, -71.13240488], [42.33846897, -71.07106737], [42.37893986, -71.06547485], [42.33596958, -71.04003925], [42.33722596, -71.03765266], [42.28700307, -71.13694809], [42.35847157, -71.07084528], [42.34957108, -71.0844215], [42.3512014, -71.08670774], [42.35400398, -71.1496979], [42.39134139, -71.06998191], [42.26998257, -71.16199462], [42.37992482, -71.06953761], [42.34269389, -71.07613985], [42.35075865, -71.08475024], [42.34203602, -71.07038922], [42.30818054, -71.0515531], [42.28208, -71.16574], [42.28993, -71.13128], [42.33381279, -71.05147649], [42.35530426, -71.13758971], [42.29184, -71.06806], [42.3656092, -71.03628649], [42.33783307, -71.076084], [42.35186, -71.1268], [42.3259072, -71.07684321], [42.36968, -71.04091], [42.3777, -71.03522491], [42.37892226, -71.03644665], [42.33651542, -71.07601484], [42.35186, -71.1268], [42.3441847, -71.08013285], [42.37941955, -71.03901549], [42.35442, -71.14534], [42.28632246, -71.12295132], [42.3535805, -71.12663535], [42.36725474, -71.05363562], [42.31487782, -71.0553765], [42.32434727, -71.05747797], [42.34408, -71.08212], [42.35959524, -71.06749356], [42.35939592, -71.06573135], [42.358047, -71.056152], [42.27977443, -71.09268887], [42.28614901, -71.1683925], [42.30351, -71.06713], [42.35312873, -71.07619165], [42.35316, -71.07622], [42.35359452, -71.07638051], [42.30040953, -71.06746238], [42.35067006, -71.08500508], [42.28307341, -71.07589725], [42.34295866, -71.07018566], [42.35018471, -71.08652306], [42.35013595, -71.08694403], [42.34171308, -71.07007687], [42.29703, -71.08283], [42.28284, -71.07588], [42.34192016, -71.07567645], [42.33973176, -71.07929825], [42.35019915, -71.08736704], [42.35004049, -71.08791969], [42.27563, -71.1074], [42.35116982, -71.08671748], [42.34549394, -71.07356042], [42.27809, -71.13756], [42.34989725, -71.08819825], [42.34484, -71.08064], [42.33693759, -71.07533345], [42.32543428, -71.05710239], [42.33661648, -71.07488929], [42.3556214, -71.07625773], [42.32824146, -71.07510744], [42.33559114, -71.07457913], [42.3028613, -71.05859791], [42.3091452, -71.11549074], [42.30255898, -71.05840137], [42.30926248, -71.11550962], [42.34612651, -71.07764722], [42.33331, -71.07959], [42.24804064, -71.12225052], [42.24190367, -71.13856061], [42.35191, -71.16808], [42.29412912, -71.06083188], [42.38139975, -71.03097109], [42.32713375, -71.05822704], [42.28495537, -71.16336794], [42.33663552, -71.07582106], [42.33665, -71.07568], [42.27668045, -71.15250535], [42.34362488, -71.13903065], [42.34684098, -71.1519102], [42.35311073, -71.07617975], [42.35310397, -71.07617817], [42.33297, -71.11163], [42.27130654, -71.07263402], [42.34967112, -71.08728524], [42.27132, -71.07233], [42.3527675, -71.080539], [42.35274401, -71.08049984], [42.34952626, -71.08442531], [42.3495581, -71.08447559], [42.374742, -71.03468], [42.35835, -71.07084], [42.34885491, -71.06087521], [42.35060154, -71.05730888], [42.359841, -71.066091], [42.36018, -71.063477], [42.359649, -71.06876], [42.38133, -71.06359], [42.33624892, -71.0744452], [42.33696621, -71.07527305], [42.33615136, -71.07416715], [42.33688, -71.07539], [42.3362625, -71.07439545], [42.33619061, -71.07439298], [42.33660559, -71.07490008], [42.32614368, -71.07644007], [42.35127308, -71.08916325], [42.36211, -71.05319], [42.3466304, -71.0734731], [42.31849428, -71.06043281], [42.34529038, -71.07702779], [42.338385, -71.078509], [42.33303, -71.07603333], [42.34692089, -71.08619157], [42.2965, -71.0615], [42.35154657, -71.05596475], [42.35087841, -71.13174562], [42.33567349, -71.07467652], [42.28208, -71.16574], [42.35064, -71.12596], [42.28996683, -71.06277772], [42.32184, -71.09461], [42.30328, -71.11717], [42.3353628, -71.0751668], [42.36349711, -71.05737489], [42.33796, -71.07775], [42.33568699, -71.07464855], [42.29019, -71.0514], [42.32446, -71.10891], [42.32181214, -71.09478935], [42.29374, -71.05727], [42.33460498, -71.10202096], [42.30784, -71.11625], [42.33426023, -71.10218659], [42.317275, -71.10783], [42.34392129, -71.08730829], [42.28732544, -71.14926253], [42.30001276, -71.06134828], [42.32243688, -71.07263938], [42.32086175, -71.07199967], [42.32238779, -71.0724305], [42.32086547, -71.07201274], [42.307935, -71.070123], [42.32238779, -71.0724305], [42.30816379, -71.05153726], [42.34340169, -71.07800335], [42.28053613, -71.12047767], [42.31089072, -71.04893664], [42.3086614, -71.1153433], [42.344773, -71.147646], [42.341117, -71.10046428], [42.3410994, -71.1004032], [42.33444881, -71.07574205], [42.35961968, -71.06863815], [42.33080343, -71.07393656], [42.33981335, -71.08301927], [42.35959005, -71.06756732], [42.33573889, -71.07596446], [42.34046, -71.08267], [42.34603379, -71.15245439], [42.335429, -71.074756], [42.31768048, -71.05250707], [42.37270687, -71.06412649], [42.261319, -71.115087], [42.34159284, -71.06834889], [42.32578424, -71.07455864], [42.32591525, -71.07443467], [42.35083598, -71.13210122], [42.35102087, -71.07790587], [42.35846555, -71.0708039], [42.35887377, -71.07087311], [42.31914119, -71.05818583], [42.34626517, -71.10389879], [42.26456355, -71.10055663], [42.27857, -71.06846], [42.31775, -71.05965], [42.36678, -71.03524], [42.3928506, -71.06851815], [42.36610903, -71.05202], [42.34700154, -71.08855065], [42.36953718, -71.03328252], [42.34698808, -71.08834214], [42.3324586, -71.0990639], [42.36511, -71.05492], [42.38398, -71.01407], [42.289695, -71.039668], [42.38475976, -71.01669054], [42.34232986, -71.08341759], [42.31357001, -71.122059], [42.35279511, -71.13018785], [42.33292, -71.03895], [42.33911187, -71.07904047], [42.33902364, -71.07910149], [42.2851435, -71.04960008], [42.34003, -71.068566], [42.36501437, -71.05241677], [42.34517001, -71.09518077], [42.34268958, -71.07990493], [42.34202185, -71.10134217], [42.37164934, -71.0346402], [42.34423473, -71.09013744], [42.3511105, -71.08664151], [42.3598396, -71.0660919], [42.36640744, -71.05786068], [42.3172285, -71.05984227], [42.35421784, -71.15009168], [42.35335607, -71.15303557], [42.34023, -71.07399], [42.3521664, -71.07467508], [42.29203103, -71.0433147], [42.34121, -71.09847], [42.28306, -71.05915], [42.284577, -71.066867], [42.33951087, -71.07939351], [42.34698, -71.13943], [42.33736132, -71.0698473], [42.35019, -71.134696], [42.33636716, -71.07356747], [42.33748851, -71.0297552], [42.3499442, -71.04921272], [42.33573962, -71.07674436], [42.34089147, -71.10020432], [42.37330819, -71.03526825], [42.37316467, -71.03516221], [42.36473835, -71.06466148], [42.34592945, -71.07815645], [42.33944006, -71.06560296], [42.35984797, -71.06605538], [42.35310023, -71.07626538], [42.34165489, -71.07622969], [42.3468, -71.16047], [42.35184023, -71.14938451], [42.37686064, -71.05827583], [42.36632234, -71.05755235], [42.38118, -71.01764], [42.36024373, -71.06844804], [42.29103, -71.07759], [42.32575301, -71.09444106], [42.338385, -71.078509], [42.31075906, -71.08124853], [42.3688669, -71.04201276], [42.35264826, -71.15845342], [42.27979439, -71.11358698], [42.25173614, -71.13425448], [42.25143751, -71.13440354], [42.26628939, -71.12467182], [42.36393, -71.05652], [42.35156, -71.127342], [42.27730829, -71.13523962], [42.33870791, -71.07938312], [42.3458405, -71.09344871], [42.36393, -71.05652], [42.34405344, -71.07054978], [42.34553, -71.07974], [42.28208, -71.16574], [42.34532486, -71.07869735], [42.36062997, -71.13064963], [42.35244828, -71.1548756], [42.29169827, -71.11935399], [42.31726583, -71.0953286], [42.28742106, -71.13027642], [42.31847862, -71.07234696], [42.34272021, -71.06936801], [42.3320222, -71.07939899], [42.32543632, -71.05968311], [42.30038828, -71.06190763], [42.33561, -71.05089], [42.33057, -71.08376], [42.38619, -71.01327], [42.34636, -71.07377], [42.32537967, -71.05970294], [42.31178642, -71.09677327], [42.36442006, -71.05536512], [42.38062, -71.069485], [42.35323353, -71.0550924], [42.36473687, -71.05549302], [42.32608734, -71.06361143], [42.31356, -71.06357], [42.36495382, -71.0553812], [42.35031378, -71.07709814], [42.34230144, -71.14906736], [42.3607987, -71.0649906], [42.32591912, -71.08377051], [42.35983824, -71.06605408], [42.35981408, -71.0660557], [42.3592501, -71.0654792], [42.316185, -71.062029], [42.3596184, -71.0667925], [42.31459693, -71.06015174], [42.35975961, -71.06693767], [42.36002024, -71.06697656], [42.36012487, -71.06643402], [42.312499, -71.057093], [42.36041993, -71.06667868], [42.36062028, -71.06591525], [42.3604305, -71.0675491], [42.289069, -71.040948], [42.32605564, -71.06310606], [42.31073131, -71.04682848], [42.37270687, -71.06412649], [42.33278877, -71.0382235], [42.35611295, -71.06165942], [42.296114, -71.055052], [42.31665326, -71.07476161], [42.28944639, -71.0626523], [42.33894545, -71.08075286], [42.33695153, -71.07816137], [42.364505, -71.057902], [42.29136051, -71.07608881], [42.28781168, -71.12661775], [42.3352, -71.07502], [42.359368, -71.070951], [42.30813046, -71.09665581], [42.37832, -71.03423], [42.38305528, -71.02117627], [42.33661793, -71.02870736], [42.33659222, -71.02842479], [42.31994073, -71.11305668], [42.3884301, -71.002026], [42.26921446, -71.09577813], [42.38044491, -71.06551073], [42.36631178, -71.05751817], [42.24809419, -71.1226265], [42.28663, -71.079], [42.24463234, -71.13697359], [42.28601169, -71.06403678], [42.36676421, -71.05197236]],
+                {
+  "minOpacity": 0.3,
+  "maxZoom": 18,
+  "radius": 14,
+  "blur": 18,
+}
+            );
+        
+    
+            heat_map_7ef594500c70c8603fe8f06c56a86925.addTo(map_2301b767dbdc2f5e2cfff2fef97fe3a3);
+        
+    
+            var feature_group_ad3da719a93d80b35d566a5a981a7fbc = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_d653749f91a77988ba9a1def52589afb = L.circleMarker(
+                [42.3601, -71.0549],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 4.448979591836735, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_d653749f91a77988ba9a1def52589afb.bindTooltip(
+                `<div>
+                     ZIP 02108: 1 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_33e939e46c397d8da5dd4c6e6744886c = L.circleMarker(
+                [42.3601, -71.0518],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5.795918367346939, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_33e939e46c397d8da5dd4c6e6744886c.bindTooltip(
+                `<div>
+                     ZIP 02109: 4 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8fc76801904e6f20ab7de3e2a95c534a = L.circleMarker(
+                [42.363, -71.0596],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 4.448979591836735, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_8fc76801904e6f20ab7de3e2a95c534a.bindTooltip(
+                `<div>
+                     ZIP 02111: 1 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9297ba41b0049a5d27f327c1956c1533 = L.circleMarker(
+                [42.3658, -71.056],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8.040816326530614, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_9297ba41b0049a5d27f327c1956c1533.bindTooltip(
+                `<div>
+                     ZIP 02113: 9 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d96c45253e3337d9075384b92e848e1d = L.circleMarker(
+                [42.3614, -71.0706],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.122448979591837, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_d96c45253e3337d9075384b92e848e1d.bindTooltip(
+                `<div>
+                     ZIP 02114: 27 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_48284d4962789b86b49b7b63b7243e2f = L.circleMarker(
+                [42.3447, -71.0875],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.73469387755102, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_48284d4962789b86b49b7b63b7243e2f.bindTooltip(
+                `<div>
+                     ZIP 02115: 15 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cf51c5f892a81961475171a9e25d2550 = L.circleMarker(
+                [42.3508, -71.0757],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.53061224489796, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_cf51c5f892a81961475171a9e25d2550.bindTooltip(
+                `<div>
+                     ZIP 02116: 19 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_858c7fe76db4749a8ed62cb5dfd08d6c = L.circleMarker(
+                [42.3361, -71.0714],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 26.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_858c7fe76db4749a8ed62cb5dfd08d6c.bindTooltip(
+                `<div>
+                     ZIP 02118: 49 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_335ec56ad754ef2d7439c7519dea87b7 = L.circleMarker(
+                [42.3199, -71.0875],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.387755102040817, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_335ec56ad754ef2d7439c7519dea87b7.bindTooltip(
+                `<div>
+                     ZIP 02119: 12 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b2c55384010b49010f2be9fef13b8e74 = L.circleMarker(
+                [42.3308, -71.0931],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5.346938775510204, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_b2c55384010b49010f2be9fef13b8e74.bindTooltip(
+                `<div>
+                     ZIP 02120: 3 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9b9e43dd3b775bf26645b3651f49df3c = L.circleMarker(
+                [42.3077, -71.0864],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 4.8979591836734695, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_9b9e43dd3b775bf26645b3651f49df3c.bindTooltip(
+                `<div>
+                     ZIP 02121: 2 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4c873aa19103e8040342b4dd1d6ba63a = L.circleMarker(
+                [42.2993, -71.0691],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.836734693877553, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_4c873aa19103e8040342b4dd1d6ba63a.bindTooltip(
+                `<div>
+                     ZIP 02122: 13 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_734210dcc3cc82a98e9252e151d9be3b = L.circleMarker(
+                [42.2935, -71.0797],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.387755102040817, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_734210dcc3cc82a98e9252e151d9be3b.bindTooltip(
+                `<div>
+                     ZIP 02124: 12 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fd47111abe04b9e49aa3f186ae0d8fd2 = L.circleMarker(
+                [42.3077, -71.0704],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.53061224489796, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_fd47111abe04b9e49aa3f186ae0d8fd2.bindTooltip(
+                `<div>
+                     ZIP 02125: 19 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_167167f51f32de5891f5382083c82238 = L.circleMarker(
+                [42.2801, -71.1003],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.6938775510204085, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_167167f51f32de5891f5382083c82238.bindTooltip(
+                `<div>
+                     ZIP 02126: 6 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b71f23d3f87ccdc2451b8f3a00ada812 = L.circleMarker(
+                [42.3341, -71.0376],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.387755102040817, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_b71f23d3f87ccdc2451b8f3a00ada812.bindTooltip(
+                `<div>
+                     ZIP 02127: 12 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a7d05e7a54e057d4befad00489484028 = L.circleMarker(
+                [42.37, -71.0155],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.081632653061225, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_a7d05e7a54e057d4befad00489484028.bindTooltip(
+                `<div>
+                     ZIP 02128: 18 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b405259c6f1dc5b38373b173fa24a045 = L.circleMarker(
+                [42.3839, -71.0576],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.142857142857142, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_b405259c6f1dc5b38373b173fa24a045.bindTooltip(
+                `<div>
+                     ZIP 02129: 7 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7ec4719b87e335f9c4eff6c0e6087e62 = L.circleMarker(
+                [42.3096, -71.1148],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.142857142857142, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_7ec4719b87e335f9c4eff6c0e6087e62.bindTooltip(
+                `<div>
+                     ZIP 02130: 7 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_efc6a6fd93838ad78221fc0be17ad3ec = L.circleMarker(
+                [42.2906, -71.1249],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.387755102040817, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_efc6a6fd93838ad78221fc0be17ad3ec.bindTooltip(
+                `<div>
+                     ZIP 02131: 12 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d28711c5d13ddd1b2da26680f802d5cb = L.circleMarker(
+                [42.2786, -71.1519],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8.040816326530614, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_d28711c5d13ddd1b2da26680f802d5cb.bindTooltip(
+                `<div>
+                     ZIP 02132: 9 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7518d5e5533dd6d2d1a2eb1a275073a4 = L.circleMarker(
+                [42.3508, -71.1102],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8.938775510204081, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_7518d5e5533dd6d2d1a2eb1a275073a4.bindTooltip(
+                `<div>
+                     ZIP 02134: 11 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_638b2c768de585ad46ecf663bdae5164 = L.circleMarker(
+                [42.3536, -71.1502],
+                {"bubblingMouseEvents": true, "color": "#1a1a6e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3333cc", "fillOpacity": 0.45, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.387755102040817, "stroke": true, "weight": 3}
+            ).addTo(feature_group_ad3da719a93d80b35d566a5a981a7fbc);
+        
+    
+            circle_marker_638b2c768de585ad46ecf663bdae5164.bindTooltip(
+                `<div>
+                     ZIP 02135: 12 env complaints
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_ad3da719a93d80b35d566a5a981a7fbc.addTo(map_2301b767dbdc2f5e2cfff2fef97fe3a3);
+        
+    
+            var layer_control_bc9271cd05c07d219b51e15c8e824535_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_a41e7ee5f9d7b97c17a6821d2df2ec47,
+                },
+                overlays :  {
+                    "Median Income by ZIP" : feature_group_cf5309f391298b778896fe534d6261bc,
+                    "311 Complaints Heatmap" : heat_map_7ef594500c70c8603fe8f06c56a86925,
+                    "311 Complaint Count by ZIP" : feature_group_ad3da719a93d80b35d566a5a981a7fbc,
+                },
+            };
+            let layer_control_bc9271cd05c07d219b51e15c8e824535 = L.control.layers(
+                layer_control_bc9271cd05c07d219b51e15c8e824535_layers.base_layers,
+                layer_control_bc9271cd05c07d219b51e15c8e824535_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_2301b767dbdc2f5e2cfff2fef97fe3a3);
+
+        
+</script>
+</html>
