@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "boston-data": {
+      "type": "http",
+      "url": "http://data-mcp.boston.gov/mcp"
+    }
+  }
+}
