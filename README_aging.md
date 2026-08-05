@@ -1,130 +1,174 @@
 # Does brain cell composition change with age?
 
-Allen Brain Cell Atlas, `Zeng-Aging-Mouse-10Xv3`. This is the dataset with real
-biological replication — **108 donors in two age groups** (~P56 "adult" vs
-~P550 "aged") — and, as established in `README_spatial.md`, no spatial
-coordinates. That trade-off is the reason this is a separate analysis.
+Allen Brain Cell Atlas, `Zeng-Aging-Mouse-10Xv3`. 108 donors, two age groups.
+This is the dataset with real biological replication and no spatial
+coordinates (see `README_spatial.md` for why you cannot have both).
 
-```bash
-python3 abc_fetch.py --dataset aging-mouse    # 419 MB
-python3 aging_composition.py aging_cells.csv
-python3 make_figures.py
-```
+> **Correction.** An earlier version of this file reported that microglia,
+> pericytes and smooth muscle rise with age while endothelium stays flat. That
+> result does not survive a confound check and has been retracted. The
+> corrected finding is close to its inverse: **endothelium and border-associated
+> macrophages DECLINE as a share of non-neuronal cells; the microglia /
+> pericyte / smooth-muscle increases were the neuronal denominator moving.**
+> The superseded numbers are kept below, because the comparison is the point.
 
-## Headline
+## What the data is
 
-**Microglia, pericytes, smooth muscle and lymphoid cells rise with age.
-Endothelium does not.**
+| | |
+|---|---|
+| Assay | 10x Genomics 3′ v3 (1,087,208 cells) and v3.1 (75,357) — **dissociated scRNA-seq** |
+| Donors | 108 mice: **64 adult** (median P61, ~2.0 months), **44 aged** (median P544, ~17.9 months) |
+| Sex | adult 33M/31F, aged 24M/20F — balanced |
+| Genotype | mostly `Snap25-IRES2-Cre;Ai14`, some `Ai14` only, 2 wild-type |
+| Regions | 7 anatomical divisions, 16 dissected ROIs |
+| Cells used | 785,769 from 58 donors after removing FACS-sorted libraries |
 
-That last part is the interesting bit. The vascular *wall* changes — mural
-cells (pericytes, smooth muscle) go up substantially — while the endothelial
-lining stays flat. Aging here is not "the vasculature declines" as a bloc; it
-is a specific shift in the mural/endothelial ratio.
+There is no imaging and no tissue here — brains are dissected into ROIs,
+dissociated into a cell suspension, and sequenced. Nothing is segmented.
 
-![Age effects](fig1_age_effects.png)
+## Are the tissues comparable?
 
-| Cell type | CLR shift | Cliff's δ | q (FDR) | |
-|---|---|---|---|---|
-| Lymphoid | +0.635 | +0.400 | 0.005 | ** ⚠ sparse |
-| Smooth muscle | +0.464 | +0.492 | 0.001 | ** |
-| Pericyte | +0.425 | +0.465 | 0.001 | ** |
-| Microglia | +0.333 | +0.414 | 0.004 | ** |
-| Arachnoid barrier | +0.271 | +0.162 | 0.272 | ns |
-| VLMC | +0.087 | +0.176 | 0.262 | ns |
-| Dendritic cell | +0.017 | +0.054 | 0.767 | ns |
-| **Endothelial** | **+0.007** | **+0.029** | **0.825** | **ns** |
-| Border-assoc. macrophage | −0.272 | −0.179 | 0.262 | ns |
+Mostly yes, and I checked rather than assumed:
 
-## Three corrections, without which this analysis is wrong
+- **ROI matching: 100%.** Every dissected ROI within all 7 divisions is
+  sampled in *both* age groups. There is no region present in one age group
+  and absent from the other.
+- **Region proportions: not matched.** The *amount* sampled per region differs
+  a lot by age (midbrain 25.7% of adult cells vs 13.1% of aged; isocortex
+  18.4% vs 28.2%). This is why every test is computed within region.
+- **Sex: balanced.** No confound.
+- **Genotype: imbalanced, but not driving the result.** `Snap25-Cre;Ai14` is
+  20 adult / 18 aged among unbiased donors, `Ai14`-only is 6 / 12. Re-running
+  inside the `Snap25-Cre` stratum alone makes the effects *stronger*
+  (microglia +0.664, p<0.0001), so genotype is not generating them.
+- **Library quality: comparable.** Median genes per neuron 7548 adult vs 7405
+  aged. Aged libraries are not degraded.
 
-These are not hygiene footnotes — each one changes the answer.
+The one thing that is *not* comparable is what the dissociation recovers —
+see below.
 
-**1. FACS sorting.** 70 of 108 donors have libraries sorted for `Snap25+
-neurons`, which depletes exactly the cells being counted:
+## The confound that changed the answer
 
-| | Endothelial | Microglia |
+Neurons are fragile in dissociation and recover differently by age:
+
+| | Adult | Aged |
 |---|---|---|
-| Unbiased libraries | 6.30% | 8.64% |
-| `Snap25+` sorted | 0.51% | 0.32% |
-| **Artefact** | **12×** | **27×** |
+| Neuronal share of unbiased cells | **32.2%** | **24.7%** |
+| Median neuronal share per donor×region | 34.1% | 9.5% |
 
-Only `population_sampling == "unbiased"` is used: 785,769 cells, 58 donors
-(26 adult, 32 aged).
+(The two rows differ because the second is a median across samples, and aged
+samples are more often non-neuronal-dominated. Both are real; they measure
+different things.)
 
-**2. Region imbalance.** Regions are not sampled equally across age groups —
-midbrain is 25.7% of adult cells but 13.1% of aged; isocortex 18.4% vs 28.2%.
-Since non-neuronal fractions vary strongly by region (6.4%–11.3% across
-divisions in the MERFISH data), a whole-brain comparison confounds region with
-age. Everything is computed **within** region, then combined.
+Library quality does not explain it, so this is about which cells survive to
+be sequenced. Whether that is purely technical or partly genuine neuron loss
+cannot be settled here — **and it does not matter for the correction.**
+Proportions are compositional: any drop in the neuronal denominator inflates
+every non-neuronal fraction, whether or not a single glial cell was gained.
 
-**3. Compositionality.** Proportions sum to 1 within a donor, so they are not
-independent: if neurons are lost with age, every non-neuronal fraction rises
-mechanically without a single cell being gained. Tests run on centred
-log-ratio values. Raw percentages are reported because they are readable, but
-the inference is on CLR.
+The fix is to ask a question the confound cannot reach — *within non-neuronal
+cells only, does the mix change?* That conditions the denominator away.
 
-The unit of replication is the **donor**, not the cell. Testing 785,769 cells
-as independent would produce microscopic p-values for trivial effects.
+![Confound](fig5_confound.png)
 
-## Microglia rise; endothelium does not
+| Cell type | Share of ALL cells | Share of non-neuronal only | Verdict |
+|---|---|---|---|
+| Smooth muscle | +0.464, q=0.002 ✱ | +0.155, q=0.12 | **lost** |
+| Pericyte | +0.425, q=0.003 ✱ | +0.176, q=0.13 | **lost** |
+| Astrocyte (NT) | +0.403, q=0.009 ✱ | +0.201, q=0.36 | **lost** |
+| OPC | +0.394, q=0.007 ✱ | +0.030, q=0.67 | **lost** |
+| Astrocyte (TE) | +0.345, q=0.007 ✱ | +0.165, q=0.12 | **lost** |
+| Microglia | +0.333, q=0.007 ✱ | +0.024, q=0.51 | **lost** |
+| **Endothelial** | +0.007, q=0.83 | **−0.286, q=0.003 ✱** | **emerges** |
+| **Border macrophage** | −0.272, q=0.22 | **−0.665, q=0.007 ✱** | **emerges** |
 
-![Region dumbbell](fig2_region_dumbbell.png)
+Six of seven "findings" evaporate. Every point moves left, which is the
+signature of a shared-denominator artefact rather than eight independent
+biological stories.
 
-Microglia increase in **6 of 7 regions** (ratios 1.32–2.17; only isocortex is
-flat at 8.1→8.0%). That consistency across independently-sampled regions is
-what makes it credible — more so than the p-value.
+## What actually changes most with age
 
-Endothelium has no consistent direction: hypothalamus rises (3.0→5.1%),
-midbrain and pons fall (9.2→6.1%, 15.1→8.0%), hippocampus and isocortex are
-unchanged (5.0→5.0%, 4.7→4.6%). That is what a real null looks like — scatter
-around zero, not a uniform flat line.
+Within the non-neuronal compartment, only two survive FDR:
 
-![Donor spread](fig4_donor_spread.png)
+- **Endothelial cells: 10.00% → 7.55%** of non-neuronal cells (−0.286,
+  δ=−0.499, q=0.003). A ~25% relative decline.
+- **Border-associated macrophages: 0.52% → 0.31%** (−0.665, δ=−0.438,
+  q=0.007). A ~40% relative decline.
 
-## Immune composition
+So the endothelial "null" from the earlier analysis was two effects cancelling:
+a real relative decline, masked by the denominator inflation lifting it back to
+zero. The vasculature story survives, with the opposite sign to the first pass —
+endothelium loses ground relative to other non-neuronal cells, while mural
+cells (pericytes, SMC) hold roughly steady. The mural:endothelial ratio still
+shifts; it does so by endothelium falling, not mural cells rising.
 
-![Immune composition](fig3_immune_composition.png)
+**Neuronal subtypes** (tested on the all-cell composition, so read with the
+confound in mind) decline hardest: `050 Lamp5 Lhx6 Gaba` (−1.484),
+`049 Lamp5 Gaba` (−1.055), `036 HPF CR Glut` (−1.000), `053 Sst Gaba`
+(−0.802), `046 Vip Gaba` (−0.672) — all q<0.05. Interneuron vulnerability in
+aging is a real literature finding, but here it is inseparable from the
+dissociation bias, so treat it as a hypothesis, not a result.
 
-Within the immune compartment, microglia go from 93.83% to 96.03% (q=0.035)
-and border-associated macrophages fall from 5.69% to 3.04% (q=0.005).
+## What "pooling across regions" means
 
-**Read that BAM decline carefully.** Within-compartment shares are
-compositional, and microglia are ~94% of the compartment. Their expansion
-mechanically pushes everything else down. In the region-stratified CLR
-analysis — which does not force a constant sum over the immune subset — BAM
-is **not** significant (−0.272, q=0.262). So the honest statement is: *BAMs
-decline as a share of immune cells because microglia expand*, not that BAMs
-are independently lost. The two analyses disagree because they ask different
-questions, and the CLR one is the more conservative.
+It is a statistical operation, not anything to do with cell segmentation —
+there is no segmentation in this dataset at all (that was the MERFISH imaging
+data in `README_spatial.md`; this is dissociated scRNA-seq, where cells are
+physically separated before sequencing).
 
-## What I would not trust
+The problem: the unit of observation is a **donor × region** sample (58 donors
+× the regions each was dissected from = 90 observations). Endothelial share
+differs by region regardless of age — ~4.7% in isocortex, ~15% in pons. If I
+compared all adult samples against all aged samples directly, and aged animals
+happened to be sampled more from cortex, I would "discover" an age effect that
+is really a region effect.
 
-- **Lymphoid is the largest effect and the weakest evidence.** Only 305
-  lymphoid cells exist in the whole dataset, and they are absent from 20 of 90
-  donor×region samples. With that much zero-inflation the CLR pseudocount does
-  real work, and the effect size is sensitive to it. The direction (T-cell
-  infiltration of the aged brain) matches the literature, which is reassuring
-  but is not independent evidence. Treat as provisional. Dendritic cells
-  (242 cells, absent from 22 samples) are worse and came out ns anyway.
-- **No single region survives FDR on its own** — 0 of 45 region×celltype
-  tests. The effects are only detectable when pooling across regions with
-  region adjustment. That is a power statement, not a contradiction, but it
-  means per-region claims are not supported.
-- **Two age groups, not a gradient.** ~P56 vs ~P550 is a contrast, not a
-  trajectory. Nothing here says when a change begins or whether it is linear.
-- **Mouse.** ~P550 is roughly a 60-year-old human by convention, but glial and
-  vascular aging differ between species.
-- **Proportions, not counts.** Nothing here measures absolute cell number per
-  brain. A rising fraction is consistent with either gaining that cell type or
-  losing others.
+The fix, in three steps:
+
+1. **Within each region**, compute the adult median for that cell type.
+2. **Subtract it** from every observation in that region, adult and aged alike.
+   Each region is now centred on its own baseline; the region's absolute level
+   is gone, and only the *within-region* adult→aged difference remains.
+3. **Pool** the centred values across regions and test once.
+
+Pooling gives statistical power that no single region has — that is the whole
+reason to do it, since 0 of 45 individual region × cell-type tests survive FDR
+on their own. Centring first is what makes pooling legitimate: without step 2,
+pooling would be exactly the confound it is designed to prevent.
+
+## What I still would not trust
+
+- **Two age groups, not a gradient.** ~P56 vs ~P550 is a contrast. Nothing
+  here says when a change starts or whether it is linear.
+- **Lymphoid.** Largest raw effect, weakest evidence: 305 cells total, absent
+  from 20 of 90 samples, and it is not significant once restricted to the
+  non-neuronal compartment (q=0.51). Ignore it.
+- **No per-region claims.** 0 of 45 region×celltype tests survive FDR alone.
+- **The non-neuronal analysis has its own assumption** — that non-neuronal
+  types dissociate comparably to *each other*. Weaker than assuming it of
+  neurons, but not free. Endothelial cells in particular are known to be
+  dissociation-sensitive, so a technical component to their decline cannot be
+  excluded from this data alone.
+- **Proportions, not counts.** Nothing here measures cells per brain.
+- **Mouse.** ~18 months is roughly human 55–60, but glial and vascular aging
+  differ by species.
 
 ## Files
 
 | File | Contents |
 |---|---|
-| `aging_composition.py` | analysis: filtering, CLR, region stratification, FDR |
-| `make_figures.py` | the four figures |
-| `results_aging_pooled.csv` | region-stratified overall test per cell type |
-| `results_aging_per_region.csv` | all 45 region × cell type tests |
-| `aging_immune_props.csv` | per-donor immune compartment shares |
-| `aging_donor_region_props.csv` | per-donor × region proportions, all subclasses |
+| `aging_composition.py` | primary analysis: filtering, CLR, region stratification, FDR |
+| `aging_confound_check.py` | **the correction** — neuronal denominator, non-neuronal re-test |
+| `make_figures.py` | all five figures |
+| `results_aging_nonneuronal.csv` | corrected, confound-free effects |
+| `results_aging_confound.csv` | both analyses side by side |
+| `results_aging_all_subclasses.csv` | all testable subclasses incl. neuronal |
+| `results_aging_pooled.csv`, `results_aging_per_region.csv` | superseded first pass |
+
+### Superseded figures
+
+`fig1_age_effects.png`, `fig2_region_dumbbell.png` and `fig4_donor_spread.png`
+show the **all-cell** composition and therefore carry the confound. They are
+kept because `fig5_confound.png` is only interpretable next to them, but their
+headline claims are retracted. `fig3_immune_composition.png` (within-immune
+shares) is unaffected by the neuronal denominator and still stands.

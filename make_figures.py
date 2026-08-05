@@ -302,6 +302,62 @@ def fig4_donors(props, meta, outdir):
     print("  fig4_donor_spread.png")
 
 
+
+# ---------------------------------------------------------------- figure 5
+def fig5_confound(outdir):
+    """What survives the neuronal-denominator confound.
+
+    Two analyses of the same donors: share of ALL cells (confounded by
+    differential neuronal recovery) versus share of NON-NEURONAL cells only
+    (which conditions that denominator away). Two series -> categorical
+    palette slots 1 and 2, both validated.
+    """
+    m = pd.read_csv(os.path.join(outdir, "results_aging_confound.csv"))
+    m = m.sort_values("clr_nn", ascending=False).reset_index(drop=True)
+
+    fig, ax = plt.subplots(figsize=(10.6, 5.8))
+    ax.axvline(0, color=INK_2, lw=1.1, zorder=2)
+    for i, r in m.iterrows():
+        ax.plot([r.clr_whole, r.clr_nn], [i, i], color=GREY_L, lw=3.2,
+                solid_capstyle="round", zorder=1)
+        ax.scatter([r.clr_whole], [i], s=100, color=BLUE, zorder=3,
+                   edgecolor=SURFACE, linewidth=1.8)
+        ax.scatter([r.clr_nn], [i], s=100, color=ORANGE, zorder=4,
+                   edgecolor=SURFACE, linewidth=1.8)
+        note = ""
+        if r.q_whole < 0.05 and r.q_nn >= 0.05:
+            note = "was sig. — did not survive"
+        elif r.q_whole >= 0.05 and r.q_nn < 0.05:
+            note = "emerges once confound removed"
+        if note:
+            ax.text(max(r.clr_whole, r.clr_nn) + 0.05, i, note, va="center",
+                    fontsize=8.4,
+                    color=ORANGE if r.q_nn < 0.05 else INK_2)
+    ax.set_yticks(range(len(m)))
+    ax.set_yticklabels(m.label_nn, fontsize=10)
+    for tick, (_, r) in zip(ax.get_yticklabels(), m.iterrows()):
+        if r.q_nn < 0.05:
+            tick.set_color(ORANGE)
+            tick.set_fontweight("bold")
+    ax.set_xlim(-0.95, 1.5)
+    ax.set_ylim(len(m) - 0.4, -0.6)
+    _tidy(ax, "CLR shift, aged − adult",
+          "Most age effects were the neuronal denominator moving",
+          "Same 58 donors, two denominators · only endothelium and border macrophages survive")
+    ax.legend(handles=[
+        Line2D([], [], marker="o", ls="", color=BLUE, ms=9,
+               label="Share of ALL cells (confounded)"),
+        Line2D([], [], marker="o", ls="", color=ORANGE, ms=9,
+               label="Share of NON-NEURONAL cells only"),
+    ], loc="lower right", frameon=True, framealpha=0.95, edgecolor="#dedbd2",
+        fontsize=9)
+    fig.tight_layout()
+    for ext in ("png", "svg"):
+        fig.savefig(os.path.join(outdir, "fig5_confound.%s" % ext), dpi=200)
+    plt.close(fig)
+    print("  fig5_confound.png")
+
+
 def main() -> int:
     outdir = sys.argv[1] if len(sys.argv) > 1 else "."
     df = load("aging_cells.csv")
@@ -311,6 +367,7 @@ def main() -> int:
     fig2_regions(props, meta, outdir)
     fig3_immune(outdir)
     fig4_donors(props, meta, outdir)
+    fig5_confound(outdir)
     return 0
 
 
