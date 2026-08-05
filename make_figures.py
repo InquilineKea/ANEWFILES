@@ -43,6 +43,10 @@ INK = "#0b0b0b"
 INK_2 = "#52514e"
 SURFACE = "#fcfcfb"
 
+# Deterministic SVG output: without a fixed hashsalt matplotlib mints random
+# element IDs each run, so re-running produces a large but meaningless diff.
+matplotlib.rcParams["svg.hashsalt"] = "abc-aging-figures"
+
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE,
     "savefig.facecolor": SURFACE, "font.size": 10,
@@ -135,7 +139,8 @@ def fig1_effects(props, meta, outdir):
     ], loc="lower right", frameon=False, fontsize=9)
     fig.tight_layout()
     for ext in ("png", "svg"):
-        fig.savefig(os.path.join(outdir, "fig1_age_effects.%s" % ext), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig1_age_effects.%s" % ext), dpi=200,
+                    metadata={"Date": None} if ext == "svg" else None)
     plt.close(fig)
     print("  fig1_age_effects.png")
 
@@ -177,7 +182,8 @@ def fig2_regions(props, meta, outdir):
                  fontsize=13, fontweight="bold", color=INK, x=0.008, ha="left", y=0.995)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     for ext in ("png", "svg"):
-        fig.savefig(os.path.join(outdir, "fig2_region_dumbbell.%s" % ext), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig2_region_dumbbell.%s" % ext), dpi=200,
+                    metadata={"Date": None} if ext == "svg" else None)
     plt.close(fig)
     print("  fig2_region_dumbbell.png")
 
@@ -224,7 +230,8 @@ def fig3_immune(outdir):
         fontsize=9)
     fig.tight_layout()
     for ext in ("png", "svg"):
-        fig.savefig(os.path.join(outdir, "fig3_immune_composition.%s" % ext), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig3_immune_composition.%s" % ext), dpi=200,
+                    metadata={"Date": None} if ext == "svg" else None)
     plt.close(fig)
     print("  fig3_immune_composition.png")
 
@@ -297,7 +304,8 @@ def fig4_donors(props, meta, outdir):
              fontsize=8.4, color=INK_2)
     fig.tight_layout(rect=[0.0, 0.035, 1, 0.94])
     for ext in ("png", "svg"):
-        fig.savefig(os.path.join(outdir, "fig4_donor_spread.%s" % ext), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig4_donor_spread.%s" % ext), dpi=200,
+                    metadata={"Date": None} if ext == "svg" else None)
     plt.close(fig)
     print("  fig4_donor_spread.png")
 
@@ -353,7 +361,8 @@ def fig5_confound(outdir):
         fontsize=9)
     fig.tight_layout()
     for ext in ("png", "svg"):
-        fig.savefig(os.path.join(outdir, "fig5_confound.%s" % ext), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig5_confound.%s" % ext), dpi=200,
+                    metadata={"Date": None} if ext == "svg" else None)
     plt.close(fig)
     print("  fig5_confound.png")
 
