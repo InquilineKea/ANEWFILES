@@ -26,6 +26,10 @@
   --path-edge:#e3b768;
   --plank:#c98a4b;
   --lamp-off:#3a3354;
+  --s-red:#ff4a5f;
+  --s-green:#2fd27a;
+  --s-blue:#5b8cff;
+  --s-yellow:#ffd23f;
   --lamp-rim:#0e0a1f;
   --display:"Titan One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
@@ -142,6 +146,14 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px dashe
 kbd{font:700 13px var(--body);border:2px solid currentColor;border-radius:6px;padding:0 5px;margin-left:8px;opacity:.75}
 @media (hover:none){kbd{display:none}}
 
+/* Stroop */
+.stroop{height:150px;display:grid;place-items:center;font-family:var(--display);font-size:clamp(46px,12vw,84px);letter-spacing:.04em;background:var(--ink);color:var(--paper);border-radius:22px}
+.spad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.spad button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;background:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--ink);cursor:pointer;touch-action:manipulation;user-select:none}
+.spad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.spad .sw{display:block;width:100%;max-width:70px;height:36px;border-radius:9px;border:2px solid var(--ink)}
+.spad kbd{margin:0;color:var(--ink)}
+
 /* Reaction time */
 .lights{display:flex;justify-content:center;align-items:flex-start;gap:clamp(8px,2.5vw,18px);padding:20px 16px;background:var(--ink);border:0;border-radius:22px;width:100%}
 .rzone{cursor:pointer;touch-action:manipulation;user-select:none}
@@ -188,10 +200,10 @@ details p{margin-top:8px}
 
 <div class="app">
   <header class="hud">
-    <h1 class="logo">Noggin Island<small>Five brain games. One brain age.</small></h1>
+    <h1 class="logo">Noggin Island<small>Six brain games. One brain age.</small></h1>
     <div class="chip" aria-label="Your stats">
       <span class="stat"><span class="coin" aria-hidden="true"></span><span id="coins">10</span></span>
-      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/5</span>
+      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/6</span>
     </div>
     <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
     <button class="iconbtn" id="modeBtn" type="button">Free roam</button>
@@ -199,12 +211,12 @@ details p{margin-top:8px}
   </header>
 
   <div class="board-wrap">
-    <svg id="board" viewBox="0 0 1000 690" role="img" aria-label="Board: a brain-shaped island with a loop of spaces and five game stations"></svg>
+    <svg id="board" viewBox="0 0 1000 690" role="img" aria-label="Board: a brain-shaped island with a loop of spaces and six game stations"></svg>
     <canvas id="world" hidden aria-label="Walkable map of the brain island. Use WASD or arrow keys, or tap where you want to go."></canvas>
   </div>
 
   <div class="bar">
-    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. Play all five to get your brain age.</div>
+    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. Play all six to get your brain age.</div>
     <button class="btn" id="hitBtn" type="button">Hit the block</button>
   </div>
 </div>
@@ -233,6 +245,7 @@ const store = {
 const NORMS = {
   dsst: { sd: 10,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 70 - 0.33 * x - 0.0042 * x * x; } },
   bds:  { sd: 1.25, peak: 28, mu: a => { const x = Math.max(0, a - 28); return 5.8 - 0.02 * x - 0.00025 * x * x; } },
+  stroop:{ sd: 55,  peak: 22, mu: a => { const x = Math.max(0, a - 22); return 85 + 0.6 * x + 0.012 * x * x; } },
   react:{ sd: 75,   peak: 24, mu: a => { const x = Math.max(0, a - 24); return 470 + 2.2 * x + 0.03 * x * x; } },
   rot:  { sd: 55,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 150 - 1.0 * x - 0.012 * x * x; } },
   ws:   { sd: 1.15, peak: 25, mu: a => { const x = Math.max(0, a - 25); return 6.2 - 0.022 * x - 0.0002 * x * x; } }
@@ -260,6 +273,8 @@ const ST = {
           skill: 'Working memory', blurb: 'Hold a string of digits and flip it around in your head.', time: '2 to 3 minutes' },
   dsst: { idx: 8,  id: 'dsst', place: 'Parietal Plaza', lobe: 'Parietal lobe', sign: 'PARIETAL', game: 'Digit Symbol Coding', short: 'SPEED',
           skill: 'Processing speed', blurb: 'Match symbols to digits as fast as your eyes and fingers allow.', time: '90 seconds, plus 5 practice symbols' },
+  stroop:{ idx: 20, id: 'stroop', place: 'Prefrontal Lighthouse', lobe: 'Prefrontal cortex, front of the frontal lobe', sign: 'PREFRONTAL', mark: 'S', game: 'Stroop', short: 'STROOP',
+          skill: 'Inhibition', blurb: 'Name the ink colour, not the word. Easy until RED is printed in blue.', time: 'about 2 minutes' },
   react:{ idx: 5,  id: 'react', place: 'Motor Strip Raceway', lobe: 'Motor cortex, back edge of the frontal lobe', sign: 'MOTOR', game: 'Reaction Time', short: 'REACT',
           skill: 'Response speed', blurb: 'Five red lights, then lights out: go. Then a four-lamp round where you hit whichever lamp lights.', time: 'about 90 seconds' },
   rot:  { idx: 12, id: 'rot',  place: 'Occipital Observatory', lobe: 'Occipital lobe', sign: 'OCCIPITAL', game: 'Rotations', short: 'ROTATE',
@@ -267,8 +282,8 @@ const ST = {
   ws:   { idx: 16, id: 'ws',   place: 'Temporal Tavern', lobe: 'Temporal lobe', sign: 'TEMPORAL', game: 'Word Span', short: 'WORDS',
           skill: 'Verbal short-term memory', blurb: 'Keep a list of words in order, then pick them back out from decoys.', time: '2 to 3 minutes' }
 };
-const ORDER = ['dsst', 'react', 'rot', 'bds', 'ws'];
-const EMPTY = () => ({ dsst: null, react: null, rot: null, bds: null, ws: null });
+const ORDER = ['dsst', 'react', 'stroop', 'rot', 'bds', 'ws'];
+const EMPTY = () => ({ dsst: null, react: null, stroop: null, rot: null, bds: null, ws: null });
 const stationAt = i => Object.values(ST).find(s => s.idx === i);
 
 /* ---------- state ---------- */
@@ -352,7 +367,7 @@ function star(cx, cy, R, r) {
   return p.join(' ');
 }
 const sw = `stroke="${C.ink}" stroke-width="3" stroke-linejoin="round"`;
-function signBoard(text, y, w = text.length > 8 ? 80 : 70) {
+function signBoard(text, y, w = text.length > 9 ? 90 : text.length > 8 ? 80 : 70) {
   return `<rect x="${-w / 2}" y="${y}" width="${w}" height="15" rx="4" fill="${C.paper}" stroke="${C.ink}" stroke-width="2"/>
     <text x="0" y="${y + 11.5}" text-anchor="middle" font-size="10.5" class="svgt" fill="${C.ink}">${text}</text>`;
 }
@@ -371,6 +386,15 @@ function building(kind, sign) {
     <line x1="0" y1="-74" x2="0" y2="-86" stroke="${C.ink}" stroke-width="3"/><circle cx="0" cy="-88" r="4" fill="${C.red}" stroke="${C.ink}" stroke-width="2"/>
     <rect x="-10" y="-16" width="20" height="16" fill="${C.ink}"/>
     ${signBoard(sign, -30)}`;
+  if (kind === 'lighthouse') return `
+    <polygon points="12,-82 52,-96 52,-66" fill="${C.gold}" opacity=".55"/><polygon points="-12,-82 -52,-96 -52,-66" fill="${C.gold}" opacity=".55"/>
+    <ellipse cx="0" cy="-1" rx="32" ry="7" fill="${C.stone}" ${sw}/>
+    <polygon points="-18,-2 18,-2 11,-72 -11,-72" fill="${C.paper}" ${sw}/>
+    <polygon points="-15.6,-26 15.6,-26 14.4,-38 -14.4,-38" fill="${C.red}"/><polygon points="-13,-50 13,-50 11.8,-62 -11.8,-62" fill="${C.red}"/>
+    <polygon points="-18,-2 18,-2 11,-72 -11,-72" fill="none" ${sw}/>
+    <rect x="-12" y="-86" width="24" height="14" fill="${C.gold}" ${sw}/>
+    <polygon points="-16,-86 16,-86 0,-100" fill="${C.red}" ${sw}/>
+    ${signBoard(sign, -20)}`;
   if (kind === 'lights') return `
     <rect x="-46" y="-6" width="92" height="6" fill="${C.paper}" ${sw}/>
     ${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<rect x="${-46 + i * 11.5}" y="-6" width="5.75" height="6" fill="${C.ink}"/>`).join('')}
@@ -426,7 +450,7 @@ function buildBoard() {
   h += `<path d="${track}" fill="none" stroke="${C.ink}" stroke-width="22"/><path d="${track}" fill="none" stroke="${C.sand}" stroke-width="13"/>`;
   // station buildings (outward from the loop)
   for (const s of Object.values(ST)) {
-    const p = pts[s.idx], n = normal(p.t), kind = { bds: 'castle', dsst: 'arcade', react: 'lights', rot: 'dome', ws: 'tavern' }[s.id];
+    const p = pts[s.idx], n = normal(p.t), kind = { bds: 'castle', dsst: 'arcade', react: 'lights', stroop: 'lighthouse', rot: 'dome', ws: 'tavern' }[s.id];
     const bx = p.x + n.x * 74, by = p.y + n.y * 74 + 36;
     h += `<g transform="translate(${bx.toFixed(1)},${by.toFixed(1)})">${building(kind, s.sign)}</g>`;
   }
@@ -452,10 +476,10 @@ function buildBoard() {
     <rect x="362" y="226" width="276" height="160" rx="22" fill="${C.ink}"/>
     <rect x="362" y="220" width="276" height="160" rx="22" fill="${C.paper}" stroke="${C.ink}" stroke-width="4"/>
     <text x="500" y="250" text-anchor="middle" class="svgt" font-size="15" letter-spacing="2" fill="${C.muted}">BRAIN AGE</text>
-    <text id="oNum" x="500" y="309" text-anchor="middle" class="svgt" font-size="56" fill="${C.blue}" stroke="${C.ink}" stroke-width="2.5" paint-order="stroke">??</text>
-    <text id="oSub" x="500" y="334" text-anchor="middle" class="svgb" font-size="13" fill="${C.muted}">play all 4 games to reveal</text>
-    ${ORDER.map((k, j) => `<g transform="translate(${367 + j * 54},348)"><rect id="pip-${k}" width="50" height="20" rx="10" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
-      <text x="25" y="14" text-anchor="middle" class="svgt" font-size="7.5" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
+    <text id="oNum" x="500" y="298" text-anchor="middle" class="svgt" font-size="50" fill="${C.blue}" stroke="${C.ink}" stroke-width="2.5" paint-order="stroke">??</text>
+    <text id="oSub" x="500" y="320" text-anchor="middle" class="svgb" font-size="13" fill="${C.muted}">play all 4 games to reveal</text>
+    ${ORDER.map((k, j) => `<g transform="translate(${370 + (j % 3) * 88},${330 + Math.floor(j / 3) * 22})"><rect id="pip-${k}" width="84" height="18" rx="9" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
+      <text x="42" y="13" text-anchor="middle" class="svgt" font-size="8.5" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
   </g>`;
   // token + dice block + step bubble
   h += `<g id="tok">${noggin()}
@@ -562,6 +586,7 @@ const BITS = [
   'Vocabulary keeps growing into the 60s for many people, even while processing speed drifts down.',
   'Miller\'s "magical number seven" has mostly been revised down to about four chunks when rehearsal is blocked (Cowan, 2001).',
   'In cross-sectional data, processing speed starts its decline in the twenties. Longitudinal data shows a later, gentler start.',
+  'J. R. Stroop described the colour-word effect in 1935. Reading is so automatic that a clashing word slows you down even when you are trying to ignore it.',
   'Simple reaction time barely slows until middle age. Choice reaction time, where you first have to work out which button, slows sooner and more (Der and Deary, 2006).',
   'Shepard and Metzler (1971): the time to match two shapes grows roughly in a straight line with the angle between them, as if you were turning one in your head.',
   'Practice effects are real: retaking these games will usually make your brain age look younger. Your neurons didn\'t get younger, you got better at the game.'
@@ -572,7 +597,7 @@ function landOn(i) {
   if (t === 'blue') { S.coins += 3; sfx.coin(); msg(`<b>Blue space, +3 coins.</b>${tail}`); }
   else if (t === 'red') { S.coins = Math.max(0, S.coins - 3); sfx.bad(); msg(`<b>Red space, −3 coins.</b>${tail}`); }
   else if (t === 'green') { S.coins += 2; sfx.chime(); msg(`<b>Brain bit (+2):</b> ${BITS[ri(BITS.length)]}`); }
-  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All five done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
+  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All six done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
 }
 
 /* ---------- modal plumbing ---------- */
@@ -644,6 +669,7 @@ function scoreText(id) {
   const d = S.details[id] || {};
   if (id === 'dsst') return `${S.scores.dsst} correct in 90 s${d.errors ? `, ${d.errors} slip${d.errors > 1 ? 's' : ''}` : ''}`;
   if (id === 'bds') return `longest backward span ${S.scores.bds}`;
+  if (id === 'stroop') return `${S.scores.stroop} ms Stroop cost${d.con ? ` · ${d.con} ms matching vs ${d.inc} ms clashing` : ''}${d.errors ? ` · ${d.errors} wrong` : ''}`;
   if (id === 'react') return `${S.scores.react} ms choice reaction${d.simple ? ` · lights-out ${d.simple} ms` : ''}${d.wrong ? ` · ${d.wrong} wrong lamp${d.wrong > 1 ? 's' : ''}` : ''}`;
   if (id === 'rot') return `${S.scores.rot} points · ${d.correct} right, ${d.wrong} wrong · biggest grid ${d.maxN}×${d.maxN}`;
   return `longest word span ${S.scores.ws}`;
@@ -656,7 +682,7 @@ function gameResult(id, next) {
   card.innerHTML = `
     <div><span class="eyebrow">${st.place} · finished</span><h2>${st.game}</h2></div>
     <div class="hero"><div class="big">${S.scores[id]}</div><div class="txt"><b>${scoreText(id)}</b>
-      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : id === 'rot' ? 'This one has the roughest age curve of the five, so it counts for less in the final number.' : id === 'react' ? 'Choice reaction slows more with age than simple reaction, so that is the number that counts. Device lag adds noise.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
+      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : id === 'rot' ? 'This one has the roughest age curve of the six, so it counts for less in the final number.' : id === 'react' ? 'Choice reaction slows more with age than simple reaction, so that is the number that counts. Device lag adds noise.' : id === 'stroop' ? 'Lower is better: it is how much a clashing word slowed you down. It counts lightly, because a lot of its age trend is plain slowing.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
     <div class="actions"><button class="btn" id="next" type="button">${all && !S.revealed ? 'Reveal my brain age' : mode === 'roam' ? 'Back to exploring' : 'Back to the board'}</button></div>`;
   $('#next').focus();
   $('#next').onclick = next;
@@ -1043,7 +1069,82 @@ function REACT(api) {
   }
 }
 
-const GAMES = { dsst: DSST, react: REACT, rot: ROT, bds: BDS, ws: WS };
+/* ---------- game 6: stroop ---------- */
+const SCOL = [{ n: 'RED', k: 'r', v: '--s-red' }, { n: 'GREEN', k: 'g', v: '--s-green' }, { n: 'BLUE', k: 'b', v: '--s-blue' }, { n: 'YELLOW', k: 'y', v: '--s-yellow' }];
+function STROOP(api) {
+  const st = ST.stroop;
+  let onResp = null;
+  const wait = ms => new Promise(res => {
+    const id = setTimeout(() => { onResp = null; res(null); }, ms);
+    onResp = r => { clearTimeout(id); onResp = null; res(r); };
+  });
+  const press = r => { if (onResp) onResp(r); };
+  card.innerHTML = `${head(st)}
+    <p>A colour word appears, printed in coloured ink. Answer the <b>ink colour</b> and ignore what the word says.</p>
+    <div class="stroop" style="height:110px"><span style="color:var(--s-red)">BLUE</span></div>
+    <p class="note" style="text-align:center;margin:0 auto">Here the answer is <b>red</b>.</p>
+    <p>Keys: <b>R</b> red, <b>G</b> green, <b>B</b> blue, <b>Y</b> yellow, or tap the swatches. 8 practice words, then 48 for real. About 2 minutes.</p>
+    <p class="note">If you're red-green colour-blind, skip this one. It can't measure what it's meant to, and your brain age still works from the other games.</p>
+    <div class="actions"><button class="btn" id="go" type="button">Practice 8 words</button></div>`;
+  $('#go').focus();
+  $('#go').onclick = () => run(true);
+
+  function makeTrials(n) {
+    const out = []; let prevInk = -1;
+    const kinds = shuffle(Array.from({ length: n }, (_, i) => i % 2 === 0));   // half matching, half clashing
+    for (const cong of kinds) {
+      let ink, word;
+      do { ink = ri(4); } while (ink === prevInk);
+      if (cong) word = ink; else do { word = ri(4); } while (word === ink);
+      out.push({ ink, word, cong }); prevInk = ink;
+    }
+    return out;
+  }
+  async function run(practice) {
+    const trials = makeTrials(practice ? 8 : 48);
+    card.innerHTML = `${head(st)}
+      <div class="meta"><span id="sprog">${practice ? 'Practice' : 'Stroop'} · 1 of ${trials.length}</span><span id="slast"></span></div>
+      <div class="stroop" id="sstim">+</div>
+      <div class="spad" id="spad">${SCOL.map((c, i) => `<button type="button" data-i="${i}" aria-label="${c.n.toLowerCase()}"><span class="sw" style="background:var(${c.v})"></span><kbd>${c.k.toUpperCase()}</kbd></button>`).join('')}</div>
+      <div class="fb" id="fb"></div>`;
+    const stim = $('#sstim'), fb = $('#fb');
+    $('#spad').addEventListener('pointerdown', e => { const b = e.target.closest('[data-i]'); if (b) { e.preventDefault(); press({ t: e.timeStamp, i: +b.dataset.i }); } });
+    keyHandler = e => { const i = 'rgby'.indexOf(e.key.toLowerCase()); if (i >= 0 && e.key.length === 1) { e.preventDefault(); if (!e.repeat) press({ t: e.timeStamp, i: [0, 1, 2, 3][i] }); } };
+    const rec = []; let errors = 0, misses = 0;
+    for (let n = 0; n < trials.length; n++) {
+      if (!api.isAlive()) return;
+      const tr = trials[n];
+      $('#sprog').textContent = `${practice ? 'Practice' : 'Stroop'} · ${n + 1} of ${trials.length}`;
+      stim.textContent = '+'; stim.style.color = '';
+      if (await wait(450)) { await sleep(300); }       // a press during the fixation cross is just ignored
+      if (!api.isAlive()) return;
+      stim.textContent = SCOL[tr.word].n; stim.style.color = `var(${SCOL[tr.ink].v})`;
+      const tOn = await nextFrame();
+      const r = await wait(2500);
+      if (!api.isAlive()) return;
+      stim.textContent = ''; stim.style.color = '';
+      if (!r) { misses++; fb.className = 'fb no'; fb.textContent = 'Too slow. Next one.'; await sleep(600); fb.textContent = ''; continue; }
+      const rt = r.t - tOn, ok = r.i === tr.ink;
+      if (ok) rec.push({ cong: tr.cong, rt }); else { errors++; sfx.bad(); }
+      if (practice) { fb.className = 'fb ' + (ok ? 'ok' : 'no'); fb.textContent = ok ? `Right, ${Math.round(rt)} ms` : `The ink was ${SCOL[tr.ink].n.toLowerCase()}.`; await sleep(ok ? 500 : 1100); fb.textContent = ''; }
+      else if (!ok) { fb.className = 'fb no'; fb.textContent = '✗'; await sleep(300); fb.textContent = ''; }
+      else $('#slast').textContent = `${Math.round(rt)} ms`;
+    }
+    keyHandler = null;
+    if (!api.isAlive()) return;
+    if (practice) {
+      card.innerHTML = `${head(st)}<p>Practice done. 48 words now. Half the time word and ink match, half the time they clash. Same keys.</p>
+        <div class="actions"><button class="btn" id="go" type="button">Start</button></div>`;
+      $('#go').focus(); $('#go').onclick = () => run(false);
+      return;
+    }
+    const con = median(rec.filter(x => x.cong).map(x => x.rt)), inc = median(rec.filter(x => !x.cong).map(x => x.rt));
+    const cost = con != null && inc != null ? Math.round(inc - con) : 300;
+    api.done(cost, { con: con == null ? null : Math.round(con), inc: inc == null ? null : Math.round(inc), errors, misses, acc: Math.round(100 * rec.length / trials.length) });
+  }
+}
+
+const GAMES = { dsst: DSST, react: REACT, stroop: STROOP, rot: ROT, bds: BDS, ws: WS };
 
 /* ---------- results ---------- */
 const pc = a => ((clamp(a, 20, 90) - 20) / 70 * 100);
@@ -1080,7 +1181,7 @@ function showResults(fanfare) {
     const missing = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place);
     const ages = [25, 45, 65, 85];
     card.innerHTML = `
-      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all five games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
+      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all six games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
       <div class="hero"><div class="big">${f.age}</div><div class="txt">
         <b>Plausible range ${f.lo} to ${f.hi}</b>
         <span class="note">${done.length < 3 ? `Still to play: ${missing.join(', ')}. ` : ''}The dot is the single best guess. The gold band is every age that fits your scores about as well.</span></div></div>
@@ -1094,11 +1195,12 @@ function showResults(fanfare) {
           <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}</div>`;
       }).join('')}</div>
       <details><summary>How this number is made</summary>
-        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your five scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the five, so it gets a wide spread and pulls about half as hard. Span scores move only about one point between 25 and 75, so they nudge the estimate.</p>
+        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your six scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the six, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate.</p>
         <p>The curves are hand-fitted to the shape of published age trends (Wechsler coding and digit span norms, word span studies). They have not been calibrated against this exact app, its timing or touch vs. keyboard input. Treat it as a party game with honest error bars, not a medical test. Replays get easier, so your first run is the fairest.</p>
         <div class="ntable"><table><thead><tr><th>Typical score at age</th>${ages.map(a => `<th>${a}</th>`).join('')}<th>Spread (SD)</th></tr></thead><tbody>
           <tr><td>Digit Symbol (correct in 90 s)</td>${ages.map(a => `<td>${NORMS.dsst.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.dsst.sd}</td></tr>
           <tr><td>Backward Digit Span (longest)</td>${ages.map(a => `<td>${NORMS.bds.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.bds.sd}</td></tr>
+          <tr><td>Stroop cost (clashing minus matching, ms)</td>${ages.map(a => `<td>${NORMS.stroop.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.stroop.sd}</td></tr>
           <tr><td>Reaction Time (choice, median ms)</td>${ages.map(a => `<td>${NORMS.react.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.react.sd}</td></tr>
           <tr><td>Rotations (points in 90 s)</td>${ages.map(a => `<td>${NORMS.rot.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.rot.sd}</td></tr>
           <tr><td>Word Span (longest)</td>${ages.map(a => `<td>${NORMS.ws.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.ws.sd}</td></tr>
@@ -1172,11 +1274,12 @@ const RIVERS = [
 ];
 const RIVER_HALF = 24;
 const BRIDGES = [pt(1090, 295), pt(1000, 856), pt(700, 990)];
-const RS = { bds: pt(390, 690), dsst: pt(1340, 380), react: pt(870, 470), rot: pt(1720, 740), ws: pt(1000, 1080) };
+const RS = { bds: pt(390, 690), dsst: pt(1340, 380), react: pt(870, 470), stroop: pt(300, 880), rot: pt(1720, 740), ws: pt(1000, 1080) };
 const ORACLE = pt(1000, 740);
 const PATHS = [
   [pt(1000, 770), pt(1000, 856), pt(1000, 990)],
   [pt(950, 660), pt(900, 570), pt(875, 505)],
+  [pt(400, 730), pt(350, 800), pt(320, 870)],
   [pt(940, 740), pt(700, 720), pt(470, 700)],
   [pt(1040, 690), pt(1200, 560), pt(1330, 440)],
   [pt(1060, 750), pt(1400, 770), pt(1650, 750)],
@@ -1225,7 +1328,7 @@ function svgImg(markup, vb, w, h) {
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="${w}" height="${h}">${fixed}</svg>`);
   return img;
 }
-const KIND = { bds: 'castle', dsst: 'arcade', react: 'lights', rot: 'dome', ws: 'tavern' };
+const KIND = { bds: 'castle', dsst: 'arcade', react: 'lights', stroop: 'lighthouse', rot: 'dome', ws: 'tavern' };
 
 function drawNeuron(g, t) {
   const rnd = mulberry(t.seed), n = 5 + Math.floor(rnd() * 3);
@@ -1339,15 +1442,15 @@ function drawOracle(ctx) {
   ctx.fillStyle = C.ink; rr(ctx, x - 140, y - 222, 280, 156, 22); ctx.fill();
   ctx.fillStyle = C.paper; rr(ctx, x - 140, y - 230, 280, 156, 22); ctx.fill(); ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = C.muted; ctx.font = `15px ${FD}`; ctx.fillText('B R A I N   A G E', x, y - 198);
-  ctx.font = `58px ${FD}`; ctx.lineWidth = 6; ctx.strokeStyle = C.ink; ctx.strokeText(f ? f.age : '??', x, y - 132); ctx.fillStyle = C.blue; ctx.fillText(f ? f.age : '??', x, y - 132);
+  ctx.fillStyle = C.muted; ctx.font = `15px ${FD}`; ctx.fillText('B R A I N   A G E', x, y - 204);
+  ctx.font = `50px ${FD}`; ctx.lineWidth = 6; ctx.strokeStyle = C.ink; ctx.strokeText(f ? f.age : '??', x, y - 150); ctx.fillStyle = C.blue; ctx.fillText(f ? f.age : '??', x, y - 150);
   ctx.fillStyle = C.muted; ctx.font = `700 14px ${FB}`;
-  ctx.fillText(!f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · bump me`, x, y - 104);
+  ctx.fillText(!f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · bump me`, x, y - 127);
   ORDER.forEach((k, j) => {
-    const px = x - 133 + j * 54;
+    const px = x - 130 + (j % 3) * 88, py = y - 118 + Math.floor(j / 3) * 21;
     ctx.fillStyle = S.scores[k] != null ? C.gold : '#fff'; ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5;
-    rr(ctx, px, y - 94, 50, 18, 9); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = C.ink; ctx.font = `7.5px ${FD}`; ctx.fillText(ST[k].short, px + 25, y - 81.5);
+    rr(ctx, px, py, 84, 17, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.font = `8.5px ${FD}`; ctx.fillText(ST[k].short, px + 42, py + 12.5);
   });
 }
 
@@ -1398,7 +1501,7 @@ function draw(now) {
     ctx.save(); ctx.translate(ex, ey);
     ctx.rotate(a); ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(14, -10); ctx.lineTo(14, 10); ctx.closePath(); ctx.fill(); ctx.rotate(-a);
     ctx.fillStyle = C.gold; ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = C.ink; ctx.font = `16px ${FD}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ST[id].sign[0], 0, 1);
+    ctx.fillStyle = C.ink; ctx.font = `16px ${FD}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ST[id].mark || ST[id].sign[0], 0, 1);
     ctx.restore();
   }
 }
