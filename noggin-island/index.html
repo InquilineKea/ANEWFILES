@@ -123,6 +123,18 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px dashe
 .fb.ok{color:var(--green)}
 .fb.no{color:var(--red)}
 
+/* Rotations */
+.rpair{display:flex;justify-content:center;align-items:center;gap:clamp(10px,3vw,26px);padding:12px;border:3px dashed transparent;border-radius:22px}
+.rpair.ok{border-color:var(--green)}
+.rpair.no{border-color:var(--red)}
+.rgrid{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:3px;width:min(36vw,220px);aspect-ratio:1;padding:4px;background:var(--ink);border-radius:12px}
+.rgrid i{background:#fff;border-radius:3px}
+.rgrid i.on{background:var(--blue)}
+.rpair .vs{font-family:var(--display);font-size:clamp(20px,5vw,30px);color:var(--muted)}
+.rbtns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+kbd{font:700 13px var(--body);border:2px solid currentColor;border-radius:6px;padding:0 5px;margin-left:8px;opacity:.75}
+@media (hover:none){kbd{display:none}}
+
 /* Results */
 .big{font-family:var(--display);font-size:clamp(72px,18vw,120px);line-height:.9;color:var(--blue);text-shadow:0 5px 0 var(--ink)}
 .hero{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 20px}
@@ -159,21 +171,21 @@ details p{margin-top:8px}
 
 <div class="app">
   <header class="hud">
-    <h1 class="logo">Noggin Island<small>Three brain games. One brain age.</small></h1>
+    <h1 class="logo">Noggin Island<small>Four brain games. One brain age.</small></h1>
     <div class="chip" aria-label="Your stats">
       <span class="stat"><span class="coin" aria-hidden="true"></span><span id="coins">10</span></span>
-      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/3</span>
+      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/4</span>
     </div>
     <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
     <button class="iconbtn" id="resultsBtn" type="button">Brain age</button>
   </header>
 
   <div class="board-wrap">
-    <svg id="board" viewBox="0 0 1000 690" role="img" aria-label="Board: a brain-shaped island with a loop of spaces and three game stations"></svg>
+    <svg id="board" viewBox="0 0 1000 690" role="img" aria-label="Board: a brain-shaped island with a loop of spaces and four game stations"></svg>
   </div>
 
   <div class="bar">
-    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. Play all three to get your brain age.</div>
+    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. Play all four to get your brain age.</div>
     <button class="btn" id="hitBtn" type="button">Hit the block</button>
   </div>
 </div>
@@ -202,6 +214,7 @@ const store = {
 const NORMS = {
   dsst: { sd: 10,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 70 - 0.33 * x - 0.0042 * x * x; } },
   bds:  { sd: 1.25, peak: 28, mu: a => { const x = Math.max(0, a - 28); return 5.8 - 0.02 * x - 0.00025 * x * x; } },
+  rot:  { sd: 55,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 150 - 1.0 * x - 0.012 * x * x; } },
   ws:   { sd: 1.15, peak: 25, mu: a => { const x = Math.max(0, a - 25); return 6.2 - 0.022 * x - 0.0002 * x * x; } }
 };
 // Brain age = the age where your scores are jointly most typical (min summed squared z).
@@ -227,14 +240,17 @@ const ST = {
           skill: 'Working memory', blurb: 'Hold a string of digits and flip it around in your head.', time: '2 to 3 minutes' },
   dsst: { idx: 8,  id: 'dsst', place: 'Parietal Plaza', lobe: 'Parietal lobe', sign: 'PARIETAL', game: 'Digit Symbol Coding', short: 'SPEED',
           skill: 'Processing speed', blurb: 'Match symbols to digits as fast as your eyes and fingers allow.', time: '90 seconds, plus 5 practice symbols' },
+  rot:  { idx: 12, id: 'rot',  place: 'Occipital Observatory', lobe: 'Occipital lobe', sign: 'OCCIPITAL', game: 'Rotations', short: 'ROTATE',
+          skill: 'Mental rotation', blurb: 'Two grids. Is the right one the left one turned around, or its mirror image?', time: '90 seconds, plus 4 practice pairs' },
   ws:   { idx: 16, id: 'ws',   place: 'Temporal Tavern', lobe: 'Temporal lobe', sign: 'TEMPORAL', game: 'Word Span', short: 'WORDS',
           skill: 'Verbal short-term memory', blurb: 'Keep a list of words in order, then pick them back out from decoys.', time: '2 to 3 minutes' }
 };
-const ORDER = ['dsst', 'bds', 'ws'];
+const ORDER = ['dsst', 'rot', 'bds', 'ws'];
+const EMPTY = () => ({ dsst: null, rot: null, bds: null, ws: null });
 const stationAt = i => Object.values(ST).find(s => s.idx === i);
 
 /* ---------- state ---------- */
-const S = { pos: 3, coins: 10, scores: { dsst: null, bds: null, ws: null }, details: {}, revealed: false, realAge: store.get('noggin-age', null), phase: 'await' };
+const S = { pos: 3, coins: 10, scores: EMPTY(), details: {}, revealed: false, realAge: store.get('noggin-age', null), phase: 'await' };
 let sound = store.get('noggin-sound', true);
 
 /* ---------- sound ---------- */
@@ -314,7 +330,7 @@ function star(cx, cy, R, r) {
   return p.join(' ');
 }
 const sw = `stroke="${C.ink}" stroke-width="3" stroke-linejoin="round"`;
-function signBoard(text, y, w = 70) {
+function signBoard(text, y, w = text.length > 8 ? 80 : 70) {
   return `<rect x="${-w / 2}" y="${y}" width="${w}" height="15" rx="4" fill="${C.paper}" stroke="${C.ink}" stroke-width="2"/>
     <text x="0" y="${y + 11.5}" text-anchor="middle" font-size="10.5" class="svgt" fill="${C.ink}">${text}</text>`;
 }
@@ -333,6 +349,14 @@ function building(kind, sign) {
     <line x1="0" y1="-74" x2="0" y2="-86" stroke="${C.ink}" stroke-width="3"/><circle cx="0" cy="-88" r="4" fill="${C.red}" stroke="${C.ink}" stroke-width="2"/>
     <rect x="-10" y="-16" width="20" height="16" fill="${C.ink}"/>
     ${signBoard(sign, -30)}`;
+  if (kind === 'dome') return `
+    <rect x="-5" y="-92" width="11" height="34" rx="3" fill="${C.gold}" ${sw} transform="rotate(28 0 -62)"/>
+    <path d="M-34 -34 A34 34 0 0 1 34 -34 Z" fill="${C.blue}" ${sw}/>
+    <path d="M-4 -67 L4 -67 L7 -35 L-7 -35 Z" fill="${C.ink}"/>
+    <rect x="-36" y="-36" width="72" height="36" fill="${C.stone}" ${sw}/>
+    <rect x="-8" y="-14" width="16" height="14" fill="${C.ink}"/>
+    <polygon points="${star(34, -78, 8, 3.5)}" fill="${C.gold}" stroke="${C.ink}" stroke-width="2" stroke-linejoin="round"/>
+    ${signBoard(sign, -31)}`;
   return `
     <rect x="18" y="-80" width="12" height="22" fill="${C.red}" ${sw}/>
     <polygon points="-44,-44 0,-78 44,-44" fill="${C.blue}" ${sw}/>
@@ -373,7 +397,7 @@ function buildBoard() {
   h += `<path d="${track}" fill="none" stroke="${C.ink}" stroke-width="22"/><path d="${track}" fill="none" stroke="${C.sand}" stroke-width="13"/>`;
   // station buildings (outward from the loop)
   for (const s of Object.values(ST)) {
-    const p = pts[s.idx], n = normal(p.t), kind = s.id === 'bds' ? 'castle' : s.id === 'dsst' ? 'arcade' : 'tavern';
+    const p = pts[s.idx], n = normal(p.t), kind = { bds: 'castle', dsst: 'arcade', rot: 'dome', ws: 'tavern' }[s.id];
     const bx = p.x + n.x * 74, by = p.y + n.y * 74 + 36;
     h += `<g transform="translate(${bx.toFixed(1)},${by.toFixed(1)})">${building(kind, s.sign)}</g>`;
   }
@@ -400,9 +424,9 @@ function buildBoard() {
     <rect x="362" y="220" width="276" height="160" rx="22" fill="${C.paper}" stroke="${C.ink}" stroke-width="4"/>
     <text x="500" y="250" text-anchor="middle" class="svgt" font-size="15" letter-spacing="2" fill="${C.muted}">BRAIN AGE</text>
     <text id="oNum" x="500" y="309" text-anchor="middle" class="svgt" font-size="56" fill="${C.blue}" stroke="${C.ink}" stroke-width="2.5" paint-order="stroke">??</text>
-    <text id="oSub" x="500" y="334" text-anchor="middle" class="svgb" font-size="13" fill="${C.muted}">play all 3 games to reveal</text>
-    ${ORDER.map((k, j) => `<g transform="translate(${397 + j * 82},348)"><rect id="pip-${k}" width="74" height="20" rx="10" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
-      <text x="37" y="14.5" text-anchor="middle" class="svgt" font-size="10" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
+    <text id="oSub" x="500" y="334" text-anchor="middle" class="svgb" font-size="13" fill="${C.muted}">play all 4 games to reveal</text>
+    ${ORDER.map((k, j) => `<g transform="translate(${370 + j * 66},348)"><rect id="pip-${k}" width="62" height="20" rx="10" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
+      <text x="31" y="14.3" text-anchor="middle" class="svgt" font-size="8.5" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
   </g>`;
   // token + dice block + step bubble
   h += `<g id="tok">${noggin()}
@@ -444,7 +468,7 @@ function hud() {
   $('#stars').textContent = ORDER.filter(k => S.scores[k] != null).length;
   const f = fitAge(S.scores), n = f ? f.n : 0;
   $('#oNum').textContent = f ? f.age : '??';
-  $('#oSub').textContent = !f ? 'play all 3 games to reveal' : n < 3 ? `so far · ${n} of 3 games` : `plausible ${f.lo}–${f.hi} · tap for details`;
+  $('#oSub').textContent = !f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · tap for details`;
   ORDER.forEach(k => $('#pip-' + k).setAttribute('fill', S.scores[k] != null ? C.gold : '#fff'));
   $('#soundBtn').textContent = sound ? 'Sound on' : 'Sound off';
   $('#soundBtn').setAttribute('aria-pressed', String(sound));
@@ -509,6 +533,7 @@ const BITS = [
   'Vocabulary keeps growing into the 60s for many people, even while processing speed drifts down.',
   'Miller\'s "magical number seven" has mostly been revised down to about four chunks when rehearsal is blocked (Cowan, 2001).',
   'In cross-sectional data, processing speed starts its decline in the twenties. Longitudinal data shows a later, gentler start.',
+  'Shepard and Metzler (1971): the time to match two shapes grows roughly in a straight line with the angle between them, as if you were turning one in your head.',
   'Practice effects are real: retaking these games will usually make your brain age look younger. Your neurons didn\'t get younger, you got better at the game.'
 ];
 function landOn(i) {
@@ -517,7 +542,7 @@ function landOn(i) {
   if (t === 'blue') { S.coins += 3; sfx.coin(); msg(`<b>Blue space, +3 coins.</b>${tail}`); }
   else if (t === 'red') { S.coins = Math.max(0, S.coins - 3); sfx.bad(); msg(`<b>Red space, −3 coins.</b>${tail}`); }
   else if (t === 'green') { S.coins += 2; sfx.chime(); msg(`<b>Brain bit (+2):</b> ${BITS[ri(BITS.length)]}`); }
-  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All three done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
+  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All four done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
 }
 
 /* ---------- modal plumbing ---------- */
@@ -587,6 +612,7 @@ function scoreText(id) {
   const d = S.details[id] || {};
   if (id === 'dsst') return `${S.scores.dsst} correct in 90 s${d.errors ? `, ${d.errors} slip${d.errors > 1 ? 's' : ''}` : ''}`;
   if (id === 'bds') return `longest backward span ${S.scores.bds}`;
+  if (id === 'rot') return `${S.scores.rot} points · ${d.correct} right, ${d.wrong} wrong · biggest grid ${d.maxN}×${d.maxN}`;
   return `longest word span ${S.scores.ws}`;
 }
 function gameResult(id, next) {
@@ -597,7 +623,7 @@ function gameResult(id, next) {
   card.innerHTML = `
     <div><span class="eyebrow">${st.place} · finished</span><h2>${st.game}</h2></div>
     <div class="hero"><div class="big">${S.scores[id]}</div><div class="txt"><b>${scoreText(id)}</b>
-      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
+      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : id === 'rot' ? 'This one has the roughest age curve of the four, so it counts for less in the final number.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
     <div class="actions"><button class="btn" id="next" type="button">${all && !S.revealed ? 'Reveal my brain age' : 'Back to the board'}</button></div>`;
   $('#next').focus();
   $('#next').onclick = next;
@@ -790,7 +816,101 @@ function WS(api) {
     })
   });
 }
-const GAMES = { dsst: DSST, bds: BDS, ws: WS };
+/* ---------- game 4: rotations ---------- */
+// [grid size, filled squares] per level. Right answer: up a level; wrong: down one.
+const ROT_LV = [[3, 4], [3, 5], [4, 6], [4, 7], [4, 8], [5, 9], [5, 10], [5, 12], [6, 13], [6, 15], [6, 17], [7, 19], [7, 21], [7, 24], [8, 27], [8, 30]];
+const ROT_EX = [[0, 1, 0], [0, 1, 0], [0, 1, 1]];
+const rot90 = g => g.map((row, i) => row.map((_, j) => g[g.length - 1 - j][i]));
+const flipH = g => g.map(r => r.slice().reverse());
+const gkey = g => g.map(r => r.join('')).join('/');
+function makePair(lv) {
+  const [n, k] = ROT_LV[lv];
+  for (;;) {
+    const on = new Set(shuffle([...Array(n * n).keys()]).slice(0, k));
+    const A = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => on.has(i * n + j) ? 1 : 0));
+    const rots = [A]; for (let r = 1; r < 4; r++) rots.push(rot90(rots[r - 1]));
+    const M = flipH(A);
+    // skip patterns with mirror symmetry (mirror == some rotation) or 90° symmetry: the answer would be ambiguous or trivial
+    if (rots.some(R => gkey(R) === gkey(M)) || gkey(rots[1]) === gkey(A)) continue;
+    const same = Math.random() < .5;
+    let B = same ? A : M;
+    for (let t = 1 + ri(3); t > 0; t--) B = rot90(B);
+    return { A, B, same, n, k };
+  }
+}
+const gridHTML = g => `<div class="rgrid" style="--n:${g.length}">${g.flat().map(v => `<i${v ? ' class="on"' : ''}></i>`).join('')}</div>`;
+
+function ROT(api) {
+  const st = ST.rot;
+  card.innerHTML = `${head(st)}
+    <p>Two grids appear. The right one is always turned 90°, 180° or 270°. Your call: is it the <b>same</b> grid rotated, or a <b>mirror image</b> of it, rotated?</p>
+    <div class="rpair">${gridHTML(ROT_EX)}<span class="vs">→</span>${gridHTML(rot90(ROT_EX))}</div>
+    <p class="note" style="text-align:center;margin:0 auto">Example: same grid, turned 90° clockwise.</p>
+    <p>Right answers grow the grids, wrong ones shrink them. Every blue square in a pair you get right is a point; in a pair you get wrong it costs a point. 4 practice pairs, then 90 seconds.</p>
+    <p class="note">Keyboard: ← or S for same, → or M for mirror.</p>
+    <div class="actions"><button class="btn" id="go" type="button">Practice 4 pairs</button></div>`;
+  $('#go').focus();
+  $('#go').onclick = () => play(true);
+
+  function play(practice) {
+    card.innerHTML = `${head(st)}
+      <div class="meta"><span id="lvl">${practice ? 'Practice' : 'Go'}</span><span><b id="pts">0</b> points</span></div>
+      ${practice ? '' : '<div class="timer"><i id="bar"></i></div>'}
+      <div class="rpair" id="rpair"></div>
+      <div class="rbtns"><button class="btn blue" type="button" data-a="same">Same, rotated<kbd>←</kbd></button><button class="btn" type="button" data-a="mirror">Mirror image<kbd>→</kbd></button></div>
+      <div class="fb" id="fb"></div>`;
+    let lv = 0, pts = 0, correct = 0, wrong = 0, maxN = 3, cur = null, locked = false, seen = 0;
+    const box = $('#rpair'), fb = $('#fb');
+    const show = () => {
+      cur = makePair(lv); maxN = Math.max(maxN, cur.n);
+      box.innerHTML = gridHTML(cur.A) + '<span class="vs">→</span>' + gridHTML(cur.B);
+      if (!practice) $('#lvl').textContent = `Grid ${cur.n}×${cur.n} · ${cur.k} squares`;
+    };
+    const answer = saySame => {
+      if (!api.isAlive() || locked || !cur) return;
+      const ok = saySame === cur.same;
+      if (ok) { correct++; pts += cur.k; lv = Math.min(lv + 1, ROT_LV.length - 1); }
+      else { wrong++; pts -= cur.k; lv = Math.max(0, lv - 1); }
+      $('#pts').textContent = Math.max(0, pts);
+      box.classList.add(ok ? 'ok' : 'no');
+      if (practice) { fb.className = 'fb ' + (ok ? 'ok' : 'no'); fb.textContent = (ok ? 'Right. ' : 'Not quite. ') + (cur.same ? 'That was the same grid, rotated.' : 'That was a mirror image.'); }
+      locked = true;
+      setTimeout(() => {
+        if (!api.isAlive()) return;
+        locked = false; box.classList.remove('ok', 'no'); fb.textContent = '';
+        if (practice && ++seen >= 4) { ready(); return; }
+        show();
+      }, practice ? 1100 : 220);
+    };
+    keyHandler = e => {
+      const k = e.key.toLowerCase();
+      if (k === 'arrowleft' || k === 's') { e.preventDefault(); answer(true); }
+      else if (k === 'arrowright' || k === 'm') { e.preventDefault(); answer(false); }
+    };
+    card.querySelector('.rbtns').onclick = e => { const b = e.target.closest('button[data-a]'); if (b) answer(b.dataset.a === 'same'); };
+    show();
+    if (!practice) {
+      const T = 90000, t0 = performance.now(), bar = $('#bar');
+      const tick = now => {
+        if (!api.isAlive()) return;
+        const p = (now - t0) / T;
+        bar.style.transform = `scaleX(${Math.max(0, 1 - p)})`;
+        if (p >= 1) { keyHandler = null; const score = Math.max(0, pts); api.done(score, { points: score, correct, wrong, maxN }); return; }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+  function ready() {
+    keyHandler = null;
+    card.innerHTML = `${head(st)}<p>Practice done. The clock run starts back at small grids and climbs as you get them right.</p>
+      <div class="actions"><button class="btn" id="go" type="button">Start the clock</button></div>`;
+    $('#go').focus();
+    $('#go').onclick = () => play(false);
+  }
+}
+
+const GAMES = { dsst: DSST, rot: ROT, bds: BDS, ws: WS };
 
 /* ---------- results ---------- */
 const pc = a => ((clamp(a, 20, 90) - 20) / 70 * 100);
@@ -822,12 +942,12 @@ function showResults(fanfare) {
       return;
     }
     const hist = store.get('noggin-history', []);
-    if (fanfare && done.length === 3) { hist.push({ t: Date.now(), age: f.age }); store.set('noggin-history', hist.slice(-12)); }
-    const prev = hist.slice(0, fanfare && done.length === 3 ? -1 : undefined).slice(-5);
+    if (fanfare && done.length === ORDER.length) { hist.push({ t: Date.now(), age: f.age }); store.set('noggin-history', hist.slice(-12)); }
+    const prev = hist.slice(0, fanfare && done.length === ORDER.length ? -1 : undefined).slice(-5);
     const missing = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place);
     const ages = [25, 45, 65, 85];
     card.innerHTML = `
-      <div><span class="eyebrow">${done.length === 3 ? 'Composite of all three games' : `Provisional · ${done.length} of 3 games`}</span><h2>Your brain age</h2></div>
+      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all four games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
       <div class="hero"><div class="big">${f.age}</div><div class="txt">
         <b>Plausible range ${f.lo} to ${f.hi}</b>
         <span class="note">${done.length < 3 ? `Still to play: ${missing.join(', ')}. ` : ''}The dot is the single best guess. The gold band is every age that fits your scores about as well.</span></div></div>
@@ -841,11 +961,12 @@ function showResults(fanfare) {
           <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}</div>`;
       }).join('')}</div>
       <details><summary>How this number is made</summary>
-        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your three scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding. Span scores move only about one point between 25 and 75, so they nudge the estimate.</p>
+        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your four scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding. Rotations also falls steeply with age, but its curve is the roughest guess of the four, so it gets a wide spread and pulls about half as hard. Span scores move only about one point between 25 and 75, so they nudge the estimate.</p>
         <p>The curves are hand-fitted to the shape of published age trends (Wechsler coding and digit span norms, word span studies). They have not been calibrated against this exact app, its timing or touch vs. keyboard input. Treat it as a party game with honest error bars, not a medical test. Replays get easier, so your first run is the fairest.</p>
         <div class="ntable"><table><thead><tr><th>Typical score at age</th>${ages.map(a => `<th>${a}</th>`).join('')}<th>Spread (SD)</th></tr></thead><tbody>
           <tr><td>Digit Symbol (correct in 90 s)</td>${ages.map(a => `<td>${NORMS.dsst.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.dsst.sd}</td></tr>
           <tr><td>Backward Digit Span (longest)</td>${ages.map(a => `<td>${NORMS.bds.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.bds.sd}</td></tr>
+          <tr><td>Rotations (points in 90 s)</td>${ages.map(a => `<td>${NORMS.rot.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.rot.sd}</td></tr>
           <tr><td>Word Span (longest)</td>${ages.map(a => `<td>${NORMS.ws.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.ws.sd}</td></tr>
         </tbody></table></div>
       </details>
@@ -860,9 +981,9 @@ function showResults(fanfare) {
       $('#cmp').textContent = compare(f);
       $('#compMeter').innerHTML = meter(f, S.realAge);
     };
-    $('#back').onclick = () => { closeModal(); msg(done.length === 3 ? `<b>Brain age ${f.age}.</b> Walk around to replay any game, or hit the block for coins.` : `<b>${3 - done.length} to go.</b> Hit the block and keep walking.`); resolve(); };
+    $('#back').onclick = () => { closeModal(); msg(done.length === ORDER.length ? `<b>Brain age ${f.age}.</b> Walk around to replay any game, or hit the block for coins.` : `<b>${ORDER.length - done.length} to go.</b> Hit the block and keep walking.`); resolve(); };
     $('#reset').onclick = () => {
-      S.scores = { dsst: null, bds: null, ws: null }; S.details = {}; S.revealed = false;
+      S.scores = EMPTY(); S.details = {}; S.revealed = false;
       hud(); closeModal(); msg('<b>Scores cleared.</b> Fresh start. Hit the block.'); resolve();
     };
   });
@@ -872,7 +993,7 @@ function showResults(fanfare) {
 function start(data) {
   if (data && data.scores) {
     ['pos', 'coins', 'revealed'].forEach(k => { if (data[k] != null) S[k] = data[k]; });
-    S.scores = Object.assign({ dsst: null, bds: null, ws: null }, data.scores);
+    S.scores = Object.assign(EMPTY(), data.scores);
     S.details = data.details || {};
   }
   buildBoard();
