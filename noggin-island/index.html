@@ -261,13 +261,14 @@ const store = {
 const NORMS = {
   dsst: { sd: 10,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 70 - 0.33 * x - 0.0042 * x * x; } },
   bds:  { sd: 1.25, peak: 28, mu: a => { const x = Math.max(0, a - 28); return 5.8 - 0.02 * x - 0.00025 * x * x; } },
+  meteor:{ sd: 150, peak: 24, mu: a => { const x = Math.max(0, a - 24); return 560 + 3 * x + 0.04 * x * x; } },
   recall:{ sd: 1.8,  peak: 25, mu: a => { const x = Math.max(0, a - 25); return 7.2 - 0.03 * x - 0.0006 * x * x; } },
   stroop:{ sd: 55,  peak: 22, mu: a => { const x = Math.max(0, a - 22); return 85 + 0.6 * x + 0.012 * x * x; } },
   react:{ sd: 75,   peak: 24, mu: a => { const x = Math.max(0, a - 24); return 470 + 2.2 * x + 0.03 * x * x; } },
   rot:  { sd: 55,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 150 - 1.0 * x - 0.012 * x * x; } },
   ws:   { sd: 1.15, peak: 25, mu: a => { const x = Math.max(0, a - 25); return 6.2 - 0.022 * x - 0.0002 * x * x; } }
 };
-NORMS.react.dir = NORMS.stroop.dir = -1;   // lower is better
+NORMS.react.dir = NORMS.stroop.dir = NORMS.meteor.dir = -1;   // lower is better
 // Brain age = the age where your scores are jointly most typical (min summed squared z).
 // Range = ages within 0.5 of that minimum in negative log-likelihood (roughly a 1-SD band).
 function fitAge(scores) {
@@ -291,6 +292,8 @@ const ST = {
           skill: 'Working memory', blurb: 'Hold a string of digits and flip it around in your head.', time: '2 to 3 minutes' },
   dsst: { idx: 8,  id: 'dsst', place: 'Parietal Plaza', lobe: 'Parietal lobe', sign: 'PARIETAL', game: 'Digit Symbol Coding', short: 'SPEED',
           skill: 'Processing speed', blurb: 'Match symbols to digits as fast as your eyes and fingers allow.', time: '90 seconds, plus 5 practice symbols' },
+  meteor:{ idx: null, id: 'meteor', place: 'the open map', lobe: 'Everywhere', sign: 'METEOR', game: 'Meteor Dodging', short: 'METEOR',
+          skill: 'Reaction under surprise', blurb: '', time: '' },
   recall:{ idx: null, id: 'recall', place: 'Brain Age statue', lobe: 'Hippocampus', sign: 'RECALL', mark: 'R', game: 'Delayed Recall', short: 'RECALL',
           skill: 'Episodic memory', blurb: 'Learn ten words, play other games, then type them back.', time: '2 minutes now, 1 minute later' },
   stroop:{ idx: 20, id: 'stroop', place: 'Prefrontal Lighthouse', lobe: 'Prefrontal cortex, front of the frontal lobe', sign: 'PREFRONTAL', mark: 'S', game: 'Stroop', short: 'STROOP',
@@ -540,7 +543,7 @@ function msg(html) { $('#msg').innerHTML = html; }
 function hud() {
   $('#coins').textContent = S.coins;
   $('#stars').textContent = ORDER.filter(k => S.scores[k] != null).length;
-  const f = fitAge(S.scores), n = f ? f.n : 0;
+  const f = fitAge(S.scores), n = ORDER.filter(k => S.scores[k] != null).length;
   $('#oNum').textContent = f ? f.age : '??';
   $('#oSub').textContent = !f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · tap for details`;
   ORDER.forEach(k => $('#pip-' + k).setAttribute('fill', S.scores[k] != null ? C.gold : k === 'recall' && S.recall ? C.sand : '#fff'));
@@ -692,6 +695,7 @@ function scoreText(id) {
   const d = S.details[id] || {};
   if (id === 'dsst') return `${S.scores.dsst} correct in 90 s${d.errors ? `, ${d.errors} slip${d.errors > 1 ? 's' : ''}` : ''}`;
   if (id === 'bds') return `longest backward span ${S.scores.bds}`;
+  if (id === 'meteor') return `${S.scores.meteor} ms median to start moving · ${d.n} standstill meteors timed (hits count, freezing counts as the full warning time)`;
   if (id === 'recall') return `${S.scores.recall} of 10 words after ${d.mins} min${d.imm != null ? ` (${d.imm} right after learning)` : ''}${d.missed && d.missed.length ? ` · missed: ${d.missed.join(', ')}` : ''}`;
   if (id === 'stroop') return `${S.scores.stroop} ms Stroop cost${d.con ? ` · ${d.con} ms matching vs ${d.inc} ms clashing` : ''}${d.errors ? ` · ${d.errors} wrong` : ''}`;
   if (id === 'react') return `${S.scores.react} ms choice reaction${d.simple ? ` · lights-out ${d.simple} ms` : ''}${d.wrong ? ` · ${d.wrong} wrong lamp${d.wrong > 1 ? 's' : ''}` : ''}`;
@@ -1338,7 +1342,9 @@ function rowsHTML() {
     const g = fitAge({ [k]: S.scores[k] });
     return `<div class="trow"><div><b>${ST[k].game}</b><div class="note">${scoreText(k)}</div></div>
       <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}${pctBlock(k)}</div>`;
-  }).join('');
+  }).join('') + (S.scores.meteor != null ? (() => { const g = fitAge({ meteor: S.scores.meteor });
+    return `<div class="trow"><div><b>Meteor Dodging <small class="note">bonus</small></b><div class="note">${scoreText('meteor')}</div></div>
+      <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}${pctBlock('meteor')}</div>`; })() : '');
 }
 function showResults(fanfare) {
   return new Promise(resolve => {
@@ -1360,7 +1366,7 @@ function showResults(fanfare) {
     const missing = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place);
     const ages = [25, 45, 65, 85];
     card.innerHTML = `
-      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all seven games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
+      <div><span class="eyebrow">${done.length === ORDER.length ? `Composite of all seven games${S.scores.meteor != null ? ' + meteor dodging' : ''}` : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
       <div class="hero"><div class="big">${f.age}</div><div class="txt">
         <b>Plausible range ${f.lo} to ${f.hi}</b>
         <span class="note">${done.length < 3 ? `Still to play: ${missing.join(', ')}. ` : ''}The dot is the single best guess. The gold band is every age that fits your scores about as well.</span></div></div>
@@ -1370,12 +1376,13 @@ function showResults(fanfare) {
       <div class="rows" id="rows">${rowsHTML()}</div>
       ${meteorReport()}
       <details><summary>How this number is made</summary>
-        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your seven scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the seven, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate. Delayed recall drops a lot with age, but ten words is a small test, so it pulls moderately.</p>
+        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your seven scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the seven, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate. Delayed recall drops a lot with age, but ten words is a small test, so it pulls moderately. Meteor dodging joins once 5 meteors have landed while you were standing still: the median time to start moving, with hits included. It's noisy (you might be reading or looking away), so it gets a wide spread and a light weight.</p>
         <p>Percentiles come from the same curves, assuming scores spread in a bell shape around the typical value at each age. They're rounded to the nearest 5 because the curves aren't good enough for anything finer.</p>
         <p>The curves are hand-fitted to the shape of published age trends (Wechsler coding and digit span norms, word span studies). They have not been calibrated against this exact app, its timing or touch vs. keyboard input. Treat it as a party game with honest error bars, not a medical test. Replays get easier, so your first run is the fairest.</p>
         <div class="ntable"><table><thead><tr><th>Typical score at age</th>${ages.map(a => `<th>${a}</th>`).join('')}<th>Spread (SD)</th></tr></thead><tbody>
           <tr><td>Digit Symbol (correct in 90 s)</td>${ages.map(a => `<td>${NORMS.dsst.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.dsst.sd}</td></tr>
           <tr><td>Backward Digit Span (longest)</td>${ages.map(a => `<td>${NORMS.bds.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.bds.sd}</td></tr>
+          <tr><td>Meteor dodge (median ms to start moving)</td>${ages.map(a => `<td>${NORMS.meteor.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.meteor.sd}</td></tr>
           <tr><td>Delayed Recall (words of 10)</td>${ages.map(a => `<td>${NORMS.recall.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.recall.sd}</td></tr>
           <tr><td>Stroop cost (clashing minus matching, ms)</td>${ages.map(a => `<td>${NORMS.stroop.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.stroop.sd}</td></tr>
           <tr><td>Reaction Time (choice, median ms)</td>${ages.map(a => `<td>${NORMS.react.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.react.sd}</td></tr>
@@ -1397,7 +1404,7 @@ function showResults(fanfare) {
     };
     $('#back').onclick = () => { closeModal(); msg(done.length === ORDER.length ? `<b>Brain age ${f.age}.</b> Visit any station again to replay its game.` : `<b>${ORDER.length - done.length} to go.</b> ${mode === 'roam' ? 'Follow the gold arrows.' : 'Hit the block and keep walking.'}`); resolve(); };
     $('#reset').onclick = () => {
-      S.scores = EMPTY(); S.details = {}; S.revealed = false; S.recall = null;
+      S.scores = EMPTY(); S.details = {}; S.revealed = false; S.recall = null; MET.stats = { dodges: 0, hits: 0, rts: [], timed: [] };
       hud(); closeModal(); msg('<b>Scores cleared.</b> Fresh start. Hit the block.'); resolve();
     };
   });
@@ -1405,7 +1412,8 @@ function showResults(fanfare) {
 
 /* ---------- meteors: periodic strikes aimed at Noggin in free roam ---------- */
 const MET = { on: store.get('noggin-meteors', true), list: [], fx: [], craters: [], next: 0, stun: 0, shake: 0,
-  stats: { dodges: 0, hits: 0, rts: [] } };
+  stats: { dodges: 0, hits: 0, rts: [], timed: [] } };
+const MET_MIN = 5;
 const MET_R = 64;
 function meteorInput(t) { for (const m of MET.list) if (m.rt == null && t >= m.t0) m.rt = t - m.t0; }
 function meteorTick(now) {
@@ -1440,6 +1448,13 @@ function impact(m, now) {
     if (timed) MET.stats.rts.push(m.rt);
     const med = median(MET.stats.rts);
     msg(`<b>Dodged! +2 coins.</b>${timed ? ` You moved ${Math.round(m.rt)} ms after the warning.` : ''}${med != null ? ` Your median from a standstill: ${Math.round(med)} ms.` : ''}`);
+  }
+  if (m.still) {
+    MET.stats.timed.push(m.rt != null ? Math.min(m.rt, m.dur) : m.dur);
+    if (MET.stats.timed.length >= MET_MIN) {
+      S.scores.meteor = Math.round(median(MET.stats.timed));
+      S.details.meteor = { n: MET.stats.timed.length, dodged: MET.stats.dodges, hits: MET.stats.hits };
+    }
   }
   hud();
   MET.next = now + 12000 + Math.random() * 13000;
@@ -1494,7 +1509,8 @@ function meteorReport() {
   const s = MET.stats, n = s.dodges + s.hits;
   if (!n) return '';
   const med = median(s.rts);
-  return `<p class="note"><b>Meteors:</b> dodged ${s.dodges} of ${n}${med != null ? ` · median ${Math.round(med)} ms to start moving from a standstill (${s.rts.length} timed)` : ''}. Just for fun, not part of brain age: a meteor often lands while you're mid-step or reading, so it isn't a clean reaction test.</p>`;
+  const t = s.timed.length;
+  return `<p class="note"><b>Meteors:</b> dodged ${s.dodges} of ${n}${med != null ? ` · median ${Math.round(med)} ms to start moving on dodges` : ''}. ${t >= MET_MIN ? `Your standstill reaction (${t} timed, hits included) is in your brain age as a bonus score with a light weight.` : `${t} of ${MET_MIN} standstill meteors timed; at ${MET_MIN} it joins your brain age as a bonus score. Only meteors that land while Noggin is standing still are timed.`}</p>`;
 }
 
 /* ---------- free roam: a walkable top-down island ---------- */
@@ -1708,7 +1724,7 @@ function bake() {
 
 function rr(ctx, x, y, w, h, r) { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); }
 function drawOracle(ctx) {
-  const { x, y } = ORACLE, f = fitAge(S.scores), n = f ? f.n : 0;
+  const { x, y } = ORACLE, f = fitAge(S.scores), n = ORDER.filter(k => S.scores[k] != null).length;
   ctx.fillStyle = C.stone; ctx.strokeStyle = C.ink; ctx.lineWidth = 4;
   for (const dx of [-100, 86]) { ctx.fillRect(x + dx, y - 70, 14, 70); ctx.strokeRect(x + dx, y - 70, 14, 70); }
   ctx.fillStyle = C.ink; rr(ctx, x - 140, y - 222, 280, 156, 22); ctx.fill();
