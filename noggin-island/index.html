@@ -146,6 +146,20 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px dashe
 kbd{font:700 13px var(--body);border:2px solid currentColor;border-radius:6px;padding:0 5px;margin-left:8px;opacity:.75}
 @media (hover:none){kbd{display:none}}
 
+/* Delayed recall + percentiles */
+.recallform{display:flex;flex-wrap:wrap;gap:10px}
+.recallform input{flex:1 1 200px;min-width:0;font:700 20px var(--body);padding:10px 14px;border:3px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;min-height:40px}
+.chips button{font:700 16px var(--body);color:var(--ink);padding:6px 12px;border:2.5px solid var(--ink);border-radius:99px;background:var(--sand);cursor:pointer}
+.pct{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
+.pct .note{flex:1 1 220px;min-width:0}
+.bell{width:240px;max-width:100%;height:auto;flex:none}
+.bell .area{fill:var(--gold);opacity:.85}
+.bell .curve{fill:none;stroke:var(--ink);stroke-width:2}
+.bell .base{stroke:var(--fold);stroke-width:2}
+.bell .you{stroke:var(--blue);stroke-width:3}
+.bell .youdot{fill:var(--blue);stroke:var(--ink);stroke-width:1.5}
+
 /* Stroop */
 .stroop{height:150px;display:grid;place-items:center;font-family:var(--display);font-size:clamp(46px,12vw,84px);letter-spacing:.04em;background:var(--ink);color:var(--paper);border-radius:22px}
 .spad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -200,10 +214,10 @@ details p{margin-top:8px}
 
 <div class="app">
   <header class="hud">
-    <h1 class="logo">Noggin Island<small>Six brain games. One brain age.</small></h1>
+    <h1 class="logo">Noggin Island<small>Seven brain games. One brain age.</small></h1>
     <div class="chip" aria-label="Your stats">
       <span class="stat"><span class="coin" aria-hidden="true"></span><span id="coins">10</span></span>
-      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/6</span>
+      <span class="stat"><span class="star" aria-hidden="true">★</span><span id="stars">0</span>/7</span>
     </div>
     <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
     <button class="iconbtn" id="modeBtn" type="button">Free roam</button>
@@ -216,7 +230,7 @@ details p{margin-top:8px}
   </div>
 
   <div class="bar">
-    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. Play all six to get your brain age.</div>
+    <div id="msg" aria-live="polite"><b>Hit the dice block!</b> Walk the loop. Each lobe has a game. First stop: tap the Brain Age board in the middle to learn 10 words for later. Play all seven to get your brain age.</div>
     <button class="btn" id="hitBtn" type="button">Hit the block</button>
   </div>
 </div>
@@ -245,11 +259,13 @@ const store = {
 const NORMS = {
   dsst: { sd: 10,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 70 - 0.33 * x - 0.0042 * x * x; } },
   bds:  { sd: 1.25, peak: 28, mu: a => { const x = Math.max(0, a - 28); return 5.8 - 0.02 * x - 0.00025 * x * x; } },
+  recall:{ sd: 1.8,  peak: 25, mu: a => { const x = Math.max(0, a - 25); return 7.2 - 0.03 * x - 0.0006 * x * x; } },
   stroop:{ sd: 55,  peak: 22, mu: a => { const x = Math.max(0, a - 22); return 85 + 0.6 * x + 0.012 * x * x; } },
   react:{ sd: 75,   peak: 24, mu: a => { const x = Math.max(0, a - 24); return 470 + 2.2 * x + 0.03 * x * x; } },
   rot:  { sd: 55,   peak: 22, mu: a => { const x = Math.max(0, a - 22); return 150 - 1.0 * x - 0.012 * x * x; } },
   ws:   { sd: 1.15, peak: 25, mu: a => { const x = Math.max(0, a - 25); return 6.2 - 0.022 * x - 0.0002 * x * x; } }
 };
+NORMS.react.dir = NORMS.stroop.dir = -1;   // lower is better
 // Brain age = the age where your scores are jointly most typical (min summed squared z).
 // Range = ages within 0.5 of that minimum in negative log-likelihood (roughly a 1-SD band).
 function fitAge(scores) {
@@ -273,6 +289,8 @@ const ST = {
           skill: 'Working memory', blurb: 'Hold a string of digits and flip it around in your head.', time: '2 to 3 minutes' },
   dsst: { idx: 8,  id: 'dsst', place: 'Parietal Plaza', lobe: 'Parietal lobe', sign: 'PARIETAL', game: 'Digit Symbol Coding', short: 'SPEED',
           skill: 'Processing speed', blurb: 'Match symbols to digits as fast as your eyes and fingers allow.', time: '90 seconds, plus 5 practice symbols' },
+  recall:{ idx: null, id: 'recall', place: 'Brain Age statue', lobe: 'Hippocampus', sign: 'RECALL', mark: 'R', game: 'Delayed Recall', short: 'RECALL',
+          skill: 'Episodic memory', blurb: 'Learn ten words, play other games, then type them back.', time: '2 minutes now, 1 minute later' },
   stroop:{ idx: 20, id: 'stroop', place: 'Prefrontal Lighthouse', lobe: 'Prefrontal cortex, front of the frontal lobe', sign: 'PREFRONTAL', mark: 'S', game: 'Stroop', short: 'STROOP',
           skill: 'Inhibition', blurb: 'Name the ink colour, not the word. Easy until RED is printed in blue.', time: 'about 2 minutes' },
   react:{ idx: 5,  id: 'react', place: 'Motor Strip Raceway', lobe: 'Motor cortex, back edge of the frontal lobe', sign: 'MOTOR', game: 'Reaction Time', short: 'REACT',
@@ -282,8 +300,9 @@ const ST = {
   ws:   { idx: 16, id: 'ws',   place: 'Temporal Tavern', lobe: 'Temporal lobe', sign: 'TEMPORAL', game: 'Word Span', short: 'WORDS',
           skill: 'Verbal short-term memory', blurb: 'Keep a list of words in order, then pick them back out from decoys.', time: '2 to 3 minutes' }
 };
-const ORDER = ['dsst', 'react', 'stroop', 'rot', 'bds', 'ws'];
-const EMPTY = () => ({ dsst: null, react: null, stroop: null, rot: null, bds: null, ws: null });
+const ORDER = ['dsst', 'react', 'stroop', 'rot', 'bds', 'ws', 'recall'];
+const BUILT = ORDER.filter(k => ST[k].idx != null);
+const EMPTY = () => ({ dsst: null, react: null, stroop: null, rot: null, bds: null, ws: null, recall: null });
 const stationAt = i => Object.values(ST).find(s => s.idx === i);
 
 /* ---------- state ---------- */
@@ -449,7 +468,7 @@ function buildBoard() {
   // track
   h += `<path d="${track}" fill="none" stroke="${C.ink}" stroke-width="22"/><path d="${track}" fill="none" stroke="${C.sand}" stroke-width="13"/>`;
   // station buildings (outward from the loop)
-  for (const s of Object.values(ST)) {
+  for (const s of Object.values(ST).filter(s => s.idx != null)) {
     const p = pts[s.idx], n = normal(p.t), kind = { bds: 'castle', dsst: 'arcade', react: 'lights', stroop: 'lighthouse', rot: 'dome', ws: 'tavern' }[s.id];
     const bx = p.x + n.x * 74, by = p.y + n.y * 74 + 36;
     h += `<g transform="translate(${bx.toFixed(1)},${by.toFixed(1)})">${building(kind, s.sign)}</g>`;
@@ -478,8 +497,8 @@ function buildBoard() {
     <text x="500" y="250" text-anchor="middle" class="svgt" font-size="15" letter-spacing="2" fill="${C.muted}">BRAIN AGE</text>
     <text id="oNum" x="500" y="298" text-anchor="middle" class="svgt" font-size="50" fill="${C.blue}" stroke="${C.ink}" stroke-width="2.5" paint-order="stroke">??</text>
     <text id="oSub" x="500" y="320" text-anchor="middle" class="svgb" font-size="13" fill="${C.muted}">play all 4 games to reveal</text>
-    ${ORDER.map((k, j) => `<g transform="translate(${370 + (j % 3) * 88},${330 + Math.floor(j / 3) * 22})"><rect id="pip-${k}" width="84" height="18" rx="9" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
-      <text x="42" y="13" text-anchor="middle" class="svgt" font-size="8.5" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
+    ${ORDER.map((k, j) => `<g transform="translate(${369 + (j % 4) * 66},${330 + Math.floor(j / 4) * 22})"><rect id="pip-${k}" width="62" height="18" rx="9" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
+      <text x="31" y="13" text-anchor="middle" class="svgt" font-size="8" fill="${C.ink}">${ST[k].short}</text></g>`).join('')}
   </g>`;
   // token + dice block + step bubble
   h += `<g id="tok">${noggin()}
@@ -497,8 +516,8 @@ function buildBoard() {
   svg.innerHTML = h;
   $('#blockHit').addEventListener('click', hitBlock);
   const o = $('#oracle');
-  o.addEventListener('click', () => { if (S.phase === 'await') showResults(); });
-  o.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && S.phase === 'await') { e.preventDefault(); e.stopPropagation(); showResults(); } });
+  o.addEventListener('click', () => { if (S.phase === 'await') oracleTap(); });
+  o.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && S.phase === 'await') { e.preventDefault(); e.stopPropagation(); oracleTap(); } });
 }
 
 /* ---------- board UI ---------- */
@@ -522,7 +541,7 @@ function hud() {
   const f = fitAge(S.scores), n = f ? f.n : 0;
   $('#oNum').textContent = f ? f.age : '??';
   $('#oSub').textContent = !f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · tap for details`;
-  ORDER.forEach(k => $('#pip-' + k).setAttribute('fill', S.scores[k] != null ? C.gold : '#fff'));
+  ORDER.forEach(k => $('#pip-' + k).setAttribute('fill', S.scores[k] != null ? C.gold : k === 'recall' && S.recall ? C.sand : '#fff'));
   $('#soundBtn').textContent = sound ? 'Sound on' : 'Sound off';
   $('#soundBtn').setAttribute('aria-pressed', String(sound));
 }
@@ -597,7 +616,7 @@ function landOn(i) {
   if (t === 'blue') { S.coins += 3; sfx.coin(); msg(`<b>Blue space, +3 coins.</b>${tail}`); }
   else if (t === 'red') { S.coins = Math.max(0, S.coins - 3); sfx.bad(); msg(`<b>Red space, −3 coins.</b>${tail}`); }
   else if (t === 'green') { S.coins += 2; sfx.chime(); msg(`<b>Brain bit (+2):</b> ${BITS[ri(BITS.length)]}`); }
-  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All six done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
+  else { const left = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place); msg(left.length ? `<b>Still to visit:</b> ${left.join(', ')}.${tail}` : `<b>All seven done.</b> Tap the Brain Age board in the middle any time.${tail}`); }
 }
 
 /* ---------- modal plumbing ---------- */
@@ -646,7 +665,7 @@ function runGame(id) {
     let alive = true;
     const api = {
       isAlive: () => alive,
-      quit() { alive = false; closeModal(); msg(`<b>Left ${ST[id].place}.</b> No score saved. Come back any time.`); resolve(null); },
+      quit(note) { alive = false; closeModal(); msg(note || `<b>Left ${ST[id].place}.</b> No score saved. Come back any time.`); resolve(null); },
       done(score, detail) {
         alive = false; keyHandler = null;
         S.scores[id] = score; S.details[id] = detail; S.coins += 10;
@@ -654,7 +673,7 @@ function runGame(id) {
         gameResult(id, async () => {
           const all = ORDER.every(k => S.scores[k] != null);
           if (all && !S.revealed) { S.revealed = true; await showResults(true); }
-          else { closeModal(); msg(`<b>+10 coins for finishing ${ST[id].game}.</b> ${all ? 'Your brain age board has updated.' : 'Keep walking to the next station.'}`); }
+          else { closeModal(); msg(`<b>+10 coins for finishing ${ST[id].game}.</b> ${all ? 'Your brain age board has updated.' : 'Keep walking to the next station.'}${!S.recall && id !== 'recall' ? ' Tip: the Brain Age statue has 10 words to learn now and recall later.' : ''}`); }
           resolve(score);
         });
       }
@@ -669,6 +688,7 @@ function scoreText(id) {
   const d = S.details[id] || {};
   if (id === 'dsst') return `${S.scores.dsst} correct in 90 s${d.errors ? `, ${d.errors} slip${d.errors > 1 ? 's' : ''}` : ''}`;
   if (id === 'bds') return `longest backward span ${S.scores.bds}`;
+  if (id === 'recall') return `${S.scores.recall} of 10 words after ${d.mins} min${d.imm != null ? ` (${d.imm} right after learning)` : ''}${d.missed && d.missed.length ? ` · missed: ${d.missed.join(', ')}` : ''}`;
   if (id === 'stroop') return `${S.scores.stroop} ms Stroop cost${d.con ? ` · ${d.con} ms matching vs ${d.inc} ms clashing` : ''}${d.errors ? ` · ${d.errors} wrong` : ''}`;
   if (id === 'react') return `${S.scores.react} ms choice reaction${d.simple ? ` · lights-out ${d.simple} ms` : ''}${d.wrong ? ` · ${d.wrong} wrong lamp${d.wrong > 1 ? 's' : ''}` : ''}`;
   if (id === 'rot') return `${S.scores.rot} points · ${d.correct} right, ${d.wrong} wrong · biggest grid ${d.maxN}×${d.maxN}`;
@@ -682,7 +702,8 @@ function gameResult(id, next) {
   card.innerHTML = `
     <div><span class="eyebrow">${st.place} · finished</span><h2>${st.game}</h2></div>
     <div class="hero"><div class="big">${S.scores[id]}</div><div class="txt"><b>${scoreText(id)}</b>
-      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : id === 'rot' ? 'This one has the roughest age curve of the six, so it counts for less in the final number.' : id === 'react' ? 'Choice reaction slows more with age than simple reaction, so that is the number that counts. Device lag adds noise.' : id === 'stroop' ? 'Lower is better: it is how much a clashing word slowed you down. It counts lightly, because a lot of its age trend is plain slowing.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
+      <span class="note">On its own, this lands around a brain age of <b>${f.age}</b> (plausible ${f.lo}–${f.hi}). ${id === 'dsst' ? 'Speed is the game that moves the final number most.' : id === 'rot' ? 'This one has the roughest age curve of the seven, so it counts for less in the final number.' : id === 'react' ? 'Choice reaction slows more with age than simple reaction, so that is the number that counts. Device lag adds noise.' : id === 'stroop' ? 'Lower is better: it is how much a clashing word slowed you down. It counts lightly, because a lot of its age trend is plain slowing.' : id === 'recall' ? 'Delayed memory is one of the most age-sensitive abilities, but ten words is a small test and scores move in whole steps.' : 'Span scores are coarse, so one game alone has a wide range.'}</span></div></div>
+    ${pctBlock(id)}
     <div class="actions"><button class="btn" id="next" type="button">${all && !S.revealed ? 'Reveal my brain age' : mode === 'roam' ? 'Back to exploring' : 'Back to the board'}</button></div>`;
   $('#next').focus();
   $('#next').onclick = next;
@@ -1144,7 +1165,149 @@ function STROOP(api) {
   }
 }
 
-const GAMES = { dsst: DSST, react: REACT, stroop: STROOP, rot: ROT, bds: BDS, ws: WS };
+/* ---------- game 7: delayed recall (learn at the statue, recall 5+ minutes later) ---------- */
+const DELAY = 5 * 60 * 1000;
+const MEM_WORDS = 'anchor basket button candle carpet cactus rabbit pencil ladder wagon pillow lemon jacket kettle tiger wallet hammer mirror saddle violin rocket turtle garden helmet bottle feather dragon window pocket blanket'.split(' ');
+const recallDue = () => !!S.recall && S.scores.recall == null && Date.now() - S.recall.at >= DELAY;
+const mmss = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+function lev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+// one typo allowed on longer words, plurals accepted; each typed word can only count once
+function matchWords(typed, targets) {
+  const norm = w => w.toLowerCase().replace(/[^a-z]/g, '');
+  const pool = typed.map(norm).filter(Boolean), got = [];
+  for (const t of targets) {
+    const i = pool.findIndex(w => w === t || w === t + 's' || (t.length >= 5 && lev(w, t) <= 1));
+    if (i >= 0) { got.push(t); pool.splice(i, 1); }
+  }
+  return { got, missed: targets.filter(t => !got.includes(t)), intrusions: pool.length };
+}
+function collectWords(title, hint) {
+  return new Promise(res => {
+    card.innerHTML = `${head(ST.recall)}
+      <p class="prompt"><b>${title}</b></p>
+      <p class="note" style="text-align:center;margin:0 auto">${hint}</p>
+      <form class="recallform" id="rform"><input id="rin" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="enter" placeholder="type a word, press Enter" aria-label="Word">
+        <button class="btn alt" type="submit">Add</button></form>
+      <div class="chips" id="chips" aria-live="polite"></div>
+      <div class="actions"><button class="btn" id="rdone" type="button">That's all I remember</button></div>`;
+    const words = [], inp = $('#rin'), chips = $('#chips');
+    const draw = () => { chips.innerHTML = words.map((w, i) => `<button type="button" data-i="${i}" title="Remove">${w} ×</button>`).join(''); };
+    $('#rform').onsubmit = e => { e.preventDefault(); const w = inp.value.trim(); if (w && !words.includes(w.toLowerCase())) { words.push(w.toLowerCase()); draw(); } inp.value = ''; inp.focus(); };
+    chips.onclick = e => { const b = e.target.closest('[data-i]'); if (b) { words.splice(+b.dataset.i, 1); draw(); inp.focus(); } };
+    $('#rdone').onclick = () => { const w = inp.value.trim(); if (w) words.push(w.toLowerCase()); res(words); };
+    inp.focus();
+  });
+}
+function RECALL(api) {
+  const st = ST.recall;
+  if (S.recall) return recallPhase();
+  card.innerHTML = `${head(st)}
+    <p>Ten words, shown one at a time. You'll see the list twice and type what you remember after each pass.</p>
+    <p>Then go play the other games. After at least <b>5 minutes</b> this statue asks for the words again. That second recall is the score. No writing them down.</p>
+    <div class="actions"><button class="btn" id="go" type="button">Show me the words</button></div>`;
+  $('#go').focus();
+  $('#go').onclick = async () => {
+    const words = shuffle(MEM_WORDS).slice(0, 10), imm = [];
+    for (let round = 1; round <= 2; round++) {
+      card.innerHTML = `${head(st)}<div class="meta"><span>Learning · pass ${round} of 2</span><span></span></div><div class="flash words wait" id="flash">Watch closely…</div>`;
+      await sleep(1100);
+      const fl = $('#flash'); if (!api.isAlive() || !fl) return;
+      fl.classList.remove('wait'); fl.textContent = '';
+      for (const w of round === 1 ? words : shuffle(words)) {
+        if (!api.isAlive()) return;
+        fl.textContent = w; await sleep(1500); fl.textContent = ''; await sleep(300);
+      }
+      if (!api.isAlive()) return;
+      const typed = await collectWords(`Pass ${round}: type every word you remember`, 'Any order. Tap a word to remove it.');
+      if (!api.isAlive()) return;
+      imm.push(matchWords(typed, words).got.length);
+    }
+    S.recall = { words, at: Date.now(), imm, told: false };
+    hud();
+    card.innerHTML = `${head(st)}
+      <div class="hero"><div class="big">${imm[1]}</div><div class="txt"><b>of 10 right after the second pass</b>
+        <span class="note">That number doesn't count. Keep the words in mind and go play. Recall opens at this statue in 5 minutes (at ${new Date(S.recall.at + DELAY).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}).</span></div></div>
+      <div class="actions"><button class="btn" id="next" type="button">${mode === 'roam' ? 'Back to exploring' : 'Back to the board'}</button></div>`;
+    $('#next').focus();
+    $('#next').onclick = () => api.quit(`<b>Words learned.</b> Recall opens at the Brain Age statue in 5 minutes. Go play something in the meantime.`);
+  };
+
+  async function recallPhase() {
+    const left = S.recall.at + DELAY - Date.now();
+    if (left > 0) {
+      card.innerHTML = `${head(st)}<p>Not yet. Recall opens in <b>${mmss(left)}</b>. Play another game while you wait.</p>
+        <div class="actions"><button class="btn" id="next" type="button">OK</button></div>`;
+      $('#next').focus();
+      $('#next').onclick = () => api.quit(`<b>Recall opens in ${mmss(left)}.</b>`);
+      return;
+    }
+    const mins = Math.round((Date.now() - S.recall.at) / 60000);
+    const typed = await collectWords(`Type every word from the list you learned ${mins} minutes ago`, 'Any order. Take your time; only correct words count.');
+    if (!api.isAlive()) return;
+    const m = matchWords(typed, S.recall.words);
+    api.done(m.got.length, { got: m.got, missed: m.missed, intrusions: m.intrusions, mins, imm: S.recall.imm[1] });
+  }
+}
+// the statue: learn the words first, recall them once due, otherwise show results
+function oracleTap() {
+  if (!overlay.hidden) return;
+  const go = (title, body, yes, no, onYes) => {
+    card.innerHTML = `<div><span class="eyebrow">Brain Age statue · hippocampus</span><h2>${title}</h2></div><p>${body}</p>
+      <div class="actions"><button class="btn" id="yes" type="button">${yes}</button><button class="btn alt" id="no" type="button">${no}</button></div>`;
+    openModal(); $('#yes').focus();
+    $('#yes').onclick = onYes;
+    $('#no').onclick = () => { closeModal(); showResults(); };
+  };
+  if (S.scores.recall == null && !S.recall)
+    go('Words to keep', 'Learn 10 words here now, then get asked for them again 5 or more minutes later, after other games. Delayed memory is one of the most age-sensitive things you can test. Best done first.',
+      'Learn the words', 'Just show my results', () => runGame('recall').then(hud));
+  else if (recallDue())
+    go('Time to remember', `You learned 10 words ${Math.round((Date.now() - S.recall.at) / 60000)} minutes ago. Ready to type them back?`,
+      'Recall now', 'Not yet, show results', () => runGame('recall').then(hud));
+  else showResults();
+}
+setInterval(() => {
+  if (recallDue() && !S.recall.told) { S.recall.told = true; sfx.chime(); if (overlay.hidden) msg('<b>Memory check is open.</b> Go to the Brain Age statue and type back your 10 words.'); }
+}, 3000);
+
+/* ---------- percentiles ---------- */
+function erf(x) {
+  const s = Math.sign(x); x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  return s * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x));
+}
+const Phi = z => .5 * (1 + erf(z / Math.SQRT2));
+const zFor = (k, score, age) => (NORMS[k].dir || 1) * (score - NORMS[k].mu(age)) / NORMS[k].sd;
+const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'));
+// rounded to 5s in the middle: the curves behind these aren't precise enough for single points
+function pctText(p) {
+  if (p < 1) return 'below the 1st';
+  if (p > 99) return 'above the 99th';
+  return 'about the ' + ordinal(p < 5 || p > 95 ? Math.round(p) : Math.round(p / 5) * 5);
+}
+function bell(k, score, age) {
+  const zc = clamp(zFor(k, score, age), -3, 3), X = z => 10 + (z + 3) / 6 * 220, Y = z => 50 - Math.exp(-z * z / 2) * 40;
+  let curve = '', area = `M${X(-3)},50`;
+  for (let z = -3; z <= 3.001; z += .1) { curve += (curve ? 'L' : 'M') + X(z).toFixed(1) + ',' + Y(z).toFixed(1); if (z <= zc) area += `L${X(z).toFixed(1)},${Y(z).toFixed(1)}`; }
+  area += `L${X(zc).toFixed(1)},${Y(zc).toFixed(1)}L${X(zc).toFixed(1)},50Z`;
+  return `<svg class="bell" viewBox="0 0 240 58" role="img" aria-label="Your position in the spread for age ${age}">
+    <path class="area" d="${area}"/><path class="curve" d="${curve}"/><line class="base" x1="10" y1="50" x2="230" y2="50"/>
+    <line class="you" x1="${X(zc).toFixed(1)}" y1="6" x2="${X(zc).toFixed(1)}" y2="52"/><circle class="youdot" cx="${X(zc).toFixed(1)}" cy="6" r="4"/></svg>`;
+}
+function pctLine(k) {
+  const sc = S.scores[k], p25 = 100 * Phi(zFor(k, sc, 25));
+  if (S.realAge) return `<b>${pctText(100 * Phi(zFor(k, sc, S.realAge)))}</b> percentile for age ${S.realAge} · ${pctText(p25)} against 25-year-olds`;
+  return `<b>${pctText(p25)}</b> percentile against 25-year-olds · add your age on the results screen to see your own age group`;
+}
+const pctBlock = k => `<div class="pct">${bell(k, S.scores[k], S.realAge || 25)}<div class="note">${pctLine(k)}</div></div>`;
+
+const GAMES = { dsst: DSST, react: REACT, stroop: STROOP, rot: ROT, bds: BDS, ws: WS, recall: RECALL };
 
 /* ---------- results ---------- */
 const pc = a => ((clamp(a, 20, 90) - 20) / 70 * 100);
@@ -1161,6 +1324,17 @@ function compare(f) {
   const d = r - f.age, inside = r >= f.lo && r <= f.hi;
   const head = d >= 2 ? `${d} years younger than your calendar age.` : d <= -2 ? `${-d} years older than your calendar age.` : 'Right about at your calendar age.';
   return head + (inside ? ' Your real age is inside the plausible range, so the gap is within noise.' : ' Your real age is outside the plausible range, so the gap is probably more than noise (or a practice effect).');
+}
+function rowsHTML() {
+  return ORDER.map(k => {
+    if (S.scores[k] == null) {
+      const status = k !== 'recall' ? `${ST[k].place} · not played yet` : !S.recall ? 'Learn the words at the Brain Age statue' : recallDue() ? 'Ready: go to the statue to recall' : `Words learned · recall opens in ${mmss(S.recall.at + DELAY - Date.now())}`;
+      return `<div class="trow"><div><b>${ST[k].game}</b><div class="note">${status}</div></div><div class="alone">–</div></div>`;
+    }
+    const g = fitAge({ [k]: S.scores[k] });
+    return `<div class="trow"><div><b>${ST[k].game}</b><div class="note">${scoreText(k)}</div></div>
+      <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}${pctBlock(k)}</div>`;
+  }).join('');
 }
 function showResults(fanfare) {
   return new Promise(resolve => {
@@ -1181,25 +1355,22 @@ function showResults(fanfare) {
     const missing = ORDER.filter(k => S.scores[k] == null).map(k => ST[k].place);
     const ages = [25, 45, 65, 85];
     card.innerHTML = `
-      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all six games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
+      <div><span class="eyebrow">${done.length === ORDER.length ? 'Composite of all seven games' : `Provisional · ${done.length} of ${ORDER.length} games`}</span><h2>Your brain age</h2></div>
       <div class="hero"><div class="big">${f.age}</div><div class="txt">
         <b>Plausible range ${f.lo} to ${f.hi}</b>
         <span class="note">${done.length < 3 ? `Still to play: ${missing.join(', ')}. ` : ''}The dot is the single best guess. The gold band is every age that fits your scores about as well.</span></div></div>
       <div id="compMeter">${meter(f, S.realAge)}</div>
       <div class="agein"><label for="realAge">Your calendar age</label><input id="realAge" type="number" inputmode="numeric" min="10" max="110" placeholder="optional" value="${S.realAge ?? ''}"></div>
       <p class="note" id="cmp">${compare(f)}</p>
-      <div class="rows">${ORDER.map(k => {
-        if (S.scores[k] == null) return `<div class="trow"><div><b>${ST[k].game}</b><div class="note">${ST[k].place} · not played yet</div></div><div class="alone">–</div></div>`;
-        const g = fitAge({ [k]: S.scores[k] });
-        return `<div class="trow"><div><b>${ST[k].game}</b><div class="note">${scoreText(k)}</div></div>
-          <div class="alone"><small>alone</small>${g.age}</div>${meter(g)}</div>`;
-      }).join('')}</div>
+      <div class="rows" id="rows">${rowsHTML()}</div>
       <details><summary>How this number is made</summary>
-        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your six scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the six, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate.</p>
+        <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your seven scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the seven, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate. Delayed recall drops a lot with age, but ten words is a small test, so it pulls moderately.</p>
+        <p>Percentiles come from the same curves, assuming scores spread in a bell shape around the typical value at each age. They're rounded to the nearest 5 because the curves aren't good enough for anything finer.</p>
         <p>The curves are hand-fitted to the shape of published age trends (Wechsler coding and digit span norms, word span studies). They have not been calibrated against this exact app, its timing or touch vs. keyboard input. Treat it as a party game with honest error bars, not a medical test. Replays get easier, so your first run is the fairest.</p>
         <div class="ntable"><table><thead><tr><th>Typical score at age</th>${ages.map(a => `<th>${a}</th>`).join('')}<th>Spread (SD)</th></tr></thead><tbody>
           <tr><td>Digit Symbol (correct in 90 s)</td>${ages.map(a => `<td>${NORMS.dsst.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.dsst.sd}</td></tr>
           <tr><td>Backward Digit Span (longest)</td>${ages.map(a => `<td>${NORMS.bds.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.bds.sd}</td></tr>
+          <tr><td>Delayed Recall (words of 10)</td>${ages.map(a => `<td>${NORMS.recall.mu(a).toFixed(1)}</td>`).join('')}<td>${NORMS.recall.sd}</td></tr>
           <tr><td>Stroop cost (clashing minus matching, ms)</td>${ages.map(a => `<td>${NORMS.stroop.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.stroop.sd}</td></tr>
           <tr><td>Reaction Time (choice, median ms)</td>${ages.map(a => `<td>${NORMS.react.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.react.sd}</td></tr>
           <tr><td>Rotations (points in 90 s)</td>${ages.map(a => `<td>${NORMS.rot.mu(a).toFixed(0)}</td>`).join('')}<td>${NORMS.rot.sd}</td></tr>
@@ -1207,7 +1378,7 @@ function showResults(fanfare) {
         </tbody></table></div>
       </details>
       ${prev.length ? `<p class="note">Earlier visits in this browser: ${prev.map(h => `${h.age} <span>(${new Date(h.t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>`).join(' · ')}</p>` : ''}
-      <div class="actions"><button class="btn" id="back" type="button">Back to the board</button><button class="btn alt" id="reset" type="button">Clear scores</button></div>`;
+      <div class="actions"><button class="btn" id="back" type="button">${mode === 'roam' ? 'Back to exploring' : 'Back to the board'}</button><button class="btn alt" id="reset" type="button">Clear scores</button></div>`;
     openModal();
     $('#back').focus();
     $('#realAge').oninput = e => {
@@ -1216,10 +1387,11 @@ function showResults(fanfare) {
       store.set('noggin-age', S.realAge);
       $('#cmp').textContent = compare(f);
       $('#compMeter').innerHTML = meter(f, S.realAge);
+      $('#rows').innerHTML = rowsHTML();
     };
     $('#back').onclick = () => { closeModal(); msg(done.length === ORDER.length ? `<b>Brain age ${f.age}.</b> Visit any station again to replay its game.` : `<b>${ORDER.length - done.length} to go.</b> ${mode === 'roam' ? 'Follow the gold arrows.' : 'Hit the block and keep walking.'}`); resolve(); };
     $('#reset').onclick = () => {
-      S.scores = EMPTY(); S.details = {}; S.revealed = false;
+      S.scores = EMPTY(); S.details = {}; S.revealed = false; S.recall = null;
       hud(); closeModal(); msg('<b>Scores cleared.</b> Fresh start. Hit the block.'); resolve();
     };
   });
@@ -1295,13 +1467,13 @@ const COLL = [];   // {x,y,r,id?}
 const TREES = [];
 const COINS = [];
 function layout() {
-  for (const id of ORDER) COLL.push({ x: RS[id].x, y: RS[id].y - 45, r: 62, id, armed: true });
+  for (const id of BUILT) COLL.push({ x: RS[id].x, y: RS[id].y - 45, r: 62, id, armed: true });
   COLL.push({ x: ORACLE.x, y: ORACLE.y - 40, r: 64, id: 'oracle', armed: true });
   STONES.forEach(s => COLL.push({ x: s.x, y: s.y, r: 18 }));
   const rnd = mulberry(42);
   const clear = (x, y, pathGap, stGap) => pip(x, y, WALK)
     && PATHS.every(p => lineDist(x, y, p) > pathGap) && RIVERS.every(r => lineDist(x, y, r) > RIVER_HALF + 46)
-    && ORDER.every(id => Math.hypot(x - RS[id].x, y - RS[id].y + 40) > stGap) && Math.hypot(x - ORACLE.x, y - ORACLE.y + 30) > stGap + 40
+    && BUILT.every(id => Math.hypot(x - RS[id].x, y - RS[id].y + 40) > stGap) && Math.hypot(x - ORACLE.x, y - ORACLE.y + 30) > stGap + 40
     && Math.hypot(x - P.x, y - P.y) > 70 && STONES.every(s => Math.hypot(x - s.x, y - s.y) > 60)
     && LABELS.every(([, lx, ly]) => Math.abs(x - lx) > 250 || Math.abs(y - ly) > 60);
   for (let tries = 0; TREES.length < 46 && tries < 3000; tries++) {
@@ -1379,7 +1551,7 @@ function bake() {
   for (let n = 0, tries = 0; n < 90 && tries < 4000; tries++) {
     const x0 = 150 + rnd() * 1700, y0 = 150 + rnd() * 1100;
     if (!pip(x0, y0, WALK) || PATHS.some(p => lineDist(x0, y0, p) < 60) || Math.hypot(x0 - ORACLE.x, y0 - ORACLE.y) < 190
-      || ORDER.some(id => Math.hypot(x0 - RS[id].x, y0 - RS[id].y + 40) < 120) || RIVERS.some(r => lineDist(x0, y0, r) < 60)) continue;
+      || BUILT.some(id => Math.hypot(x0 - RS[id].x, y0 - RS[id].y + 40) < 120) || RIVERS.some(r => lineDist(x0, y0, r) < 60)) continue;
     n++;
     const ang = rnd() * Math.PI, dx = Math.cos(ang), dy = Math.sin(ang), L = 60 + rnd() * 80, amp = 10 + rnd() * 6;
     g.beginPath();
@@ -1419,7 +1591,7 @@ function bake() {
   g.beginPath(); g.ellipse(ORACLE.x, ORACLE.y - 20, 150, 95, 0, 0, 7); g.fill(); g.stroke();
   g.strokeStyle = C.fold; g.lineWidth = 3; g.beginPath(); g.ellipse(ORACLE.x, ORACLE.y - 20, 125, 75, 0, 0, 7); g.stroke();
   // door mats
-  for (const id of ORDER) {
+  for (const id of BUILT) {
     const s = RS[id];
     g.fillStyle = C.gold; g.strokeStyle = C.ink; g.lineWidth = 3;
     g.beginPath(); g.ellipse(s.x, s.y + 26, 40, 17, 0, 0, 7); g.fill(); g.stroke();
@@ -1447,10 +1619,10 @@ function drawOracle(ctx) {
   ctx.fillStyle = C.muted; ctx.font = `700 14px ${FB}`;
   ctx.fillText(!f ? `play all ${ORDER.length} games to reveal` : n < ORDER.length ? `so far · ${n} of ${ORDER.length} games` : `plausible ${f.lo}–${f.hi} · bump me`, x, y - 127);
   ORDER.forEach((k, j) => {
-    const px = x - 130 + (j % 3) * 88, py = y - 118 + Math.floor(j / 3) * 21;
-    ctx.fillStyle = S.scores[k] != null ? C.gold : '#fff'; ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5;
-    rr(ctx, px, py, 84, 17, 8); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = C.ink; ctx.font = `8.5px ${FD}`; ctx.fillText(ST[k].short, px + 42, py + 12.5);
+    const px = x - 131 + (j % 4) * 66, py = y - 118 + Math.floor(j / 4) * 21;
+    ctx.fillStyle = S.scores[k] != null ? C.gold : k === 'recall' && S.recall ? C.sand : '#fff'; ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5;
+    rr(ctx, px, py, 62, 17, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.font = `8px ${FD}`; ctx.fillText(ST[k].short, px + 31, py + 12.5);
   });
 }
 
@@ -1473,7 +1645,7 @@ function draw(now) {
   }
   if (R.target) { ctx.strokeStyle = C.paper; ctx.lineWidth = 4; ctx.globalAlpha = .9; ctx.beginPath(); ctx.ellipse(R.target.x, R.target.y, 16, 8, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
   // depth-sorted things that stand up
-  const items = ORDER.map(id => ({ y: RS[id].y, f: () => {
+  const items = BUILT.map(id => ({ y: RS[id].y, f: () => {
       const img = R.imgs[id], b = RS[id];
       if (img && img.complete && img.naturalWidth) ctx.drawImage(img, b.x - 84, b.y - 150, 168, 159);
       if (S.scores[id] != null) {
@@ -1491,9 +1663,10 @@ function draw(now) {
   items.sort((a, b) => a.y - b.y).forEach(i => i.f());
   // arrows at the screen edge pointing to stations you haven't played
   ctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
-  for (const id of ORDER) {
-    if (S.scores[id] != null) continue;
-    const sx = (RS[id].x - R.cam.x) * z, sy = (RS[id].y - 60 - R.cam.y) * z;
+  const marks = BUILT.filter(id => S.scores[id] == null).map(id => ({ x: RS[id].x, y: RS[id].y - 60, m: ST[id].mark || ST[id].sign[0] }));
+  if (!S.recall || recallDue()) marks.push({ x: ORACLE.x, y: ORACLE.y - 120, m: 'R' });
+  for (const mk of marks) {
+    const sx = (mk.x - R.cam.x) * z, sy = (mk.y - R.cam.y) * z;
     if (sx > 0 && sx < R.cw && sy > 0 && sy < R.ch) continue;
     const cx = R.cw / 2, cy = R.ch / 2, dx = sx - cx, dy = sy - cy;
     const m = Math.min((R.cw / 2 - 28) / Math.abs(dx || 1e-6), (R.ch / 2 - 28) / Math.abs(dy || 1e-6));
@@ -1501,7 +1674,7 @@ function draw(now) {
     ctx.save(); ctx.translate(ex, ey);
     ctx.rotate(a); ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(14, -10); ctx.lineTo(14, 10); ctx.closePath(); ctx.fill(); ctx.rotate(-a);
     ctx.fillStyle = C.gold; ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = C.ink; ctx.font = `16px ${FD}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ST[id].mark || ST[id].sign[0], 0, 1);
+    ctx.fillStyle = C.ink; ctx.font = `16px ${FD}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(mk.m, 0, 1);
     ctx.restore();
   }
 }
@@ -1544,7 +1717,7 @@ function update(dt, now) {
 }
 function enter(id) {
   R.keys.clear(); R.target = null; R.drag = false; P.moving = false;
-  if (id === 'oracle') showResults();
+  if (id === 'oracle') oracleTap();
   else stationPrompt(ST[id], 0, 'Back to exploring').then(hud);
 }
 function frame(now) {
@@ -1571,7 +1744,7 @@ function toWorld(e) {
 function initRoam() {
   R.canvas = $('#world'); R.ctx = R.canvas.getContext('2d');
   layout();
-  for (const id of ORDER) R.imgs[id] = svgImg(building(KIND[id], ST[id].sign), '-56 -100 112 106', 224, 212);
+  for (const id of BUILT) R.imgs[id] = svgImg(building(KIND[id], ST[id].sign), '-56 -100 112 106', 224, 212);
   R.imgs.noggin = svgImg(noggin(), '-32 -74 64 83', 128, 166);
   new ResizeObserver(resize).observe(R.canvas);
   document.fonts?.ready.then(() => { if (R.terrain) bake(); });
@@ -1582,7 +1755,7 @@ function initRoam() {
   addEventListener('keyup', e => R.keys.delete(e.key.toLowerCase()));
   addEventListener('blur', () => R.keys.clear());
 }
-const ROAM_MSG = '<b>Free roam.</b> Walk with WASD or the arrow keys, or tap/click where you want to go. Bump into a building to play its game. The Brain Age statue is in the middle.';
+const ROAM_MSG = '<b>Free roam.</b> Walk with WASD or the arrow keys, or tap/click where you want to go. First stop: bump the Brain Age statue in the middle to learn 10 words for later. Then bump buildings to play their games.';
 function setMode(m) {
   if (m === mode) return;
   if (S.phase !== 'await' || !overlay.hidden) return;
@@ -1606,6 +1779,7 @@ function start(data) {
     ['pos', 'coins', 'revealed'].forEach(k => { if (data[k] != null) S[k] = data[k]; });
     S.scores = Object.assign(EMPTY(), data.scores);
     S.details = data.details || {};
+    S.recall = data.recall || null;
   }
   buildBoard();
   setTok(pts[S.pos].x, pts[S.pos].y);
@@ -1613,7 +1787,7 @@ function start(data) {
   startSpin();
   initRoam();
   setMode(store.get('noggin-mode', 'roam'));
-  try { window.claude?.hot?.snapshot?.(() => ({ pos: S.pos, coins: S.coins, scores: S.scores, details: S.details, revealed: S.revealed })); } catch (e) {}
+  try { window.claude?.hot?.snapshot?.(() => ({ pos: S.pos, coins: S.coins, scores: S.scores, details: S.details, revealed: S.revealed, recall: S.recall })); } catch (e) {}
 }
 try { window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {}); } catch (e) { start({}); }
 })();
