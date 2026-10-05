@@ -31,6 +31,7 @@
   --s-blue:#5b8cff;
   --s-yellow:#ffd23f;
   --lamp-rim:#0e0a1f;
+  --rock:#6a5a86;
   --display:"Titan One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
 }
@@ -221,6 +222,7 @@ details p{margin-top:8px}
     </div>
     <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
     <button class="iconbtn" id="modeBtn" type="button">Free roam</button>
+    <button class="iconbtn" id="metBtn" type="button" aria-pressed="true" hidden>Meteors on</button>
     <button class="iconbtn" id="resultsBtn" type="button">Brain age</button>
   </header>
 
@@ -244,7 +246,7 @@ details p{margin-top:8px}
 const $ = (s, el = document) => el.querySelector(s);
 const css = getComputedStyle(document.documentElement);
 const C = {};
-['sea','wave','island','fold','sand','stone','noggin','ink','paper','muted','blue','red','gold','green','neuron','path-edge','plank'].forEach(k => C[k.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = css.getPropertyValue('--' + k).trim());
+['sea','wave','island','fold','sand','stone','noggin','ink','paper','muted','blue','red','gold','green','neuron','path-edge','plank','rock'].forEach(k => C[k.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = css.getPropertyValue('--' + k).trim());
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const ri = n => Math.floor(Math.random() * n);
@@ -544,6 +546,7 @@ function hud() {
   ORDER.forEach(k => $('#pip-' + k).setAttribute('fill', S.scores[k] != null ? C.gold : k === 'recall' && S.recall ? C.sand : '#fff'));
   $('#soundBtn').textContent = sound ? 'Sound on' : 'Sound off';
   $('#soundBtn').setAttribute('aria-pressed', String(sound));
+  if (typeof MET !== 'undefined') { $('#metBtn').textContent = MET.on ? 'Meteors on' : 'Meteors off'; $('#metBtn').setAttribute('aria-pressed', String(MET.on)); }
 }
 
 let spinTimer = null;
@@ -626,10 +629,11 @@ function openModal() { overlay.hidden = false; overlay.scrollTop = 0; }
 function closeModal() { overlay.hidden = true; card.innerHTML = ''; card.onclick = null; keyHandler = null; $('#hitBtn').focus({ preventScroll: true }); }
 document.addEventListener('keydown', e => {
   if (!overlay.hidden) { if (keyHandler) keyHandler(e); return; }
-  if (mode === 'roam') { const k = e.key.toLowerCase(); if (DIRS[k] && !e.target.closest('input')) { e.preventDefault(); R.keys.add(k); } return; }
+  if (mode === 'roam') { const k = e.key.toLowerCase(); if (DIRS[k] && !e.target.closest('input')) { e.preventDefault(); if (!R.keys.has(k)) meteorInput(e.timeStamp); R.keys.add(k); } return; }
   if (e.code === 'Space' && S.phase === 'await' && !e.target.closest('input,#oracle')) { e.preventDefault(); hitBlock(); }
 });
 $('#hitBtn').addEventListener('click', hitBlock);
+$('#metBtn').addEventListener('click', () => { MET.on = !MET.on; store.set('noggin-meteors', MET.on); MET.list = []; MET.next = 0; hud(); });
 $('#modeBtn').addEventListener('click', () => setMode(mode === 'roam' ? 'board' : 'roam'));
 $('#resultsBtn').addEventListener('click', () => { if (overlay.hidden && S.phase === 'await') showResults(); });
 $('#soundBtn').addEventListener('click', () => { sound = !sound; store.set('noggin-sound', sound); if (sound) ensureAudio(); hud(); });
@@ -1343,7 +1347,8 @@ function showResults(fanfare) {
     if (fanfare) sfx.fanfare();
     if (!f) {
       card.innerHTML = `<div><span class="eyebrow">Brain age</span><h2>Nothing scored yet</h2></div>
-        <p>Walk the loop and stop at a station. Parietal Plaza (Digit Symbol Coding) is the closest from the start.</p>
+        <p>${mode === 'roam' ? 'Bump any building to play its game, or the statue to learn your memory words.' : 'Walk the loop and stop at a station. Parietal Plaza (Digit Symbol Coding) is the closest from the start.'}</p>
+        ${meteorReport()}
         <div class="actions"><button class="btn" id="back" type="button">Back to the board</button></div>`;
       openModal(); $('#back').focus();
       $('#back').onclick = () => { closeModal(); resolve(); };
@@ -1363,6 +1368,7 @@ function showResults(fanfare) {
       <div class="agein"><label for="realAge">Your calendar age</label><input id="realAge" type="number" inputmode="numeric" min="10" max="110" placeholder="optional" value="${S.realAge ?? ''}"></div>
       <p class="note" id="cmp">${compare(f)}</p>
       <div class="rows" id="rows">${rowsHTML()}</div>
+      ${meteorReport()}
       <details><summary>How this number is made</summary>
         <p>Each game has a rough age curve: the score a typical person gets at each age, plus how much people vary around it. Your brain age is the age where your seven scores, taken together, are most typical. Games whose scores change a lot with age relative to how much people differ pull harder. That's mostly Digit Symbol Coding and choice reaction time. Rotations also falls steeply with age, but its curve is the roughest guess of the seven, so it gets a wide spread and pulls about half as hard. Stroop cost does grow with age, but much of that is general slowing that the speed games already capture, so it gets a light weight too. Span scores move only about one point between 25 and 75, so they nudge the estimate. Delayed recall drops a lot with age, but ten words is a small test, so it pulls moderately.</p>
         <p>Percentiles come from the same curves, assuming scores spread in a bell shape around the typical value at each age. They're rounded to the nearest 5 because the curves aren't good enough for anything finer.</p>
@@ -1395,6 +1401,100 @@ function showResults(fanfare) {
       hud(); closeModal(); msg('<b>Scores cleared.</b> Fresh start. Hit the block.'); resolve();
     };
   });
+}
+
+/* ---------- meteors: periodic strikes aimed at Noggin in free roam ---------- */
+const MET = { on: store.get('noggin-meteors', true), list: [], fx: [], craters: [], next: 0, stun: 0, shake: 0,
+  stats: { dodges: 0, hits: 0, rts: [] } };
+const MET_R = 64;
+function meteorInput(t) { for (const m of MET.list) if (m.rt == null && t >= m.t0) m.rt = t - m.t0; }
+function meteorTick(now) {
+  if (!MET.on) { MET.list = []; return; }
+  if (!MET.next) MET.next = now + 8000;
+  if (!MET.list.length && now >= MET.next) {
+    // a little less warning each time you dodge, never under a second
+    const dur = Math.max(1000, 1500 - 50 * MET.stats.dodges), side = Math.random() < .5 ? -1 : 1;
+    MET.list.push({ x: P.x, y: P.y, t0: now, dur, dx: side * (170 + Math.random() * 90), dy: -420, rt: null,
+      still: !P.moving && !R.keys.size && !R.target });
+    tone(900, .5, 'sawtooth', .025); tone(600, .6, 'sine', .03, .1);
+    msg('<b>Meteor incoming!</b> Get out of the red ring.');
+  }
+  for (const m of MET.list) if (!m.done && now - m.t0 >= m.dur) impact(m, now);
+  MET.list = MET.list.filter(m => !m.done);
+  MET.fx = MET.fx.filter(f => now - f.t < 600);
+  MET.craters = MET.craters.filter(c => now - c.t < 9000);
+}
+function impact(m, now) {
+  m.done = true;
+  const d = Math.hypot(P.x - m.x, P.y - m.y), hit = d < MET_R + PR * .5;
+  MET.fx.push({ x: m.x, y: m.y, t: now }); MET.craters.push({ x: m.x, y: m.y, t: now });
+  if (d < 320) MET.shake = now + 320;
+  tone(70, .45, 'sawtooth', .07); tone(140, .25, 'square', .04);
+  const timed = m.still && m.rt != null;
+  if (hit) {
+    MET.stats.hits++; S.coins = Math.max(0, S.coins - 5); MET.stun = now + 700;
+    R.target = null; sfx.bad();
+    msg(`<b>Bonk! Meteor hit, −5 coins.</b> ${timed ? `You started moving ${Math.round(m.rt)} ms after the warning. Not quite enough.` : m.still ? 'You didn\'t move.' : 'Move sideways, out of the ring.'}`);
+  } else {
+    MET.stats.dodges++; S.coins += 2; sfx.coin();
+    if (timed) MET.stats.rts.push(m.rt);
+    const med = median(MET.stats.rts);
+    msg(`<b>Dodged! +2 coins.</b>${timed ? ` You moved ${Math.round(m.rt)} ms after the warning.` : ''}${med != null ? ` Your median from a standstill: ${Math.round(med)} ms.` : ''}`);
+  }
+  hud();
+  MET.next = now + 12000 + Math.random() * 13000;
+}
+function drawMeteorGround(ctx, now) {
+  for (const c of MET.craters) {
+    const a = 1 - (now - c.t) / 9000;
+    ctx.globalAlpha = .35 * a; ctx.fillStyle = C.ink; ctx.beginPath(); ctx.ellipse(c.x, c.y, 46, 22, 0, 0, 7); ctx.fill();
+    ctx.globalAlpha = .5 * a; ctx.fillStyle = C.fold; ctx.beginPath(); ctx.ellipse(c.x, c.y - 3, 30, 13, 0, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  for (const m of MET.list) {
+    const p = clamp((now - m.t0) / m.dur, 0, 1), pulse = .55 + .45 * Math.sin(now / 70);
+    ctx.fillStyle = C.ink; ctx.globalAlpha = .12 + .3 * p; ctx.beginPath(); ctx.ellipse(m.x, m.y, MET_R * (.3 + .7 * p), MET_R * .5 * (.3 + .7 * p), 0, 0, 7); ctx.fill();
+    ctx.globalAlpha = .18 * pulse; ctx.fillStyle = C.red; ctx.beginPath(); ctx.ellipse(m.x, m.y, MET_R, MET_R * .5, 0, 0, 7); ctx.fill();
+    ctx.globalAlpha = pulse; ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.setLineDash([14, 10]);
+    ctx.beginPath(); ctx.ellipse(m.x, m.y, MET_R, MET_R * .5, 0, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(m.x - 18, m.y); ctx.lineTo(m.x + 18, m.y); ctx.moveTo(m.x, m.y - 9); ctx.lineTo(m.x, m.y + 9); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+function drawMeteorSky(ctx, now) {
+  for (const m of MET.list) {
+    const p = clamp((now - m.t0) / m.dur, 0, 1), e = Math.pow(p, 1.4);
+    const x = m.x + m.dx * (1 - e), y = m.y - 40 + m.dy * (1 - e), L = Math.hypot(m.dx, m.dy), ux = m.dx / L, uy = m.dy / L;
+    const g = ctx.createLinearGradient(x, y, x + ux * 150, y + uy * 150);
+    g.addColorStop(0, C.gold); g.addColorStop(.5, C.red); g.addColorStop(1, 'rgba(242,58,82,0)');
+    ctx.strokeStyle = g; ctx.lineCap = 'round'; ctx.lineWidth = 30; ctx.globalAlpha = .9;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + ux * 150, y + uy * 150); ctx.stroke();
+    ctx.globalAlpha = .35; ctx.fillStyle = C.gold; ctx.beginPath(); ctx.arc(x, y, 32, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = C.rock; ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, 21, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.globalAlpha = .35;
+    ctx.beginPath(); ctx.arc(x - 6, y - 5, 5, 0, 7); ctx.arc(x + 7, y + 4, 4, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+  }
+  for (const f of MET.fx) {
+    const q = (now - f.t) / 600;
+    ctx.globalAlpha = 1 - q; ctx.strokeStyle = C.gold; ctx.lineWidth = 8 * (1 - q) + 2;
+    ctx.beginPath(); ctx.ellipse(f.x, f.y, 20 + 150 * q, (20 + 150 * q) * .5, 0, 0, 7); ctx.stroke();
+    ctx.fillStyle = C.rock;
+    for (let i = 0; i < 9; i++) { const a = i / 9 * 2 * Math.PI; ctx.fillRect(f.x + Math.cos(a) * 130 * q - 4, f.y + Math.sin(a) * 65 * q - Math.sin(q * Math.PI) * 40 - 4, 8, 8); }
+    ctx.globalAlpha = 1;
+  }
+  if (now < MET.stun) {
+    for (let i = 0; i < 3; i++) {
+      const a = now / 160 + i * 2.1, sx = P.x + Math.cos(a) * 26, sy = P.y - 104 + Math.sin(a) * 8;
+      ctx.fillStyle = C.gold; ctx.strokeStyle = C.ink; ctx.lineWidth = 2;
+      ctx.beginPath(); star(sx, sy, 8, 3.5).split(' ').forEach((q, j) => { const [a2, b2] = q.split(',').map(Number); j ? ctx.lineTo(a2, b2) : ctx.moveTo(a2, b2); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+}
+function meteorReport() {
+  const s = MET.stats, n = s.dodges + s.hits;
+  if (!n) return '';
+  const med = median(s.rts);
+  return `<p class="note"><b>Meteors:</b> dodged ${s.dodges} of ${n}${med != null ? ` · median ${Math.round(med)} ms to start moving from a standstill (${s.rts.length} timed)` : ''}. Just for fun, not part of brain age: a meteor often lands while you're mid-step or reading, so it isn't a clean reaction test.</p>`;
 }
 
 /* ---------- free roam: a walkable top-down island ---------- */
@@ -1633,6 +1733,7 @@ function draw(now) {
   R.viewH = R.ch / z;
   R.cam.x = R.viewW >= W ? (W - R.viewW) / 2 : clamp(P.x - R.viewW / 2, 0, W - R.viewW);
   R.cam.y = R.viewH >= H ? (H - R.viewH) / 2 : clamp(P.y - 40 - R.viewH / 2, 0, H - R.viewH);
+  if (now < MET.shake && !reduce) { const k = (MET.shake - now) / 320 * 7; R.cam.x += (Math.random() - .5) * k; R.cam.y += (Math.random() - .5) * k; }
   ctx.setTransform(s, 0, 0, s, -R.cam.x * s, -R.cam.y * s);
   if (R.terrain) ctx.drawImage(R.terrain, 0, 0, W, H);
   // coins
@@ -1643,6 +1744,7 @@ function draw(now) {
     ctx.fillStyle = C.ink; ctx.beginPath(); ctx.ellipse(c.x, c.y + 14, 10, 4, 0, 0, 7); ctx.globalAlpha = .2; ctx.fill(); ctx.globalAlpha = 1;
     ctx.fillStyle = C.gold; ctx.strokeStyle = C.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(c.x, c.y - 4, w, 13, 0, 0, 7); ctx.fill(); ctx.stroke();
   }
+  drawMeteorGround(ctx, now);
   if (R.target) { ctx.strokeStyle = C.paper; ctx.lineWidth = 4; ctx.globalAlpha = .9; ctx.beginPath(); ctx.ellipse(R.target.x, R.target.y, 16, 8, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
   // depth-sorted things that stand up
   const items = BUILT.map(id => ({ y: RS[id].y, f: () => {
@@ -1658,9 +1760,10 @@ function draw(now) {
   items.push({ y: P.y, f: () => {
     const img = R.imgs.noggin, bob = P.moving ? Math.abs(Math.sin(now / 75)) * 6 : 0;
     if (!img || !img.complete || !img.naturalWidth) return;
-    ctx.save(); ctx.translate(P.x, P.y - bob); ctx.scale(P.face, 1); ctx.drawImage(img, -42, -96, 84, 109); ctx.restore();
+    ctx.save(); if (now < MET.stun) ctx.globalAlpha = .45 + .55 * (Math.floor(now / 90) % 2); ctx.translate(P.x, P.y - bob); ctx.scale(P.face, 1); ctx.drawImage(img, -42, -96, 84, 109); ctx.restore();
   } });
   items.sort((a, b) => a.y - b.y).forEach(i => i.f());
+  drawMeteorSky(ctx, now);
   // arrows at the screen edge pointing to stations you haven't played
   ctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
   const marks = BUILT.filter(id => S.scores[id] == null).map(id => ({ x: RS[id].x, y: RS[id].y - 60, m: ST[id].mark || ST[id].sign[0] }));
@@ -1688,6 +1791,7 @@ function update(dt, now) {
     const dx = R.target.x - P.x, dy = R.target.y - P.y, d = Math.hypot(dx, dy);
     if (d < 6) R.target = null; else { vx = dx / d; vy = dy / d; }
   }
+  if (now < MET.stun) { vx = vy = 0; R.target = null; }
   const len = Math.hypot(vx, vy);
   P.moving = false;
   if (len) {
@@ -1722,8 +1826,11 @@ function enter(id) {
 }
 function frame(now) {
   if (mode !== 'roam') { R.raf = null; return; }
-  const dt = Math.min(.05, (now - (R.last || now)) / 1000); R.last = now;
-  if (overlay.hidden) update(dt, now);
+  const gap = R.last ? now - R.last : 0;
+  if (gap > 300) { for (const m of MET.list) m.t0 += gap; if (MET.next) MET.next += gap; }   // tab was hidden: don't drop a meteor you never saw
+  const dt = Math.min(.05, gap / 1000); R.last = now;
+  if (overlay.hidden) { update(dt, now); meteorTick(now); }
+  else { MET.list = []; MET.next = 0; }   // no meteors while a game or card is open; a grace period follows
   draw(now);
   R.raf = requestAnimationFrame(frame);
 }
@@ -1748,7 +1855,7 @@ function initRoam() {
   R.imgs.noggin = svgImg(noggin(), '-32 -74 64 83', 128, 166);
   new ResizeObserver(resize).observe(R.canvas);
   document.fonts?.ready.then(() => { if (R.terrain) bake(); });
-  R.canvas.addEventListener('pointerdown', e => { if (!overlay.hidden) return; R.drag = true; try { R.canvas.setPointerCapture(e.pointerId); } catch (_) {} R.target = toWorld(e); });
+  R.canvas.addEventListener('pointerdown', e => { if (!overlay.hidden) return; meteorInput(e.timeStamp); R.drag = true; try { R.canvas.setPointerCapture(e.pointerId); } catch (_) {} R.target = toWorld(e); });
   R.canvas.addEventListener('pointermove', e => { if (R.drag) R.target = toWorld(e); });
   const up = () => { R.drag = false; };
   R.canvas.addEventListener('pointerup', up); R.canvas.addEventListener('pointercancel', up);
@@ -1763,6 +1870,7 @@ function setMode(m) {
   const roamOn = m === 'roam';
   $('#board').toggleAttribute('hidden', roamOn); R.canvas.hidden = !roamOn; $('#hitBtn').hidden = roamOn;
   $('#modeBtn').textContent = roamOn ? 'Dice board' : 'Free roam';
+  $('#metBtn').hidden = !roamOn; MET.list = []; MET.next = 0;
   if (roamOn) {
     clearInterval(spinTimer);
     resize(); msg(ROAM_MSG);
