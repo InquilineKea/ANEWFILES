@@ -144,10 +144,41 @@ select.btn{padding-right:6px}
 .kv{display:grid;grid-template-columns:auto auto;gap:2px 10px;font-size:11.5px;align-content:start}
 .kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
 
+/* linked highlighting between readouts and the lattice */
+[data-focus]{cursor:pointer}
+.bars [data-focus],.kv [data-focus],.spark [data-focus],.nodes tr[data-focus]{border-radius:3px}
+.bars span.hot,.kv .hot,.spark .hot,.chip.hot,.nodes tr.hot td{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.chip[data-focus]:hover,.kv dt[data-focus]:hover,.bars span[data-focus]:hover,.spark span[data-focus]:hover{color:var(--ink)}
+.focusbar{position:absolute;left:10px;top:28px;display:flex;align-items:center;gap:4px;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:2px 2px 2px 10px;font-size:11.5px;z-index:3;max-width:calc(100% - 20px)}
+.focusbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.focusbar b{font-weight:600}
+.focusbar button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;line-height:1;padding:2px 8px;border-radius:10px}
+.focusbar button:hover{color:var(--ink);background:var(--soft)}
+.actstrip{position:absolute;left:10px;bottom:40px;max-width:calc(100% - 20px);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 9px;font-family:var(--f-mono);font-size:11px;line-height:1.5;z-index:3;transition:opacity .5s;font-variant-numeric:tabular-nums}
+.actstrip .dn{color:var(--accent)} .actstrip .up{color:var(--viol)}
+.pulse{animation:pulse 1.4s ease-out}
+@keyframes pulse{0%{background:color-mix(in srgb,var(--kpos) 45%,transparent)}100%{background:transparent}}
+.bars .bt .sm{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:1px}
+.flow{width:100%;height:auto;display:block;max-height:220px}
+.flow .nd rect{fill:var(--panel);stroke:var(--line);stroke-width:1}
+.flow .nd.on rect{stroke:var(--ink)}
+.flow .nd text{font-family:var(--f-ui);font-size:11px;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.flow .nd.off{opacity:.35}
+.flow .ar{fill:none;stroke-linecap:round}
+.flow .hit{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.flow .lab{font-family:var(--f-mono);font-size:9px;fill:var(--muted);text-anchor:middle;pointer-events:none}
+.flow .loop{font-family:var(--f-mono);font-size:9.5px;fill:var(--accent);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.pinonly{display:none}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}.actstrip{transition:none}}
 @media (max-width:1180px){
   .app{grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,42%);grid-template-areas:"head head" "ctrl stage" "ctrl ana"}
 }
 @media (max-width:760px){
+  .pinonly{display:inline-block}
+  .app.pin .stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;height:46vh;min-height:280px;box-shadow:0 6px 16px rgba(0,0,0,.14)}
+  .hud{top:40px}
+  .focusbar{top:60px}
+  .app.pin .legend{max-height:3.1em;overflow:hidden;font-size:10px}
   html,body{height:auto}
   .app{display:flex;flex-direction:column;height:auto}
   .stage{height:64vh;min-height:340px;order:1}
@@ -201,12 +232,20 @@ select.btn{padding-right:6px}
       <button class="btn" data-cam="oblique">Oblique</button>
       <button class="btn" data-cam="top">Top</button>
       <button class="btn" data-cam="side">Side</button>
+      <button class="btn pinonly" id="pinBtn" aria-pressed="true" title="Keep the lattice in view while the readouts scroll">Unpin</button>
     </div>
+    <div class="focusbar" id="focusbar" hidden></div>
+    <div class="actstrip" id="actstrip" hidden></div>
     <div class="legend" id="legend"></div>
     <div class="tip" id="tip" hidden></div>
   </main>
 
   <aside class="analytics" id="analytics" aria-label="Readouts">
+    <section class="pan">
+      <h2>Signal flow <small id="flowInfo"></small></h2>
+      <svg class="flow" id="flow" viewBox="0 0 360 178" role="img" aria-label="Which way each active coupling acts between the sectors"></svg>
+      <p class="cap">Arrows show which way each active coupling pushes while the simulation runs; solid widths follow the energy each term carries, dashed arrows are structural. Hover or tap any arrow, bar, chip, row or chart bar on this side to light up those elements in the lattice; click to pin it. Click a site in the lattice to flip it and see what changed here.</p>
+    </section>
     <section class="pan">
       <h2>Energy <small id="eTot"></small></h2>
       <div class="formula" id="formula"></div>
@@ -737,12 +776,12 @@ function cohomology(){
         if(seen[j]<0){seen[j]=comp;g[j]=pred;st.push(j);}
       }}
   }
-  const compOk=new Uint8Array(comps).fill(1);
+  const compOk=new Uint8Array(comps).fill(1),badEdges=[];
   for(let e=0;e<G.sE;e++){if(!G.sw[e])continue;const a=G.si[e],b=G.sj[e];let om=G.sw0[e];if(gaugeOn&&G.s[a]!==G.s[b])om+=P.gamma*Math.PI;
-    const d=Math.abs(wrap(g[a]+om-g[b]));hol+=d;if(d>1e-5){bad++;compOk[seen[a]]=0;}}
+    const d=Math.abs(wrap(g[a]+om-g[b]));hol+=d;if(d>1e-5){bad++;compOk[seen[a]]=0;badEdges.push(e);}}
   let E1=0;for(let e=0;e<G.sE;e++)if(G.sw[e])E1++;
   cyc=E1-N+comps;for(let c=0;c<comps;c++)if(compOk[c])good++;
-  COH={comps,good,h0:2*good,cyc,bad,meanDefect:E1?hol/E1:0,E1};
+  COH={comps,good,h0:2*good,cyc,bad,meanDefect:E1?hol/E1:0,E1,badEdges};
 }
 
 /* ------------------------------------------------------------------ Weyl spectral block */
@@ -1071,7 +1110,7 @@ function bondStyle(e){
 }
 function draw(){
   if(!G||!W)return;
-  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);ctx.globalAlpha=FOCUS?.24:1;
   const pr=projectAll();
   const ns=P.nodeSize,showSheaf=ON.sheaf&&P.arrows;
   // map bond -> sheaf edge for tension colouring (bonds come first in sheaf edge list, in order, skipping type 2)
@@ -1094,7 +1133,7 @@ function draw(){
     if(cp('weyl|ising')){ctx.setLineDash([3,3]);ctx.strokeStyle=rgba(C.weyl,.45);ctx.beginPath();
       for(let b=0;b<S.iface.length;b+=2){ctx.moveTo(spx[S.iface[b]],spy[S.iface[b]]);ctx.lineTo(px[S.iface[b+1]],py[S.iface[b+1]]);}ctx.stroke();ctx.setLineDash([]);}
     if(P.labels){const o=[[0],[0],[0]];pr(-Math.min(G.R,4.5)-.4,0,slabZ(0),o,0);ctx.fillStyle=C.weyl;ctx.font='500 11px '+getFont('mono');ctx.textAlign='right';
-      ctx.fillText(hasNode?`Weyl block · ${WEYL.nodes.length} nodes`:'Weyl block · no nodes',o[0][0]-6,o[1][0]+4);ctx.textAlign='left';}
+      const lab=hasNode?`Weyl block · ${WEYL.nodes.length} nodes`:'Weyl block · no nodes';ctx.fillText(lab,Math.max(ctx.measureText(lab).width+6,o[0][0]-6),o[1][0]+4);ctx.textAlign='left';}
   }
   for(let l=0;l<G.L;l++){
     const LI=G.layerIdx[l],mechHere=mechOn()&&l===MECH.layer;
@@ -1128,6 +1167,8 @@ function draw(){
     }
   }
   drawHyper(G.hGlobal,true);
+  ctx.globalAlpha=1;
+  if(FOCUS){const n=drawFocus();if(n!==FOCUS.n){FOCUS.n=n;renderFocusBar();}}
   drawLegend();
   // hud
   const t=Tcur;
@@ -1206,8 +1247,9 @@ cv.addEventListener('pointermove',e=>{
     cam.yaw=drag.yaw-dx*.008;cam.pitch=clamp(drag.pitch+dy*.006,.02,Math.PI/2);dirty=true;$('tip').hidden=true;return;}
   hover(e);
 });
-cv.addEventListener('pointerup',e=>{cv.classList.remove('drag');if(drag&&drag.moved<4){const i=pick(e);if(i>=0&&ON.ising){G.s[i]=-G.s[i];statsDirty=true;dirty=true;hover(e);}}drag=null;});
-cv.addEventListener('pointerleave',()=>{$('tip').hidden=true;});
+cv.addEventListener('pointerup',e=>{cv.classList.remove('drag');if(drag&&drag.moved<4){const i=pick(e);if(i>=0&&ON.ising){
+  energies();const before={...E};if(G.hViol)before.viol=E.viol;G.s[i]=-G.s[i];energies();reportFlip(i,before,E);statsDirty=true;dirty=true;hover(e);}}drag=null;});
+cv.addEventListener('pointerleave',()=>{$('tip').hidden=true;if(SITE){SITE=null;renderBars();}});
 cv.addEventListener('wheel',e=>{e.preventDefault();cam.zoom=clamp(cam.zoom*Math.exp(-e.deltaY*.0012),.3,6);dirty=true;},{passive:false});
 function pick(e){const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=-1,bd=100;
   for(let i=0;i<G.N;i++){const d=(px[i]-x)**2+(py[i]-y)**2;if(d<bd){bd=d;best=i;}}return best;}
@@ -1221,11 +1263,156 @@ function hover(e){
     `bonds ${nb} · hyperedges ${nh}\n`+(ON.sheaf?`stalk angle ${ang.toFixed(0)}° · |x| ${Math.hypot(G.vx[i],G.vy[i]).toFixed(2)}\n`:'')+
     `local energy ${G.eLoc[i].toFixed(2)}`+(ON.ising?'\nclick to flip':'');
   tip.hidden=false;
+  if(!SITE||SITE.i!==i){SITE={i,c:siteContrib(i)};renderBars();}
   let tx=e.clientX-r.left+14,ty=e.clientY-r.top+12;
   if(tx+190>r.width)tx-=210;if(ty+100>r.height)ty-=110;tip.style.left=tx+'px';tip.style.top=ty+'px';
 }
 document.querySelectorAll('[data-cam]').forEach(b=>b.addEventListener('click',()=>{
   const m=b.dataset.cam;if(m==='top'){cam.yaw=0;cam.pitch=Math.PI/2;}else if(m==='side'){cam.yaw=-.3;cam.pitch=.04;}else{cam.yaw=-.55;cam.pitch=.42;}cam.zoom=1;dirty=true;}));
+
+/* ------------------------------------------------------------------ linked highlighting: readouts <-> lattice */
+let FOCUS=null,SITE=null;const PULSE=new Map();
+function setFocus(key,label,pin){
+  if(pin){FOCUS=FOCUS&&FOCUS.pinned&&FOCUS.key===key?null:{key,label,pinned:true,n:-1};}
+  else if(!FOCUS||!FOCUS.pinned){FOCUS=key?{key,label,pinned:false,n:-1}:null;}
+  renderFocusBar();markHot();dirty=true;
+}
+function renderFocusBar(){
+  const fb=$('focusbar');if(!FOCUS){fb.hidden=true;return;}
+  fb.hidden=false;
+  fb.innerHTML=`<span>${FOCUS.pinned?'Pinned':'Showing'}: <b>${FOCUS.label}</b>${FOCUS.n>=0?` · ${FOCUS.n} in view`:''}${FOCUS.pinned?'':' · click to pin'}</span>`+(FOCUS.pinned?`<button type="button" aria-label="Clear highlight" id="focusClear">✕</button>`:'');
+  const b=$('focusClear');if(b)b.onclick=()=>{FOCUS=null;renderFocusBar();markHot();dirty=true;};
+}
+function setHTML(el,h){if(el.__h!==h){el.__h=h;el.innerHTML=h;}}
+function markHot(){document.querySelectorAll('#analytics [data-focus]').forEach(el=>el.classList.toggle('hot',!!FOCUS&&el.dataset.focus===FOCUS.key));}
+const AN=document.getElementById('analytics');
+AN.addEventListener('pointerover',e=>{const t=e.target.closest('[data-focus]');if(t&&AN.contains(t))setFocus(t.dataset.focus,t.dataset.flabel||t.dataset.focus,false);});
+AN.addEventListener('pointerout',e=>{const t=e.target.closest('[data-focus]');const to=e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('[data-focus]');
+  if(t&&(!to||to.dataset.focus!==t.dataset.focus))setFocus(null,null,false);});
+// pin on pointerdown: readouts re-render several times a second, so a click's down and up can land on different nodes
+AN.addEventListener('pointerdown',e=>{if(e.button)return;const t=e.target.closest('[data-focus]');if(t&&AN.contains(t))setFocus(t.dataset.focus,t.dataset.flabel||t.dataset.focus,true);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&FOCUS){FOCUS=null;renderFocusBar();markHot();dirty=true;}});
+// canvases that stand for several sets: hit-test by position
+function canvasFocus(id,fn){const c=$(id);const go=(e,pin)=>{const r=c.getBoundingClientRect(),f=fn(e.clientX-r.left,e.clientY-r.top,r.width,r.height);if(f)setFocus(f[0],f[1],pin);};
+  c.addEventListener('pointermove',e=>go(e,false));c.addEventListener('pointerleave',()=>setFocus(null,null,false));c.addEventListener('pointerdown',e=>{if(!e.button)go(e,true);});c.style.cursor='pointer';}
+canvasFocus('cOrder',(x,y,w)=>{const NK=E.NbyK||[];let kmax=4;for(let k=3;k<10;k++)if(NK[k])kmax=Math.max(kmax,k);const n=kmax-1,i=Math.floor((x-26)/((w-34)/n));if(i<0||i>=n)return null;const k=i+2;
+  return k===2?['bonds:intra','pair bonds (k = 2)']:['hyper:k'+k,k+'-body hyperedges'];});
+canvasFocus('cStress',(x,y,w)=>x<w/2-4?['mech:struts','struts (compression)']:x>w/2+4?['mech:cables','cables (tension)']:['mech:all','the displayed self-stress']);
+canvasFocus('cBZ',()=>['weyl:Q','interface field from the Weyl node']);
+canvasFocus('cMoire',()=>['moire:w','interlayer bonds by weight']);
+function drawFocus(){
+  const k=FOCUS.key,hl=C.accent,bad=C.viol;let n=0;
+  ctx.lineCap='round';
+  const line=(a,b,col,w)=>{ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(px[a],py[a]);ctx.lineTo(px[b],py[b]);ctx.stroke();};
+  const dot=(i,col,f)=>{const r=Math.max(2.6,.1*ps[i]*P.nodeSize)*(f||1);ctx.fillStyle=col;ctx.beginPath();ctx.arc(px[i],py[i],r,0,TAU);ctx.fill();ctx.strokeStyle=C.panel;ctx.lineWidth=1;ctx.stroke();};
+  const poly=(h,col)=>{const vs=mechPoly(h);ctx.beginPath();vs.forEach((u,m)=>m?ctx.lineTo(px[u],py[u]):ctx.moveTo(px[u],py[u]));ctx.closePath();ctx.fillStyle=rgba(col,.5);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.4;ctx.stroke();};
+  if(k==='bonds:intra'){for(let e=0;e<G.M;e++)if(G.bt[e]<3&&(G.bOn[e]||!ON.ising)){line(G.bi[e],G.bj[e],rgba(hl,.9),2);n++;}}
+  else if(k==='bonds:frustrated'){for(let e=0;e<G.M;e++)if(G.bt[e]<2&&G.bOn[e]&&G.bJ[e]*G.s[G.bi[e]]*G.s[G.bj[e]]<0){line(G.bi[e],G.bj[e],bad,2.6);n++;}}
+  else if(k==='bonds:inter'||k==='moire:w'){for(let e=0;e<G.M;e++)if(G.bt[e]===3){const w=Math.exp(-(G.bd[e]**2)/(2*P.xi*P.xi));line(G.bi[e],G.bj[e],rgba(hl,.25+.75*w),.8+2.4*w);n++;}}
+  else if(k.startsWith('hyper:')){const q=k.slice(6);
+    for(let h=0;h<G.nH;h++){if(!G.hAct[h])continue;const kk=G.hS[h+1]-G.hS[h];
+      if(q==='all'||(q==='violated'&&G.hCon[h]&&G.hViol[h])||q==='k'+kk){poly(h,q==='violated'?bad:orderColor(kk));n++;}}}
+  else if(k==='sheaf:tension'){if(ON.sheaf)for(let e=0;e<G.sE;e++){if(!G.sw[e])continue;const t=Math.min(1,sheafEdgeE(e)/4);if(t<.04)continue;line(G.si[e],G.sj[e],rgba(hl,.3+.7*t),1+3*t);n++;}}
+  else if(k==='sheaf:defect'){if(ON.sheaf&&COH.badEdges)for(const e of COH.badEdges){line(G.si[e],G.sj[e],bad,2.4);n++;}}
+  else if(k==='sites:field'){for(let i=0;i<G.N;i++)if(Math.abs(G.hf[i])>1e-9){dot(i,G.hf[i]>0?C['chi-p']:C['chi-m']);n++;}}
+  else if(k==='sites:up'){for(let i=0;i<G.N;i++)if(G.s[i]>0){dot(i,C['spin-up']);n++;}}
+  else if(k==='sites:energy'){const a=Array.from(G.eLoc).sort((x,y)=>y-x),th=a[Math.floor(a.length*.15)];for(let i=0;i<G.N;i++)if(G.eLoc[i]>=th&&G.eLoc[i]>a[a.length-1]){dot(i,bad);n++;}}
+  else if(k==='sites:hoload'){if(G.hoLoad)for(let i=0;i<G.N;i++)if(G.hoLoad[i]>0){dot(i,rgba(C.kpos,.35+.65*G.hoLoad[i]/G.hoMax));n++;}}
+  else if(k==='weyl:Q'){const Q=WEYL&&WEYL.nodes.length?WEYL.Q:null;if(Q&&cp('weyl|ising'))for(let i=G.layerStart[0];i<G.layerStart[1];i++){const v=Math.cos(Q[0]*G.X[i]+Q[1]*G.Y[i]);dot(i,rgba(v>=0?C['chi-p']:C['chi-m'],.3+.7*Math.abs(v)));n++;}}
+  else if(k.startsWith('mech:')&&mechOn()){const q=k.slice(5),sv=mechStress();
+    if(q==='pinned'){ctx.fillStyle=hl;for(const i of MECH.pinned){const r=Math.max(2.5,.09*ps[i]*P.nodeSize);ctx.fillRect(px[i]-r,py[i]-r,2*r,2*r);n++;}}
+    else if(sv){let mx=1e-12;for(let r=0;r<MECH.nRows;r++)if(MECH.bondRow[r])mx=Math.max(mx,Math.abs(sv[r]));
+      for(let r=0;r<MECH.nRows;r++){if(!MECH.bondRow[r])continue;const v=sv[r]/mx,e=MECH.rowRef[r];
+        if((q==='cables'||q==='all')&&v>.02){line(G.bi[e],G.bj[e],hl,1.2+2.4*v);n++;}
+        else if((q==='struts'||q==='all')&&v<-.02){line(G.bi[e],G.bj[e],C.ink,2+4.5*-v);n++;}}}}
+  ctx.lineCap='butt';
+  return n;
+}
+// what one site contributes to each energy term (same shares as the local-energy colouring)
+function siteContrib(i){
+  const s=G.s,si=s[i],c={J:0,P:0,K:0,C:0,S:0,H:0};
+  if(ON.ising){for(let q=G.adj.start[i];q<G.adj.start[i+1];q++){const b=G.adj.list[q];if(!G.bOn[b])continue;const o=G.bi[b]===i?G.bj[b]:G.bi[b],v=-G.bJ[b]*si*s[o]/2;if(G.bt[b]===3)c.P+=v;else c.J+=v;}c.H=-G.hf[i]*si;}
+  if(hyperSpin)for(let q=G.hadj.start[i];q<G.hadj.start[i+1];q++){const h=G.hadj.list[q];if(!G.hAct[h])continue;const k=G.hS[h+1]-G.hS[h];let prod=1;for(let p=G.hS[h];p<G.hS[h+1];p++)prod*=s[G.hN[p]];
+    c.K+=-G.hK[h]*prod/k;if(G.hCon[h])c.C+=P.lamC*violRule(h)/k;}
+  if(ON.sheaf)for(let q=G.sadj.start[i];q<G.sadj.start[i+1];q++){const e=G.sadj.list[q];if(G.sw[e])c.S+=P.lam*G.sw[e]*sheafEdgeE(e)/2;}
+  return c;
+}
+const TERMS=[['Intralayer J','EJ','J','afm','bonds:frustrated','frustrated in-plane bonds'],['Interlayer J⊥','EP','P','afm','bonds:inter','interlayer bonds'],['Hyperedge K','EK','K','kpos','hyper:all','active hyperedges'],
+  ['Constraints','EC','C','viol','hyper:violated','hyperedges breaking their rule'],['Sheaf','ES','S','accent','sheaf:tension','sheaf edges under tension'],['Fields h','EH','H','chi-p','sites:field','sites feeling a field']];
+function renderBars(){
+  if(!G||E.tot===undefined)return;const N=G.N,now=performance.now();
+  const on={EJ:ON.ising&&cp('kagome|ising'),EP:ON.ising&&cp('moire|ising'),EK:hyperSpin,EC:hyperSpin&&P.constraint!=='none',ES:ON.sheaf,EH:ON.ising};
+  const mx=Math.max(1e-6,...TERMS.map(t=>Math.abs(E[t[1]]/N)),...(SITE?Object.values(SITE.c).map(Math.abs):[]));
+  setHTML($('bars'),TERMS.map(([l,key,sk,tok,fk,fl])=>{const x=E[key]/N,w=Math.abs(x)/mx*50,pl=(PULSE.get(key)||0)>now?' pulse':'';
+    const sm=SITE&&on[key]?`<span class="sm" style="left:calc(${50+clamp(SITE.c[sk]/mx,-1,1)*50}% - 1px)" title="site ${SITE.i}: ${SITE.c[sk].toFixed(3)}"></span>`:'';
+    const f=`data-focus="${fk}" data-flabel="${fl}"`;
+    return `<span class="bl${pl}" ${f} style="${on[key]?'':'opacity:.45'}">${l}</span><span class="bt" ${f}><span class="bf" style="background:${C[tok]};${x<0?`right:50%;width:${w.toFixed(1)}%`:`left:50%;width:${w.toFixed(1)}%`}"></span>${sm}</span><span class="bv${pl}" ${f}>${on[key]?x.toFixed(3):'off'}</span>`;}).join(''));
+  $('eTot').textContent=SITE?`site ${SITE.i}: ${Object.values(SITE.c).reduce((a,b)=>a+b,0).toFixed(3)} · bar = mean per site, mark = this site`:`${(E.tot/N).toFixed(3)} per site`;
+  markHot();
+}
+function reportFlip(i,b,a){
+  const N=G.N,parts=[];let tot=0;
+  for(const [l,key] of TERMS){const d=a[key]-b[key];tot+=d;if(Math.abs(d)>1e-9){parts.push(`${l.split(' ')[0]} ${d>0?'+':''}${d.toFixed(2)}`);PULSE.set(key,performance.now()+1400);}}
+  const dv=(a.viol||0)-(b.viol||0),du=(a.unsat||0)-(b.unsat||0);
+  const el=$('actstrip');el.hidden=false;el.style.opacity=1;
+  el.innerHTML=`flipped site ${i} → s = ${G.s[i]>0?'+1':'−1'} · ΔE <span class="${tot<0?'dn':'up'}">${tot>0?'+':''}${tot.toFixed(2)}</span>${parts.length?' ('+parts.join(' · ')+')':''}`+
+    (du?` · frustrated bonds ${du>0?'+':''}${du}`:'')+(dv?` · broken rules ${dv>0?'+':''}${dv}`:'')+(ON.ising&&running&&Tcur>.05?'<br>the Monte Carlo keeps running, so the lattice may flip it back':'');
+  clearTimeout(reportFlip.t);reportFlip.t=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>{el.hidden=true;},500);},6000);
+  renderBars();
+}
+// signal flow: which way each active coupling acts, width = energy carried
+const FLOW_NODES={kagome:[48,22],moire:[48,89],weyl:[48,156],ising:[178,89],hyper:[310,22],sheaf:[310,89],tense:[178,156]};
+const FLOW_EDGES=[
+  ['kagome','ising','kagome|ising','bonds:intra','in-plane bonds (J)',()=>E.EJ],
+  ['moire','ising','moire|ising','bonds:inter','interlayer bonds (J⊥)',()=>E.EP],
+  ['weyl','ising','weyl|ising','weyl:Q','interface field from the Weyl node',()=>E.EH],
+  ['hyper','ising','ising|hyper','hyper:all','hyperedges acting on spins (K, rules)',()=>Math.abs(E.EK)+Math.abs(E.EC)],
+  ['ising','sheaf','ising|sheaf','sheaf:tension','spins gauging the sheaf (γ)',()=>E.ES,-26],
+  ['sheaf','ising','ising|sheaf','sheaf:tension','sheaf energy acting back on spin flips',()=>E.ES,-26],
+  ['kagome','sheaf','kagome|sheaf','sheaf:defect','triangle flux in the sheaf maps',null],
+  ['moire','sheaf','moire|sheaf','sheaf:defect','twist-locked sheaf maps',null,64],
+  ['hyper','sheaf','hyper|sheaf','sheaf:tension','hyperedge cliques in the sheaf',null],
+  ['hyper','tense','hyper|tense','mech:all','hyperedges as membranes',null],
+  ['kagome','tense','kagome|tense','mech:all','bonds as cables and struts',null],
+];
+function flowActive(key){const info=COUPLINGS[key],[a,b]=key.split('|');return info.kind==='toggle'?cp(key):info.kind==='struct'&&(a==='kagome'||ON[a])&&(b==='kagome'||ON[b]);}
+function buildFlow(){
+  const svg=$('flow'),NS='http://www.w3.org/2000/svg';let h='';
+  FLOW_EDGES.forEach((ed,i)=>{h+=`<path id="fl-a${i}" class="ar"/><path id="fl-h${i}" class="ar"/>`;});
+  // hit areas after all strokes: structural first, live couplings above, the two-way loop on top
+  const rank=ed=>ed[2]==='ising|sheaf'?2:ed[5]?1:0;
+  const order=FLOW_EDGES.map((ed,i)=>i).sort((a,b)=>rank(FLOW_EDGES[a])-rank(FLOW_EDGES[b]));
+  for(const i of order){const ed=FLOW_EDGES[i];h+=`<path id="fl-x${i}" class="hit" data-focus="${ed[3]}" data-flabel="${ed[4]}"><title>${COMP_NAME[ed[0]]} → ${COMP_NAME[ed[1]]}: ${ed[4]}</title></path>`;}
+  h+=`<text id="fl-loop" class="loop" x="222" y="44">↻ two-way loop</text>`;
+  for(const [k,[x,y]] of Object.entries(FLOW_NODES))h+=`<g class="nd" id="fl-n-${k}" data-focus="${{kagome:'bonds:intra',moire:'moire:w',weyl:'weyl:Q',ising:'sites:up',hyper:'hyper:all',sheaf:'sheaf:tension',tense:'mech:all'}[k]}" data-flabel="${COMP_NAME[k]} sector"><rect x="${x-42}" y="${y-12}" width="84" height="24" rx="5"/><text x="${x}" y="${y}">${COMP_NAME[k]}</text></g>`;
+  svg.innerHTML=h;void NS;
+}
+function updateFlow(){
+  if(!$('fl-a0'))return;const N=G.N;
+  const vals=FLOW_EDGES.map(ed=>ed[5]&&flowActive(ed[2])?Math.abs(ed[5]())/N:0),vmax=Math.max(1e-6,...vals);
+  let loop=false,act=0;
+  FLOW_EDGES.forEach((ed,i)=>{
+    const [x1,y1]=FLOW_NODES[ed[0]],[x2,y2]=FLOW_NODES[ed[1]],on=flowActive(ed[2]),dyn=!!ed[5],bend=ed[6]||0;
+    // shorten to the box edges, bend sideways
+    const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+    const pad=(a)=>Math.min(42/Math.max(Math.abs(ux),1e-6),12/Math.max(Math.abs(uy),1e-6))+a;
+    const sx=x1+ux*pad(2),sy=y1+uy*pad(2),ex=x2-ux*pad(5),ey=y2-uy*pad(5),cx=(sx+ex)/2+nx*bend,cy=(sy+ey)/2+ny*bend;
+    const d=`M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`;
+    const w=dyn?1.2+5*vals[i]/vmax:1.1,isLoop=ed[2]==='ising|sheaf'&&on;loop=loop||isLoop;if(on)act++;
+    const col=!on?'var(--line)':isLoop?'var(--accent)':dyn?'var(--ink)':'var(--muted)';
+    const a=$('fl-a'+i);a.setAttribute('d',d);a.setAttribute('style',`stroke:${col};stroke-width:${w.toFixed(2)};opacity:${on?1:.35};${dyn?'':'stroke-dasharray:3 3'}`);
+    // arrowhead along the curve's end tangent
+    const tx=ex-cx,ty=ey-cy,tl=Math.hypot(tx,ty)||1,hx=tx/tl,hy=ty/tl,s=4+w;
+    $('fl-h'+i).setAttribute('d',`M${(ex-hx*s+hy*s*.6).toFixed(1)},${(ey-hy*s-hx*s*.6).toFixed(1)} L${ex.toFixed(1)},${ey.toFixed(1)} L${(ex-hx*s-hy*s*.6).toFixed(1)},${(ey-hy*s+hx*s*.6).toFixed(1)}`);
+    $('fl-h'+i).setAttribute('style',`stroke:${col};stroke-width:1.6;opacity:${on?1:.35}`);
+    $('fl-x'+i).setAttribute('d',d);
+  });
+  for(const k in FLOW_NODES){const g=$('fl-n-'+k);g.classList.toggle('on',k==='kagome'||ON[k]);g.classList.toggle('off',!(k==='kagome'||ON[k]));}
+  $('fl-loop').style.display=loop?'':'none';
+  $('flowInfo').textContent=`${act} active couplings · ${loop?'1 two-way loop':'no two-way loop'}`;
+}
+// keep the lattice in view on phones
+$('pinBtn').addEventListener('click',()=>{const a=document.querySelector('.app'),on=!a.classList.contains('pin');a.classList.toggle('pin',on);$('pinBtn').textContent=on?'Unpin':'Pin view';$('pinBtn').setAttribute('aria-pressed',on);requestAnimationFrame(()=>{resize();});});
 
 /* ------------------------------------------------------------------ controls UI */
 const secEls={};
@@ -1342,7 +1529,8 @@ function pushTrace(){
 }
 function buildSparks(){
   const rows=[['E','energy / site','ink'],['m','magnetisation','spin-up'],['u','frustrated bonds','kpos'],['v','broken rules','viol'],['s','sheaf / edge','accent']];
-  $('sparks').innerHTML=rows.map(([k,l])=>`<span class="sl">${l}</span><canvas id="sp-${k}" height="26"></canvas><span class="sv" id="sv-${k}"></span>`).join('');
+  const fk={E:['sites:energy','highest local energy'],m:['sites:up','up spins'],u:['bonds:frustrated','frustrated bonds'],v:['hyper:violated','hyperedges breaking their rule'],s:['sheaf:tension','sheaf edges under tension']};
+  $('sparks').innerHTML=rows.map(([k,l])=>`<span class="sl" data-focus="${fk[k][0]}" data-flabel="${fk[k][1]}">${l}</span><canvas id="sp-${k}" height="26" data-focus="${fk[k][0]}" data-flabel="${fk[k][1]}"></canvas><span class="sv" id="sv-${k}" data-focus="${fk[k][0]}" data-flabel="${fk[k][1]}"></span>`).join('');
   buildSparks.rows=rows;
 }
 function fitCanvas(c,h){const w=c.clientWidth||c.parentElement.clientWidth||200,d=Math.min(window.devicePixelRatio||1,2);if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return [x,w,h];}
@@ -1365,28 +1553,24 @@ function drawSparks(){
 function renderStats(){
   const N=G.N;
   $('eTot').textContent=`${(E.tot/N).toFixed(3)} per site`;
-  const terms=[['Intralayer J',E.EJ,C.afm,ON.ising&&cp('kagome|ising')],['Interlayer J⊥',E.EP,C.afm,ON.ising&&cp('moire|ising')],['Hyperedge K',E.EK,C.kpos,hyperSpin],
-    ['Constraints',E.EC,C.viol,hyperSpin&&P.constraint!=='none'],['Sheaf',E.ES,C.accent,ON.sheaf],['Fields h',E.EH,C['chi-p'],ON.ising]];
-  const mx=Math.max(1e-6,...terms.map(t=>Math.abs(t[1]/N)));
-  $('bars').innerHTML=terms.map(([l,v,c,on])=>{const x=v/N,w=Math.abs(x)/mx*50;
-    return `<span class="bl" style="${on?'':'opacity:.45'}">${l}</span><span class="bt"><span class="bf" style="background:${c};${x<0?`right:50%;width:${w}%`:`left:50%;width:${w}%`}"></span></span><span class="bv">${on?x.toFixed(3):'off'}</span>`;}).join('');
-  const chips=[];
-  chips.push(`<span class="chip">N <b>${N}</b></span>`,`<span class="chip">bonds <b>${G.M}</b></span>`,`<span class="chip">hyperedges <b>${Array.from(G.hAct).reduce((a,b)=>a+b,0)}</b></span>`,`<span class="chip">sheaf edges <b>${COH.E1||0}</b></span>`);
-  if(ON.ising){chips.push(`<span class="chip">m <b>${E.m.toFixed(3)}</b></span>`);
-    if(E.nJ){const f=E.unsat/E.nJ;const fl=P.J<0&&!P.J2;chips.push(`<span class="chip ${fl&&Math.abs(f-1/3)<.01?'good':''}">frustrated bonds <b>${(100*f).toFixed(1)}%</b>${fl?' · bulk floor 33.3%':''}</span>`);}
-    if(E.nCon)chips.push(`<span class="chip ${E.viol?'warn':'good'}">violated <b>${E.viol}</b>/${E.nCon}</span>`);}
-  $('chips').innerHTML=chips.join('');
+  renderBars();
+  const chips=[],fc=(k,l)=>`data-focus="${k}" data-flabel="${l}"`;
+  chips.push(`<span class="chip">N <b>${N}</b></span>`,`<span class="chip" ${fc('bonds:intra','in-plane bonds')}>bonds <b>${G.M}</b></span>`,`<span class="chip" ${fc('hyper:all','active hyperedges')}>hyperedges <b>${Array.from(G.hAct).reduce((a,b)=>a+b,0)}</b></span>`,`<span class="chip" ${fc('sheaf:tension','sheaf edges under tension')}>sheaf edges <b>${COH.E1||0}</b></span>`);
+  if(ON.ising){chips.push(`<span class="chip" ${fc('sites:up','up spins')}>m <b>${E.m.toFixed(3)}</b></span>`);
+    if(E.nJ){const f=E.unsat/E.nJ;const fl=P.J<0&&!P.J2;chips.push(`<span class="chip ${fl&&Math.abs(f-1/3)<.01?'good':''}" ${fc('bonds:frustrated','frustrated bonds')}>frustrated bonds <b>${(100*f).toFixed(1)}%</b>${fl?' · bulk floor 33.3%':''}</span>`);}
+    if(E.nCon)chips.push(`<span class="chip ${E.viol?'warn':'good'}" ${fc('hyper:violated','hyperedges breaking their rule')}>violated <b>${E.viol}</b>/${E.nCon}</span>`);}
+  setHTML($('chips'),chips.join(''));markHot();
   $('tInfo').textContent=ON.ising?`T ${Tcur.toFixed(3)}${P.schedule==='anneal'?' (annealing)':''}`:'';
   // moiré
   const L=G.L,th=P.theta*D2R,e=P.mismatch;
   const LM=L>1?(1+e)/Math.sqrt(e*e+2*(1+e)*(1-Math.cos(th))||1e-12):Infinity;
   let nX=0,wsum=0;for(let b=0;b<G.M;b++)if(G.bt[b]===3){nX++;wsum+=Math.exp(-(G.bd[b]**2)/(2*P.xi*P.xi));}
   $('mInfo').textContent=L>1?`L_M ≈ ${isFinite(LM)&&LM<1e4?LM.toFixed(2)+' a':'∞'}`:'single layer';
-  $('moireKV').innerHTML=L>1?`<dt>twist θ</dt><dd>${P.theta.toFixed(1)}°</dd><dt>mismatch ε</dt><dd>${e.toFixed(3)}</dd><dt>moiré period</dt><dd>${isFinite(LM)&&LM<1e4?LM.toFixed(2)+' a':'∞'}</dd><dt>periods across sample</dt><dd>${isFinite(LM)?(2*G.R/LM).toFixed(1):'0'}</dd><dt>interlayer bonds</dt><dd>${nX}</dd><dt>mean weight w</dt><dd>${nX?(wsum/nX).toFixed(3):'–'}</dd>`:
+  $('moireKV').innerHTML=L>1?`<dt>twist θ</dt><dd>${P.theta.toFixed(1)}°</dd><dt>mismatch ε</dt><dd>${e.toFixed(3)}</dd><dt>moiré period</dt><dd>${isFinite(LM)&&LM<1e4?LM.toFixed(2)+' a':'∞'}</dd><dt>periods across sample</dt><dd>${isFinite(LM)?(2*G.R/LM).toFixed(1):'0'}</dd><dt data-focus="moire:w" data-flabel="interlayer bonds by weight">interlayer bonds</dt><dd data-focus="moire:w" data-flabel="interlayer bonds by weight">${nX}</dd><dt data-focus="moire:w" data-flabel="interlayer bonds by weight">mean weight w</dt><dd data-focus="moire:w" data-flabel="interlayer bonds by weight">${nX?(wsum/nX).toFixed(3):'–'}</dd>`:
     `<dt>layers</dt><dd>1</dd><dt>note</dt><dd>switch Moiré on</dd>`;
   // sheaf
   $('sInfo').textContent=ON.sheaf?`dim H⁰ = ${COH.h0}`:'off';
-  $('sheafKV').innerHTML=ON.sheaf?`<dt>dim H⁰ (global sections)</dt><dd>${COH.h0}</dd><dt>components</dt><dd>${COH.comps} (${COH.good} flat)</dd><dt>independent cycles</dt><dd>${COH.cyc}</dd><dt>edges failing holonomy</dt><dd>${COH.bad}</dd><dt>mean holonomy defect</dt><dd>${(COH.meanDefect/D2R).toFixed(2)}°</dd><dt>Dirichlet energy / edge</dt><dd>${E.nS?(E.ES/E.nS).toFixed(4):'–'}</dd><dt>spin gauge</dt><dd>${gaugeOn?'γ = '+P.gamma.toFixed(2)+(Math.abs(P.gamma-1)<1e-9?' (pure gauge)':''):'off'}</dd>`:'<dt>sector</dt><dd>off</dd>';
+  $('sheafKV').innerHTML=ON.sheaf?`<dt>dim H⁰ (global sections)</dt><dd>${COH.h0}</dd><dt>components</dt><dd>${COH.comps} (${COH.good} flat)</dd><dt>independent cycles</dt><dd>${COH.cyc}</dd><dt data-focus="sheaf:defect" data-flabel="sheaf edges failing holonomy">edges failing holonomy</dt><dd data-focus="sheaf:defect" data-flabel="sheaf edges failing holonomy">${COH.bad}</dd><dt>mean holonomy defect</dt><dd>${(COH.meanDefect/D2R).toFixed(2)}°</dd><dt data-focus="sheaf:tension" data-flabel="sheaf edges under tension">Dirichlet energy / edge</dt><dd data-focus="sheaf:tension" data-flabel="sheaf edges under tension">${E.nS?(E.ES/E.nS).toFixed(4):'–'}</dd><dt>spin gauge</dt><dd>${gaugeOn?'γ = '+P.gamma.toFixed(2)+(Math.abs(P.gamma-1)<1e-9?' (pure gauge)':''):'off'}</dd>`:'<dt>sector</dt><dd>off</dd>';
   // pills
   const pill=(id,t)=>{const el=$('pill-'+id);if(el)el.textContent=t;};
   pill('kagome',`${G.kag?'kagome':'triangular'} · ${N} sites`);
@@ -1397,7 +1581,7 @@ function renderStats(){
   pill('sheaf',ON.sheaf?`H⁰ = ${COH.h0}`:'off');
   $('subline').textContent=`${G.kag?'kagome':'triangular'} · ${L} layer${L>1?'s':''} · ${N} sites · ${G.M} bonds · ${G.nH} hyperedges · ${G.sE} sheaf edges`;
   pill('tense',ON.tense?(mechOn()?`${MECH.nSS} stresses · ${MECH.nFloppy} floppy`:MECH&&MECH.pending?'solving…':'…'):'off');
-  renderMech();renderOrders();
+  renderMech();renderOrders();updateFlow();markHot();
   drawMoire(LM);
 }
 function renderMech(){
@@ -1410,10 +1594,10 @@ function renderMech(){
   if(P.tShow==='stress'){const usingUni=P.tPick==='uniform'&&M_.uniform&&M_.uniFrac>1e-9;
     shown=M_.nSS?(usingUni?'self-stress closest to uniform tension':`self-stress basis state ${Math.min(P.tIdx,M_.stresses.length-1)+1} of ${M_.nSS}`):'no self-stress exists';}
   else{const i=Math.min(P.tIdx,M_.modes.length-1);shown=M_.modes.length?(M_.lam[i]===0?`floppy mode ${i+1} of ${M_.nFloppy}`:`softest mode (λ/λmax = ${M_.lam[i].toExponential(1)}), no floppy mode left`):'no modes';}
-  kv.innerHTML=`<dt>free sites · pinned</dt><dd>${M_.nf} · ${M_.pinned.length}</dd><dt>degrees of freedom</dt><dd>${M_.dof}</dd>`+
+  kv.innerHTML=`<dt data-focus="mech:pinned" data-flabel="pinned sites">free sites · pinned</dt><dd data-focus="mech:pinned" data-flabel="pinned sites">${M_.nf} · ${M_.pinned.length}</dd><dt>degrees of freedom</dt><dd>${M_.dof}</dd>`+
     `<dt>constraints (bonds + membranes)</dt><dd>${nb} + ${nm}</dd><dt>rank of C</dt><dd>${M_.rank}</dd>`+
     `<dt>zero modes</dt><dd>${M_.nZero}${M_.nRigid?` (${M_.nRigid} rigid)`:''}</dd><dt>floppy modes</dt><dd>${M_.nFloppy}</dd>`+
-    `<dt>self-stresses</dt><dd>${M_.nSS}${M_.ssFound!=null&&M_.ssFound!==M_.nSS?` (direct count ${M_.ssFound})`:''}</dd>`+
+    `<dt data-focus="mech:all" data-flabel="the displayed self-stress">self-stresses</dt><dd data-focus="mech:all" data-flabel="the displayed self-stress">${M_.nSS}${M_.ssFound!=null&&M_.ssFound!==M_.nSS?` (direct count ${M_.ssFound})`:''}</dd>`+
     `<dt>Maxwell–Calladine</dt><dd>${lhs} = ${rhs} ${lhs===rhs?'✓':'✗'}</dd>`+
     `<dt>uniform tension reachable</dt><dd>${M_.uniFrac==null?'–':(100*M_.uniFrac).toFixed(1)+'%'}</dd><dt>showing</dt><dd>${shown}</dd>`;
   // stress histogram of the displayed state
@@ -1446,7 +1630,7 @@ function renderOrders(){
   let tot=0,hi=0,nh=0,sk=0;for(const k of ks){tot+=Math.abs(EK[k]);if(k>=3){hi+=Math.abs(EK[k]);nh+=NK[k];sk+=k*NK[k];}}
   $('hoInfo').textContent=nh?`${nh} k ≥ 3 terms`:'none active';
   $('hoKV').innerHTML=`<dt>share of |E| from k ≥ 3</dt><dd>${tot>0?(100*hi/tot).toFixed(1)+'%':'–'}</dd><dt>mean order of hyperedges</dt><dd>${nh?(sk/nh).toFixed(2):'–'}</dd>`+
-    `<dt>largest order present</dt><dd>${nh?kmax:'–'}</dd><dt>spins coupled to k ≥ 3 terms</dt><dd>${G.hoLoad?Array.from(G.hoLoad).filter(v=>v>0).length:0} of ${N}</dd>`+
+    `<dt>largest order present</dt><dd>${nh?kmax:'–'}</dd><dt data-focus="sites:hoload" data-flabel="sites coupled to k ≥ 3 terms">spins coupled to k ≥ 3 terms</dt><dd data-focus="sites:hoload" data-flabel="sites coupled to k ≥ 3 terms">${G.hoLoad?Array.from(G.hoLoad).filter(v=>v>0).length:0} of ${N}</dd>`+
     `<dt>acting on spins</dt><dd>${hyperSpin?'yes':'no (Ising × Hypergraph off)'}</dd>`;
 }
 function drawMoire(LM){
@@ -1522,7 +1706,7 @@ function drawWeyl(){
       x.fillStyle=C.panel;x.font='bold 9px '+FONTS.mono;x.textAlign='center';x.fillText(nd.chi>0?'+':'−',X,Y+3);x.textAlign='left';});
     if(n&&cp('weyl|ising')){const Q=Wd.Q;x.strokeStyle=C.kpos;x.lineWidth=1.4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Q[0]*sc,cy-Q[1]*sc);x.stroke();x.fillStyle=C.kpos;x.fillText('Q',cx+Q[0]*sc*.5+4,cy-Q[1]*sc*.5-4);}
   }
-  $('nodeTab').innerHTML=n?`<tr><th>χ</th><th>k<sub>x</sub></th><th>k<sub>y</sub></th><th>k<sub>z</sub></th><th>gap</th></tr>`+Wd.nodes.map(nd=>`<tr><td style="color:${nd.chi>0?C['chi-p']:C['chi-m']}">${nd.chi>0?'+'+nd.chi:'−'+(-nd.chi)}</td><td>${nd.kx.toFixed(2)}</td><td>${nd.ky.toFixed(2)}</td><td>${nd.kz.toFixed(2)}</td><td>${nd.gap<1e-3?nd.gap.toExponential(0):nd.gap.toFixed(3)}</td></tr>`).join(''):`<tr><td style="text-align:left;color:var(--muted)">No nodes to list.</td></tr>`;
+  $('nodeTab').innerHTML=n?`<tr><th>χ</th><th>k<sub>x</sub></th><th>k<sub>y</sub></th><th>k<sub>z</sub></th><th>gap</th></tr>`+Wd.nodes.map(nd=>`<tr data-focus="weyl:Q" data-flabel="interface field from the Weyl node"><td style="color:${nd.chi>0?C['chi-p']:C['chi-m']}">${nd.chi>0?'+'+nd.chi:'−'+(-nd.chi)}</td><td>${nd.kx.toFixed(2)}</td><td>${nd.ky.toFixed(2)}</td><td>${nd.kz.toFixed(2)}</td><td>${nd.gap<1e-3?nd.gap.toExponential(0):nd.gap.toFixed(3)}</td></tr>`).join(''):`<tr><td style="text-align:left;color:var(--muted)">No nodes to list.</td></tr>`;
 }
 function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r)));const m=r/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
 $('cChern').addEventListener('click',e=>{const c=$('cChern'),m=c._map;if(!m)return;const r=c.getBoundingClientRect();const u=(e.clientX-r.left-m.pl)/(m.w-m.pl-m.pr);
@@ -1581,7 +1765,7 @@ function loop(){
 readTokens();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readTokens();renderFormula();drawWeyl();statsDirty=true;});
 new MutationObserver(()=>{readTokens();renderFormula();drawWeyl();statsDirty=true;}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-buildUI();buildSparks();
+buildUI();buildSparks();buildFlow();document.querySelector('.app').classList.add('pin');
 resize();
 applyPreset('full');
 $('preset').value='full';
