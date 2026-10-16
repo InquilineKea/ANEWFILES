@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elegance Ontology Map</title>
+<style>
+:root {
+  --bg: #fbfaf7; --panel: #ffffff; --ink: #1d1c1a; --muted: #6b675f; --line: #d9d5cc;
+  --edge: #b9b3a6; --edge-hi: #1d1c1a;
+  --turn: #8a6d3b; --basin: #2f6f8f; --program: #8f3f5f; --bridge: #3d7a3d; --kalman: #6a4f9a; --test: #b0612a;
+  --chip-bg: #f0ede6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161614; --panel: #1f1f1c; --ink: #ecebe6; --muted: #a29e94; --line: #3a3934;
+    --edge: #55524a; --edge-hi: #ecebe6;
+    --turn: #d4b072; --basin: #6fb3d4; --program: #d98aa9; --bridge: #86c486; --kalman: #b39ae0; --test: #e59b62;
+    --chip-bg: #2a2925;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161614; --panel: #1f1f1c; --ink: #ecebe6; --muted: #a29e94; --line: #3a3934;
+  --edge: #55524a; --edge-hi: #ecebe6;
+  --turn: #d4b072; --basin: #6fb3d4; --program: #d98aa9; --bridge: #86c486; --kalman: #b39ae0; --test: #e59b62;
+  --chip-bg: #2a2925;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { padding: 20px 16px 8px; max-width: 1240px; margin: 0 auto; }
+h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; max-width: 1240px; margin: 0 auto; }
+.chip { border: 1px solid var(--line); background: var(--chip-bg); color: var(--ink); border-radius: 999px;
+  padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip[aria-pressed="false"] { opacity: 0.45; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; max-width: 1240px; margin: 0 auto; padding: 0 16px 24px; }
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+.stage { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+svg { display: block; width: 100%; height: auto; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.2; transition: opacity .15s; }
+.edge.hi { stroke: var(--edge-hi); stroke-width: 2; }
+.edge-label { font-size: 12.5px; fill: var(--muted); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; display: none; }
+.edge-label.hi { display: block; fill: var(--ink); }
+.node { cursor: pointer; outline: none; }
+.node rect { fill: var(--panel); stroke-width: 1.6; }
+.node text { font-size: 14px; fill: var(--ink); pointer-events: none; }
+.node:focus-visible rect, .node.sel rect { stroke-width: 3.2; }
+.dim { opacity: 0.18; }
+.hidden { display: none; }
+.rowlabel { font-size: 12px; fill: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; align-self: start; position: sticky; top: 12px; }
+aside h2 { font-size: 16px; margin: 0 0 2px; }
+aside .kind { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+aside .status { display: inline-block; font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; margin-top: 6px; }
+aside p { margin: 8px 0; }
+aside ul { padding-left: 18px; margin: 6px 0; }
+aside li button { background: none; border: none; padding: 0; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; text-align: left; }
+aside .rel { color: var(--muted); font-size: 13px; }
+footer { max-width: 1240px; margin: 0 auto; padding: 0 16px 28px; color: var(--muted); font-size: 13px; }
+.themebtn { float: right; }
+</style>
+</head>
+<body>
+<header>
+  <button class="chip themebtn" id="theme" type="button" aria-label="Toggle color theme">◐ theme</button>
+  <h1>Elegance → aging-control: an ontology map</h1>
+  <p>Ontology of a 9-turn ChatGPT conversation, from ranking fields by elegance to finding aging's dynamical axes. Click a node to see what it is, how well its claims hold up, and what it connects to. The key path: <b>Quotient → Nerode / minimal realization → Kalman decomposition → Fedichev vs. programmability</b>.</p>
+</header>
+<div class="chips" id="chips" role="group" aria-label="Show or hide layers"></div>
+<main>
+  <div class="stage"><svg id="map" viewBox="0 0 1100 820" role="img" aria-label="Concept map"></svg></div>
+  <aside id="panel" aria-live="polite"></aside>
+</main>
+<footer>Companion to README.md in the same folder. Status tags: <b>verified</b> · <b>plausible</b> · <b>misattributed</b> · <b>unverifiable</b> · <b>fake precision</b> · <b>synthesis</b> (an argument made in the evaluation, not in the original conversation).</footer>
+
+<script>
+const LAYERS = {
+  turn:    { name: "Conversation turns", color: "--turn",    y: 85  },
+  basin:   { name: "Elegance basins",    color: "--basin",   y: 250 },
+  program: { name: "Research programs",  color: "--program", y: 410 },
+  bridge:  { name: "Bridge concepts",    color: "--bridge",  y: 560 },
+  kalman:  { name: "Kalman quadrants & tests", color: "--kalman", y: 720 },
+};
+
+const N = [
+  // turns
+  { id:"t1", layer:"turn", label:"T1 Astrophysics", status:"fake precision",
+    desc:"100-item ranking of astrophysics microareas. The real thesis is good: organize by universality class (resonance → instability → cascade → phase transition → network → attractor → topology → feedback), not by object. Missing the Chandrasekhar limit, Lane–Emden polytropes, the virial theorem and black-hole thermodynamics, the purest 'few constants → huge result' cases." },
+  { id:"t2", layer:"turn", label:"T2 Alg. topology", status:"fake precision",
+    desc:"140-item ranking; stable homotopy #1. The ranking really tracks generality, not elegance (CW complexes #131 while called 'very elegant'). Missing Bott periodicity, rational homotopy theory, equivariant homotopy (HHR/Kervaire), model categories, HoTT." },
+  { id:"t3", layer:"turn", label:"T3 Varieties", status:"plausible",
+    desc:"20 'elegance phenotypes' and 8 declared axes (U,C,L,D,S,H,G,K). The key insight is forget vs. enrich. But the classification isn't topological: varieties are never placed on the axes, and the ASCII 'moduli space' has no metric or cover. The 20 reduce to 7 basins (this layer)." },
+  { id:"t4", layer:"turn", label:"T4 Fedichev", status:"verified",
+    desc:"Fedichev's gerophysics scored on the varieties: maximal quotienting. Papers cited (2015 criticality, 2017 Strehler–Mildvan manifold, 2021 resilience, 2022 dFI, 2022 entropy preprint) are real. Good caution on entropy. Missed: one dominant latent mode is partly built in when age dominates variance." },
+  { id:"t5", layer:"turn", label:"T5 Gootenberg", status:"misattributed",
+    desc:"Gootenberg/Abudayyeh as the opposite pole (programmability, composition). The 'TF Atlas >3,500 isoforms' is probably Joung et al. 2023 (Zhang lab), and the paired CRISPRa neuronal screens are probably other labs, so the 9.8 'moduli' score rests on others' papers." },
+  { id:"t6", layer:"turn", label:"T6 Tang", status:"plausible",
+    desc:"A ladder of relaxed assumptions: PepTune → Gumbel flow → BranchSBM → EntangledSBM → Expanding Flow Maps. PepTune and Gumbel flow matching are real; the later papers are plausible but unverified. Overrated: it's also the standard ICLR generalization pattern, and turn 9 itself undercuts it (paths ≠ mechanisms)." },
+  { id:"t7", layer:"turn", label:"T7 106 profs", status:"fake precision",
+    desc:"106 MIT+Penn faculty scored 86.5–99.5 to one decimal. Hand-typed into a Python dict and sorted (the code is decoration). Tracks theory keywords in lab blurbs. Bassett mislabeled as adjunct (her primary appointment is Penn BE). Chatterjee placed #4, after the user's interest in Tang." },
+  { id:"t8", layer:"turn", label:"T8 TDA critique", status:"verified",
+    desc:"Strong: TDA performed the wrong quotient (homotopy-equivalent spaces with 50 kT vs 3 kT barriers). Proposes topology of dynamics, stratified spaces, sheaves, intervention topology. Didn't name DSGRN/Conley–Morse graphs (already exists) or grid-cell tori (where topology fits data perfectly)." },
+  { id:"t9", layer:"turn", label:"T9 Aging swarm", status:"verified",
+    desc:"Best turn. Coordinate non-identifiability (C·e^{At}·B invariant under S), the non-normal counterexample (peak k/4, correct), competing hazards vs. interacting fates, response atlas, discovery contracts, benchmarks. Its operational state definition is the Nerode / PSR equivalence, unnamed." },
+  // basins
+  { id:"quot", layer:"basin", label:"Quotient", status:"synthesis",
+    desc:"Homotopy invariance, stabilization, persistence, coarse-graining, chromatic localization, cobordism. Choose the right equivalence, forget the rest. Cobordism belongs here: homotopy is cobordism with W = X × I." },
+  { id:"univ", layer:"basin", label:"Universal object", status:"synthesis",
+    desc:"Universality, representability, adjunction, moduli/classifying spaces, defects [S^k, M]. All Yoneda: a measurement is maps into an object." },
+  { id:"fail", layer:"basin", label:"Informative failure", status:"synthesis",
+    desc:"Obstruction theory, derived functors, sheaf cohomology. The defect is the invariant." },
+  { id:"locg", layer:"basin", label:"Local → global", status:"synthesis",
+    desc:"Sheaves, descent, Mayer–Vietoris. Global structure = compatible local pieces; cohomology measures gluing failure." },
+  { id:"enr", layer:"basin", label:"Enrichment", status:"synthesis",
+    desc:"Categorification, coherence, operads. What looked like equality was structure." },
+  { id:"trans", layer:"basin", label:"Translation", status:"synthesis",
+    desc:"Geometrization, algebraization, duality. The same object from two sides." },
+  { id:"filt", layer:"basin", label:"Filtration", status:"synthesis",
+    desc:"Postnikov/CW towers, spectral sequences, chromatic towers. Successive approximation; understand failures of approximation layer by layer." },
+  // programs
+  { id:"fed", layer:"program", label:"Fedichev", status:"verified",
+    desc:"Gerophysics: order parameter z, critical slowing, first passage to z_max, entropic damage Z. In Kalman terms Z is the uncontrollable-observable subspace. Risk: the wrong quotient." },
+  { id:"goot", layer:"program", label:"Gootenberg/Abudayyeh", status:"misattributed",
+    desc:"Programmable biology: perturbation → Δ cell state, the response operator R(u | s). Elegant problem statement, brute-force method. Signature tools: Cas13/SHERLOCK, REPAIR/RESCUE, PASTE." },
+  { id:"tang", layer:"program", label:"Tang / Chatterjee", status:"plausible",
+    desc:"Transport between distributions with branching, interaction and changing dimension. Paths are proposals, not mechanisms (snapshot non-identifiability, Weinreb 2018). Branching with growth was already in Waddington-OT / unbalanced OT." },
+  { id:"zm", layer:"program", label:"Zhavoronkov–Mishra", status:"unverifiable",
+    desc:"Aging-US paper (couldn't fetch): latent states, state-dependent intervention fields, a restoration-cost 'control-based age'. Per ChatGPT, it hasn't learned the intervention vector fields from data, so it's an objective without an identified system." },
+  { id:"tda", layer:"program", label:"Classical TDA", status:"verified",
+    desc:"Persistent H_k of a point cloud. Elegant quotient, often the wrong object. Counterexample: grid-cell population activity is a torus (Gardner et al. 2022)." },
+  { id:"dsgrn", layer:"program", label:"DSGRN / Conley–Morse", status:"verified",
+    desc:"Mischaikow and collaborators: a database of Morse graphs over parameter space for gene regulatory networks. Already 'topology of dynamics'; the existing answer turn 8 reinvents." },
+  // bridges
+  { id:"loc", layer:"bridge", label:"Localization", status:"synthesis",
+    desc:"Inverting weak equivalences (Dwyer–Kan) yields an ∞-category with mapping spaces. Forgetting manufactures the coherence, so Quotient and Enrichment are one operation, not two moods." },
+  { id:"ner", layer:"bridge", label:"Nerode / PSR", status:"synthesis",
+    desc:"Two histories are one state iff they give the same future responses under admissible interventions. Myhill–Nerode, ε-machine causal states (Crutchfield–Shalizi), predictive state representations (Littman–Sutton–Singh 2002), Ho–Kalman minimal realization. Turn 9's definition is this, and it's the Quotient basin again." },
+  { id:"kal", layer:"bridge", label:"Kalman decomp.", status:"synthesis",
+    desc:"State space = controllable/uncontrollable × observable/unobservable. Intervention-response data identify only the controllable∩observable part. Fedichev vs. programmability = a disagreement about the dimension of the uncontrollable-observable part." },
+  // kalman + tests
+  { id:"co", layer:"kalman", label:"C ∩ O", status:"synthesis",
+    desc:"Controllable and observable: what perturbation experiments can identify and steer. 'Control-based age' and the programmability view live here. Grows as intervention classes are added." },
+  { id:"cu", layer:"kalman", label:"C ∩ ¬O", status:"synthesis",
+    desc:"Steerable but invisible to the chosen sensors: a measurement-design problem. Turn 9's 'agent as designer of measurements' targets this." },
+  { id:"uo", layer:"kalman", label:"¬C ∩ O", status:"synthesis",
+    desc:"Visible but no admissible intervention moves it. Fedichev's Z (irreversible entropic damage). Its size is the crux." },
+  { id:"uu", layer:"kalman", label:"¬C ∩ ¬O", status:"synthesis",
+    desc:"Invisible and unsteerable. Undetectable by construction until intervention or sensor sets grow." },
+  { id:"rank", layer:"kalman", label:"Test: atlas rank", status:"synthesis",
+    desc:"Build a response atlas (state × intervention × time). Track effective rank as intervention classes are added (small molecules → TFs → partial reprogramming → mechanical/environmental). Keeps growing: programmability favored. Saturates while a static age readout stays unexplained: Fedichev favored, and the residual estimates Z." },
+  { id:"blind", layer:"kalman", label:"Test: blind re-rank", status:"synthesis",
+    desc:"Rerun the faculty ranking in a fresh chat, names stripped, blurbs shuffled, no Tang turn. Chatterjee leaves the top 10: salience/agreeableness (H3). Order tracks blurb keywords: H1." },
+];
+
+const E = [
+  ["t1","quot","universality-class reorganization"], ["t2","quot","stable homotopy #1"], ["t2","filt","spectral sequences"],
+  ["t3","quot","forget pole"], ["t3","enr","enrich pole"], ["t3","univ","representability"], ["t3","fail","obstruction"],
+  ["t3","locg","sheaves"], ["t3","trans","duality"], ["t3","filt","decomposition"],
+  ["t4","fed","scores"], ["t5","goot","scores"], ["t6","tang","scores"], ["t7","tang","Chatterjee #4"],
+  ["t8","tda","critiques"], ["t8","dsgrn","reinvents (unnamed)"], ["t8","locg","sheaves age better"],
+  ["t9","zm","evaluates"], ["t9","ner","state := same responses"], ["t9","tang","paths ≠ mechanisms"],
+  ["fed","quot","maximal quotienting"], ["goot","univ","response operator"], ["goot","enr","keeps hidden structure"],
+  ["tang","trans","transport"], ["tang","filt","assumption ladder"], ["zm","quot","control-relative quotient"],
+  ["tda","quot","wrong object"], ["dsgrn","fail","Morse graphs"], ["dsgrn","filt","Conley index"],
+  ["loc","quot","inverts weak equivalences"], ["loc","enr","creates mapping spaces"],
+  ["quot","ner","choose the right equivalence"], ["ner","kal","minimal realization"],
+  ["kal","co",""], ["kal","cu",""], ["kal","uo",""], ["kal","uu",""],
+  ["fed","uo","Z lives here"], ["goot","co","programmable part"], ["zm","co","control-based age"],
+  ["kal","rank","makes testable"], ["rank","fed","discriminates"], ["rank","goot","discriminates"],
+  ["blind","t7","audits"],
+];
+
+const svg = document.getElementById("map");
+const panel = document.getElementById("panel");
+const NS = "http://www.w3.org/2000/svg";
+const W = 1100, BH = 34;
+const byId = Object.fromEntries(N.map(n => [n.id, n]));
+const visible = Object.fromEntries(Object.keys(LAYERS).map(k => [k, true]));
+let selected = null;
+
+// position nodes evenly per layer
+for (const [k, L] of Object.entries(LAYERS)) {
+  const row = N.filter(n => n.layer === k);
+  const gap = (W - 80) / row.length;
+  const stagger = row.length > 6;  // crowded rows zigzag so neighbours don't overlap
+  row.forEach((n, i) => {
+    n.x = 40 + gap * (i + 0.5);
+    n.y = L.y + (stagger ? (i % 2 ? 22 : -22) : 0);
+    n.w = stagger ? 156 : Math.min(166, gap - 12);
+  });
+}
+const el = (tag, attrs = {}, parent = svg) => {
+  const e = document.createElementNS(NS, tag);
+  for (const [a, v] of Object.entries(attrs)) e.setAttribute(a, v);
+  parent.appendChild(e); return e;
+};
+
+for (const [k, L] of Object.entries(LAYERS)) {
+  const t = el("text", { x: 14, y: L.y - 54, class: "rowlabel" }); t.textContent = L.name;
+}
+const edgeG = el("g"), labelG = el("g"), nodeG = el("g");
+const edges = E.map(([a, b, lab]) => {
+  const A = byId[a], B = byId[b];
+  const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2 + (A.y === B.y ? -50 : 0);
+  const cx = mx + (B.y - A.y) * 0.12, cy = my - (B.x - A.x) * 0.06;
+  const p = el("path", { d: `M${A.x},${A.y} Q${cx},${cy} ${B.x},${B.y}`, class: "edge" }, edgeG);
+  const t = el("text", { x: (A.x + 2 * cx + B.x) / 4, y: (A.y + 2 * cy + B.y) / 4, "text-anchor": "middle", class: "edge-label" }, labelG);
+  t.textContent = lab;
+  return { a, b, lab, p, t };
+});
+const nodeEls = {};
+for (const n of N) {
+  const g = el("g", { class: "node", tabindex: 0, role: "button", "aria-label": n.label }, nodeG);
+  const r = el("rect", { x: n.x - n.w / 2, y: n.y - BH / 2, width: n.w, height: BH, rx: 8 }, g);
+  r.style.stroke = `var(${LAYERS[n.layer].color})`;
+  const t = el("text", { x: n.x, y: n.y + 4, "text-anchor": "middle" }, g);
+  t.textContent = n.label.length > 21 ? n.label.slice(0, 20) + "…" : n.label;
+  g.addEventListener("click", () => select(n.id));
+  g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.id); } });
+  nodeEls[n.id] = g;
+}
+
+function render() {
+  const nb = new Set();
+  if (selected) { nb.add(selected); edges.forEach(e => { if (e.a === selected) nb.add(e.b); if (e.b === selected) nb.add(e.a); }); }
+  for (const n of N) {
+    const g = nodeEls[n.id];
+    g.classList.toggle("hidden", !visible[n.layer]);
+    g.classList.toggle("sel", n.id === selected);
+    g.classList.toggle("dim", !!selected && !nb.has(n.id));
+  }
+  for (const e of edges) {
+    const show = visible[byId[e.a].layer] && visible[byId[e.b].layer];
+    const hi = !!selected && (e.a === selected || e.b === selected);
+    e.p.classList.toggle("hidden", !show); e.t.classList.toggle("hidden", !show);
+    e.p.classList.toggle("hi", hi); e.t.classList.toggle("hi", hi && !!e.lab);
+    e.p.classList.toggle("dim", !!selected && !hi);
+  }
+  renderPanel();
+}
+
+function renderPanel() {
+  if (!selected) {
+    panel.innerHTML = `<h2>Start here</h2><p>Select <b>Nerode / PSR</b> (minimal realization): it's the idea the original conversation used twice (turn 3 and turn 9) without noticing.</p><p class="rel">Then follow it to the Kalman decomposition and the atlas-rank test, which turns "Fedichev vs. programmability" into a measurable question.</p>`;
+    return;
+  }
+  const n = byId[selected];
+  const out = edges.filter(e => e.a === n.id), inc = edges.filter(e => e.b === n.id);
+  const li = (id, lab) => `<li><button data-id="${id}">${byId[id].label}</button>${lab ? ` <span class="rel">(${lab})</span>` : ""}</li>`;
+  panel.innerHTML = `<div class="kind">${LAYERS[n.layer].name}</div><h2>${n.label}</h2>
+    <span class="status">${n.status}</span><p>${n.desc}</p>
+    ${out.length ? `<div class="rel">links to</div><ul>${out.map(e => li(e.b, e.lab)).join("")}</ul>` : ""}
+    ${inc.length ? `<div class="rel">linked from</div><ul>${inc.map(e => li(e.a, e.lab)).join("")}</ul>` : ""}`;
+  panel.querySelectorAll("button[data-id]").forEach(b => b.addEventListener("click", () => select(b.dataset.id)));
+}
+
+function select(id) { selected = selected === id ? null : id; render(); }
+svg.addEventListener("click", e => { if (e.target === svg) { selected = null; render(); } });
+
+const chips = document.getElementById("chips");
+for (const [k, L] of Object.entries(LAYERS)) {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.setAttribute("aria-pressed", "true");
+  b.innerHTML = `<span class="dot" style="background:var(${L.color})"></span>${L.name}`;
+  b.addEventListener("click", () => { visible[k] = !visible[k]; b.setAttribute("aria-pressed", String(visible[k])); render(); });
+  chips.appendChild(b);
+}
+document.getElementById("theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+});
+render();
+</script>
+</body>
+</html>
