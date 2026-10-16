@@ -855,7 +855,6 @@ with **homotopy, derived functors, higher categories, persistence, sheaves, and 
 
 ### Assistant
 
-message_reaction👍
 
 Yes. Algebraic topology almost resists a scalar ranking because its beautiful ideas are beautiful in **different directions**. A better picture is a **moduli space of mathematical elegance**, where subfields occupy different strata and some lie at intersections.
 
@@ -2454,7 +2453,6 @@ Yes, I think I know the contrast you’re pointing at: some longevity work feels
 
 ### Assistant
 
-message_reaction👍
 
 Yes. **Jonathan Gootenberg’s research has a different kind of elegance from Fedichev’s, and I think it explains why it can feel unusually clean compared with most longevity research.**
 
