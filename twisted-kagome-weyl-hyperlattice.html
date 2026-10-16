@@ -790,7 +790,9 @@ function weylCompute(){
   for(let q=0;q<NZ;q++)if(Cs[q]!==Cs[q+1]&&gaps[q]>=GAPTOL&&gaps[q+1]>=GAPTOL){
     let lo=kz[q],hi=kz[q+1];const cLo=Cs[q];
     for(let it=0;it<7;it++){const mid=(lo+hi)/2;const c=Math.round(sg*chernAt(mid,band,N).C);if(c===cLo)lo=mid;else hi=mid;}
-    windows.push({lo:kz[q],hi:kz[q+1],slices:[(lo+hi)/2],jump:true});
+    // widen by one plane each side: on a flickering coarse grid the jump can land one plane off
+    const wl=kz[Math.max(q-1,0)],wh=kz[Math.min(q+2,NZ)],sl=[(lo+hi)/2];for(let z=wl;z<=wh+1e-9;z+=TAU/NZ/2)sl.push(z);
+    windows.push({lo:wl,hi:wh,slices:sl,jump:true});
   }
   for(let q=0;q<=NZ;q++){if(gaps[q]>=GAPTOL)continue;let r=q;while(r<NZ&&gaps[r+1]<GAPTOL)r++;
     const lo=kz[Math.max(q-1,0)],hi=kz[Math.min(r+1,NZ)],sl=[];for(let z=lo;z<=hi+1e-9;z+=TAU/NZ/2)sl.push(z);
@@ -798,12 +800,13 @@ function weylCompute(){
   const found=[];
   for(const w of windows){
     let cand=[];
-    for(const kc of w.slices){const M=36,gg=new Float64Array(M*M);
+    for(const kc of w.slices){const M=36,gg=new Float64Array(M*M),mins=[];
       for(let i=0;i<M;i++)for(let j=0;j<M;j++)gg[i*M+j]=gapAt(TAU*i/M,TAU*j/M,kc,gl);
-      for(let i=0;i<M;i++)for(let j=0;j<M;j++){const v=gg[i*M+j];if(v>.08)continue;let ok=true;
+      for(let i=0;i<M;i++)for(let j=0;j<M;j++){const v=gg[i*M+j];let ok=true;
         for(let a=-1;a<=1&&ok;a++)for(let b=-1;b<=1;b++){if(!a&&!b)continue;if(gg[((i+a+M)%M)*M+(j+b+M)%M]<v){ok=false;break;}}
-        if(ok)cand.push([v,TAU*i/M,TAU*j/M,kc]);}}
-    cand.sort((a,b)=>a[0]-b[0]);cand=cand.slice(0,w.jump?6:24);
+        if(ok)mins.push([v,TAU*i/M,TAU*j/M,kc]);}
+      mins.sort((a,b)=>a[0]-b[0]);cand.push(...mins.slice(0,3));}
+    cand.sort((a,b)=>a[0]-b[0]);cand=cand.slice(0,w.jump?10:24);
     let accepted=0;
     for(const c of cand){
       let x=[c[1],c[2],c[3]],fx=gapAt(x[0],x[1],x[2],gl),st=.15;

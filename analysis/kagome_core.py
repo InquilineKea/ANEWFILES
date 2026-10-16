@@ -372,7 +372,8 @@ def weyl_detect_v2(p: WeylParams, gap_sel: str = "12", nk: int = 18, nz: int = 4
                     lo = mid
                 else:
                     hi = mid
-            windows.append((kz[q], kz[q + 1], [(lo + hi) / 2], True))
+            wl, wh = kz[max(q - 1, 0)], kz[min(q + 2, nz)]
+            windows.append((wl, wh, [(lo + hi) / 2] + list(np.arange(wl, wh + 1e-9, TAU / nz / 2)), True))
     q = 0
     while q <= nz:
         if G[q] < gap_tol:
@@ -397,9 +398,9 @@ def weyl_detect_v2(p: WeylParams, gap_sel: str = "12", nk: int = 18, nz: int = 4
                 for b in (-1, 0, 1):
                     if a or b:
                         is_min &= gg <= np.roll(np.roll(gg, a, 0), b, 1)
-            for i, j in np.argwhere(is_min & (gg <= 0.08)):
-                cand.append((gg[i, j], g[i], g[j], kc))
-        cand = sorted(cand)[: 6 if jump else 24]
+            mins = sorted((gg[i, j], g[i], g[j], kc) for i, j in np.argwhere(is_min))
+            cand += mins[:3]
+        cand = sorted(cand)[: 10 if jump else 24]
         accepted = 0
         for _, a1, a2, kc in cand:
             x, fx, st = np.array([a1, a2, kc]), None, 0.15
