@@ -1,4 +1,4 @@
-"""Starting point: one parameter set where the page's Weyl detector is known to miss nodes.
+"""Starting point: the parameter set where the *previous* page detector missed nodes (the current one gets it right, so this scores 0).
 
 solution() returns a list (at most 12) of dicts with keys from t, breath, flux, mA, tz, dz and
 optionally gap ('12' or '23'). Each distinct verified disagreement with the referee scores 1.

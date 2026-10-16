@@ -8,11 +8,11 @@
 - Bounds: t [0.2,2], breath [-0.45,0.45], flux [0,360], mA [-3,3], tz [-1,1], dz [-1.5,1.5]; gap '12' (bands 1|2) or '23' (bands 2|3).
 
 # The detector under test
-- For 49 planes kz ∈ [-π, π], compute the Chern number of the band below the gap on an 18×18 grid (Fukui–Hatsugai–Suzuki). Count |ΔC| at each jump between neighbouring planes, but skip jumps where either plane has a minimum gap below 0.01 t.
-- Known first-pass behaviour: on 40 random parameter sets it agreed with a careful reference in 37. The 3 failures were 2 misses (gap nearly closed on the neighbouring planes) and 1 false positive (coarse Chern grid).
+- The page's current detector: for 49 planes kz in [-pi, pi] it computes the Chern number of the band below the gap (18x18 Fukui grid). It searches for gap minima in windows around Chern jumps (widened by one plane) and in runs of planes whose gap is below 0.01 t. A touching counts only if its refined gap converges below 1e-3 t, and it is a Weyl node only if the Berry flux through a small sphere around it is nonzero.
+- History: an earlier version counted Chern jumps directly. An AI-Scientist-v3 red team found its two failure modes (missed nodes behind the gap guard; false nodes from Chern-grid flicker near time reversal). This version fixes both and agrees with the referee on 44/44 validation cases (analysis/weyl_detector_validation.json).
 
 # Referee
-- Each case is checked by (a) the same detector at 30×30 and 97 planes and (b) a 56³ brute-force scan for gap minima below 1e-3 after local refinement. Only cases where (a) and (b) agree can score. If they disagree the case is "inconclusive", which is also worth reporting.
+- A 56^3 brute-force scan finds band touchings (gap < 1e-3 after refinement); each is classified by its Berry charge through spheres of radius 0.03 and 0.01. Cases where the two radii disagree are "inconclusive" and cannot score. A fine Chern-number count is not used: it was shown to flicker in exactly the hard cases.
 
 # Contract
 - `program_0/src/program.py` defines `solution()` returning a list of at most 12 dicts. Runtime limit 900 s.

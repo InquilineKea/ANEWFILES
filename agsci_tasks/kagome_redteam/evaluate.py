@@ -1,10 +1,14 @@
 """Evaluator: red-team the Weyl-node detector of the Twisted Kagome-Weyl Hyperlattice page.
 
-The page counts Weyl nodes between two bands from jumps in the Chern number C(kz), using an
-18x18 Chern grid, 49 kz planes, and skipping planes whose gap is below 0.01 t. The program
-proposes parameter sets; each one is checked by a referee that must agree with itself at two
-resolutions (a 30x30 / 97-plane detector and a 56^3 brute-force gap scan). A proposal scores
-when the page's count differs from an agreed referee count. Near-duplicates count once.
+The detector under test is the page's current one (weyl_detect_v2): Chern-jump windows plus
+nearly-gapless runs are searched for gap minima, a touching counts only if its refined gap
+converges below 1e-3 t, and it is a Weyl node only if its Berry charge is nonzero.
+
+Referee: a 56^3 brute-force gap scan; each touching (gap < 1e-3 after refinement) is classified
+by its Berry charge through spheres of two radii. If the radii disagree the case is inconclusive.
+(An earlier referee used a fine Chern-number count; it flickers in exactly the hard cases.)
+A proposal scores when the page's Weyl-node count differs from the referee's. Near-duplicates
+count once.
 """
 import math
 import os
@@ -14,7 +18,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from capture import cli  # noqa: E402
-from kagome_core import WeylParams, weyl_detect_like_js, weyl_gap_scan  # noqa: E402
+from kagome_core import WeylParams, weyl_berry_charge, weyl_detect_v2, weyl_gap_scan  # noqa: E402
 
 TIMEOUT_S = 900
 MAX_CASES = 12
@@ -66,12 +70,17 @@ def score(result):
             continue
         p, gap = parsed
         lower = 0 if gap == "12" else 1
-        page = weyl_detect_like_js(p, gap)["n_nodes"]
-        ref_det = weyl_detect_like_js(p, gap, nk=30, nz=96)["n_nodes"]
-        ref_bf = len([n for n in weyl_gap_scan(p, lower, 56) if n[3] < 1e-3])
-        row = {"case": c, "page": page, "referee_detector": ref_det, "referee_scan": ref_bf}
-        if ref_det != ref_bf:
-            row["status"] = "inconclusive (referees disagree)"
+        page = weyl_detect_v2(p, gap)["n_nodes"]
+        charges = []
+        for n in weyl_gap_scan(p, lower, 56):
+            if n[3] < 1e-3:
+                q1 = weyl_berry_charge(p, n[0], n[1], n[2], lower)
+                q2 = weyl_berry_charge(p, n[0], n[1], n[2], lower, r=0.01, nt=16, nph=32)
+                charges.append(q1 if q1 == q2 else None)
+        ref_bf = sum(1 for q in charges if q)
+        row = {"case": c, "page": page, "referee_nodes": ref_bf, "referee_charges": charges}
+        if any(q is None for q in charges):
+            row["status"] = "inconclusive (Berry charge depends on sphere radius)"
         elif page == ref_bf:
             row["status"] = "page correct"
         else:

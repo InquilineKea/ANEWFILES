@@ -6,7 +6,7 @@ Two task directories in the format of [SakanaAI/AI-Scientist-v3](https://github.
 | Task | Use | Score | Starter score |
 |---|---|---|---|
 | `kagome_flatband` | diversity: find different mechanisms that isolate a flat moiré band | log10(gap / width) of the best band isolated by ≥ 0.01 t | 1.24 (ratio 17, AA-confined) |
-| `kagome_redteam` | evaluation: find where the Weyl page's node detector is wrong | distinct verified failures (+0.5 for both kinds) | 1.0 (one known miss) |
+| `kagome_redteam` | evaluation: find where the Weyl page's node detector is wrong | distinct verified failures (+0.5 for both kinds) | 0 (targets the fixed detector) |
 
 Evaluators re-solve whatever the program returns with their own sealed copy of
 `analysis/kagome_core.py`, so a program cannot report a score it did not earn.

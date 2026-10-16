@@ -33,9 +33,22 @@ counted as new. Fixed in `kagome_redteam/evaluate.py` (dedup now ignores `tz`, f
    (the page already computes that gap and shows it in the node table), and cancel adjacent
    ±1 pairs whose refinement does not converge.
 
-Two further cases were *inconclusive*: the brute-force scan finds two band touchings that
-carry no Chern-number change even at high resolution. These may be touchings with zero net
-Berry charge (not Weyl nodes); the evaluator correctly gave them no credit.
+Two further cases were *inconclusive* because the two referees disagreed (fine Chern count 0,
+brute-force scan 2). I first guessed these were touchings with zero Berry charge. That was wrong:
+the Berry flux through small spheres is ±1 at two radii, and a 96² Chern number changes from 1
+to 0 across them, so they are real Weyl nodes that the *fine Chern referee* also missed. The
+evaluator was right not to credit them; my interpretation was not.
+
+## Fix applied to the page
+
+The detector on the Weyl page now searches windows around Chern jumps (widened by one plane)
+and runs of nearly gapless planes, accepts a touching only if its refined gap converges below
+1e-3 t, and classifies it by Berry flux through a small sphere. Validated against a 56³ scan
+with charge classification (`analysis/validate_weyl_detector.py`): 44/44 cases correct
+(old detector 37/44), about 28 ms per run. A first version of the fix was worse than the old
+detector (31/44) because an absolute gap cutoff on candidates discarded real nodes; the
+validation caught it before publishing. The red-team task now targets the fixed detector and
+uses the charge-classified referee.
 
 ## Diversity: isolated flat moiré band
 

@@ -15,7 +15,7 @@ Results from the last run:
 | M4 | Flux 60° delocalises the flat states and removes the AA preference | **fails**: AA ×4.4 survives. The earlier ×0.92 came from a stale-energy bug, since fixed |
 | M5 | (new) AA preference survives breathing δ | holds (×5.5–6.8), but breathing keeps the monolayer flat band exactly flat, so it does not discriminate |
 | W1 | Default Weyl block: 2 + 2 nodes at kz = ±2.556, ±0.586 | holds (brute-force 3D scan agrees) |
-| W2 | The Chern-jump detector finds the nodes | partly holds: right in 37/40 random cases; 2 misses (gap guard), 1 false positive (coarse grid) |
+| W2 | The Chern-jump detector finds the nodes | partly held (37/40). Replaced: the page's detector now verifies gap convergence and Berry charge; 44/44 in `validate_weyl_detector.py` |
 | S1, S2 | κ twist-lock and γ = 1 spin gauge are pure gauge | hold, exactly (analytic) |
 
 M4 plus M5 shift the interpretation. AA confinement survives flux, which destroys the monolayer

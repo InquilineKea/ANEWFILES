@@ -65,7 +65,7 @@ select.btn{padding-right:6px}
 /* matrix */
 .matrix{padding:12px 12px 10px;border-bottom:1px solid var(--line)}
 .eyebrow{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 6px}
-.mgrid{display:grid;grid-template-columns:22px repeat(6,minmax(0,32px));gap:4px;justify-content:start}
+.mgrid{display:grid;grid-template-columns:22px repeat(7,minmax(0,32px));gap:4px;justify-content:start}
 .mgrid .lab{font-family:var(--f-mono);font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center}
 .cell{aspect-ratio:1;max-width:100%;border-radius:4px;border:1px solid var(--line);background:transparent;cursor:pointer;padding:0;font-family:var(--f-mono);font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
 .cell.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -215,8 +215,20 @@ select.btn{padding-right:6px}
       <div class="chips" id="chips"></div>
     </section>
     <section class="pan">
+      <h2>Higher-order interactions <small id="hoInfo"></small></h2>
+      <canvas class="plot" id="cOrder" height="132"></canvas>
+      <dl class="kv" id="hoKV"></dl>
+      <p class="cap">Interactions grouped by how many sites they couple: k = 2 are the pair bonds (J, J⊥), k ≥ 3 the hyperedges. Bars count the active interactions; dots give their energy per site. A k-body term −K∏s cannot be rewritten as a sum of pair terms, so a large k ≥ 3 share means the landscape is genuinely higher-order.</p>
+    </section>
+    <section class="pan">
       <h2>Trace <small id="tInfo"></small></h2>
       <div class="spark" id="sparks"></div>
+    </section>
+    <section class="pan" id="mechPan">
+      <h2>Tensegrity <small id="mechInfo"></small></h2>
+      <dl class="kv" id="mechKV"></dl>
+      <canvas class="plot" id="cStress" height="74"></canvas>
+      <p class="cap" id="mechCap">Thin teal lines are cables (tension), thick dark lines are struts (compression), squares are pinned sites. A straight line of bonds between pinned ends can carry tension on its own, so the plain kagome supports a uniform prestress. The mechanical twist bends those lines and forces a mix of cables and struts. In the sheaf reading, floppy modes are H⁰ and self-stresses H¹ of the rigidity sheaf.</p>
     </section>
     <section class="pan" id="weylPan">
       <h2>Weyl sector <small id="wInfo"></small></h2>
@@ -261,6 +273,7 @@ const SECTIONS=[
  {id:'kagome',name:'Kagome',short:'Kg',note:'Corner-sharing triangles carry the frustrated local modes. Switching the sector off swaps in the triangular parent lattice, which keeps the triangles but not the flat band.',params:[
   {k:'radius',l:'Sample radius',min:2,max:9,step:.5,v:5,f:v=>v.toFixed(1)+' a',kind:'struct'},
   {k:'breath',l:'Breathing <i>δ</i>',min:-.45,max:.45,step:.01,v:0,f:f2,kind:'struct',hint:'Up triangles scale by 1+δ; J▲ = J(1−δ), J▽ = J(1+δ). Also enters the Weyl hoppings.'},
+  {k:'mtwist',l:'Mechanical twist <i>α</i>',min:-30,max:30,step:.5,v:0,f:deg1,kind:'struct',hint:'Rotates every up triangle by α about its centre and shrinks the lattice by cos α, so all bond lengths stay equal (the twisted kagome of Sun, Souslov, Mao and Lubensky). Straight lines of bonds become zigzags. Not the moiré twist.'},
   {k:'J',l:'Exchange <i>J</i>',min:-2,max:2,step:.05,v:-1,f:f2,kind:'coup',hint:'E = −J s<sub>i</sub>s<sub>j</sub>. Negative is antiferromagnetic and frustrated on triangles.'},
   {k:'J2',l:'Next-neighbour <i>J</i>₂',min:-1,max:1,step:.05,v:0,f:f2,kind:'coup'},
  ]},
@@ -306,7 +319,8 @@ const SECTIONS=[
   {k:'Kint',l:'<i>K</i> interlayer triads',min:-2,max:2,step:.05,v:.5,f:f2,kind:'coup'},
   {k:'Krand',l:'<i>K</i> random edges',min:0,max:2,step:.05,v:.6,f:f2,kind:'coup'},
   {k:'density',l:'Random edge density',min:0,max:.4,step:.01,v:.04,f:v=>v.toFixed(2)+'/site',kind:'struct'},
-  {k:'order',l:'Random edge order <i>k</i>',min:3,max:6,step:1,v:4,f:f0,kind:'struct'},
+  {k:'order',l:'Random edge order <i>k</i>, min',min:3,max:8,step:1,v:4,f:f0,kind:'struct'},
+  {k:'orderMax',l:'Random edge order <i>k</i>, max',min:3,max:8,step:1,v:4,f:f0,kind:'struct',hint:'Each random hyperedge draws its order uniformly between min and max.'},
   {k:'locality',l:'Random edge reach',type:'select',v:'local',opts:[['local','local (graph ball)'],['global','global (any sites)']],kind:'struct'},
   {k:'negFrac',l:'Share with K < 0',min:0,max:1,step:.05,v:.5,f:f2,kind:'struct'},
   {k:'constraint',l:'Constraint rule',type:'select',v:'nae',opts:[['none','none'],['nae','not-all-equal'],['even','even parity ∏s=+1'],['odd','odd parity ∏s=−1'],['onehot','exactly one up']],kind:'coup'},
@@ -327,8 +341,22 @@ const SECTIONS=[
   {k:'Ts',l:'Stalk noise',min:0,max:1,step:.01,v:.02,f:f2,kind:'dyn'},
   {k:'unit',l:'Keep stalks on the unit circle',type:'check',v:true,kind:'dyn'},
  ]},
+ {id:'tense',name:'Tensegrity',short:'Te',note:'Each bond of one layer is a central-force spring. The rigidity matrix C turns site displacements into bond stretches. Its kernel holds floppy modes; the kernel of Cᵀ holds states of self-stress, prestress patterns that balance at every free site: a tensegrity of cables (tension) and struts (compression). Maxwell–Calladine counting checks the solve: zero modes − self-stresses = degrees of freedom − constraints.',params:[
+  {k:'tLayer',l:'Layer solved',min:0,max:3,step:1,v:0,f:f0,kind:'mech'},
+  {k:'tBC',l:'Boundary',type:'select',v:'pinned',opts:[['pinned','pinned rim'],['free','free']],kind:'mech'},
+  {k:'tRim',l:'Pinned rim width',min:.3,max:2,step:.05,v:.8,f:v=>v.toFixed(2)+' a',kind:'mech'},
+  {k:'tNNN',l:'Add next-nearest springs',type:'check',v:false,kind:'mech'},
+  {k:'tShow',l:'Show',type:'select',v:'stress',opts:[['stress','self-stress (tensegrity)'],['mode','floppy or softest mode']],kind:'tvis'},
+  {k:'tPick',l:'Self-stress',type:'select',v:'uniform',opts:[['uniform','closest to uniform tension'],['basis','basis state']],kind:'tvis'},
+  {k:'tIdx',l:'Basis or mode index',min:0,max:59,step:1,v:0,f:f0,kind:'tvis'},
+  {k:'tAmp',l:'Mode amplitude',min:0,max:1,step:.02,v:.35,f:f2,kind:'tvis'},
+  {k:'tAnim',l:'Animate the mode',type:'check',v:true,kind:'tvis'},
+ ]},
  {id:'view',name:'View',noToggle:true,collapsed:true,params:[
-  {k:'nodeColor',l:'Site colour',type:'select',v:'spin',opts:[['spin','Ising spin'],['sheaf','sheaf angle'],['energy','local energy'],['field','local field h'],['layer','layer'],['sub','sublattice']],kind:'vis'},
+  {k:'nodeColor',l:'Site colour',type:'select',v:'spin',opts:[['spin','Ising spin'],['sheaf','sheaf angle'],['energy','local energy'],['field','local field h'],['hoload','higher-order load'],['layer','layer'],['sub','sublattice']],kind:'vis'},
+  {k:'hyperColor',l:'Hyperedge colour',type:'select',v:'sign',opts:[['sign','sign of K'],['order','order k']],kind:'vis'},
+  {k:'kMin',l:'Show hyperedges of order ≥',min:3,max:8,step:1,v:3,f:f0,kind:'vis'},
+  {k:'kMax',l:'Show hyperedges of order ≤',min:3,max:8,step:1,v:8,f:f0,kind:'vis'},
   {k:'bondColor',l:'Bond colour',type:'select',v:'coupling',opts:[['coupling','sign of J'],['sat','satisfied / not'],['sheaf','sheaf tension']],kind:'vis'},
   {k:'layerSep',l:'Layer separation',min:.6,max:8,step:.1,v:3.6,f:f1,kind:'vis'},
   {k:'nodeSize',l:'Site size',min:.3,max:3,step:.1,v:1,f:f1,kind:'vis'},
@@ -342,9 +370,9 @@ const SECTIONS=[
 ];
 const PARAM={}; SECTIONS.forEach(s=>s.params.forEach(p=>{p.sec=s.id;PARAM[p.k]=p;}));
 const DEFAULT_P={}; for(const k in PARAM) DEFAULT_P[k]=PARAM[k].v;
-const COMP=['kagome','moire','weyl','ising','hyper','sheaf'];
-const COMP_SHORT={kagome:'Kg',moire:'Mo',weyl:'Wy',ising:'Is',hyper:'Hy',sheaf:'Sh'};
-const COMP_NAME={kagome:'Kagome',moire:'Moiré',weyl:'Weyl',ising:'Ising',hyper:'Hypergraph',sheaf:'Sheaf'};
+const COMP=['kagome','moire','weyl','ising','hyper','sheaf','tense'];
+const COMP_SHORT={kagome:'Kg',moire:'Mo',weyl:'Wy',ising:'Is',hyper:'Hy',sheaf:'Sh',tense:'Te'};
+const COMP_NAME={kagome:'Kagome',moire:'Moiré',weyl:'Weyl',ising:'Ising',hyper:'Hypergraph',sheaf:'Sheaf',tense:'Tensegrity'};
 const COUPLINGS={
  'kagome|moire':{kind:'struct',d:'Every layer is a kagome sheet; the twist rotates whole sheets.'},
  'kagome|weyl':{kind:'struct',d:'The Weyl block reuses the kagome unit cell, the breathing δ and hopping t.'},
@@ -361,10 +389,16 @@ const COUPLINGS={
  'ising|hyper':{kind:'toggle',on:true,d:'Hyperedges act on spins: −K∏s plus the constraint penalty.'},
  'ising|sheaf':{kind:'toggle',on:true,d:'Spins act as a gauge field on the sheaf: anti-aligned pairs add γπ to the transport, and spin flips pay the sheaf cost.'},
  'hyper|sheaf':{kind:'toggle',on:true,d:'Clique expansion: members of each active hyperedge get extra sheaf edges of weight μ.'},
+ 'kagome|tense':{kind:'struct',d:'The bonds of the solved layer are the springs: cables under tension, struts under compression. The mechanical twist α reshapes them.'},
+ 'moire|tense':{kind:'none',d:'Not modeled. Mechanics is solved one layer at a time in the plane; interlayer springs would make it a 3D problem.'},
+ 'weyl|tense':{kind:'none',d:'Not modeled.'},
+ 'ising|tense':{kind:'none',d:'Not modeled.'},
+ 'hyper|tense':{kind:'toggle',on:false,d:'Hyperedges inside the solved layer become membranes: k-body constraints that hold the area of their polygon fixed. On kagome triangles they duplicate the three bonds, so each adds one self-stress (a pressure); larger polygons remove floppy modes.'},
+ 'sheaf|tense':{kind:'struct',d:'The rigidity matrix is the coboundary of a cellular sheaf with ℝ² on sites and ℝ on bonds (restriction = projection onto the bond). Floppy modes are its H⁰ and self-stresses its H¹. This is a different sheaf from the SO(2) one in the Sheaf sector.'},
 };
 const ckey=(a,b)=>COMP.indexOf(a)<COMP.indexOf(b)?a+'|'+b:b+'|'+a;
 const DEFAULT_CPL={}; for(const k in COUPLINGS) if(COUPLINGS[k].kind==='toggle') DEFAULT_CPL[k]=COUPLINGS[k].on;
-const DEFAULT_ON={kagome:true,moire:true,weyl:true,ising:true,hyper:true,sheaf:true};
+const DEFAULT_ON={kagome:true,moire:true,weyl:true,ising:true,hyper:true,sheaf:true,tense:true};
 
 let P={...DEFAULT_P}, ON={...DEFAULT_ON}, CPL={...DEFAULT_CPL};
 function cp(k){const [a,b]=k.split('|');return !!CPL[k]&&(a==='kagome'||ON[a])&&(b==='kagome'||ON[b]);}
@@ -378,6 +412,11 @@ const PRESETS={
  gauge:{label:'Spins gauge the sheaf',P:{layers:1,gamma:.5,lam:1,J:0,T:.3,nodeColor:'sheaf',bondColor:'sheaf',sSteps:3},ON:{moire:false,weyl:false,hyper:false},CPL:{}},
  weyl:{label:'Weyl node check',P:{flux:90,mA:0,dz:.8,tz:0,g:1,J:0,Jp:0,T:.2,nodeColor:'field',layers:1},ON:{moire:false,hyper:false,sheaf:false},CPL:{}},
  triangular:{label:'Triangular parent lattice',P:{radius:5,J:-1,T:.3,bondColor:'sat'},ON:{kagome:false,weyl:false},CPL:{}},
+ tensegrity:{cam:'top',label:'Kagome tensegrity (pinned rim)',P:{layers:1,radius:5,mtwist:0,tBC:'pinned',tShow:'stress',tPick:'uniform',nodeColor:'layer',hyperAlpha:.1},ON:{moire:false,weyl:false,ising:false,sheaf:false,hyper:false},CPL:{}},
+ twisted:{cam:'top',label:'Twisted kagome: cables and struts',P:{layers:1,radius:5,mtwist:18,tBC:'pinned',tShow:'stress',tPick:'uniform',nodeColor:'layer'},ON:{moire:false,weyl:false,ising:false,sheaf:false,hyper:false},CPL:{}},
+ floppy:{cam:'top',label:'Twisted kagome: floppy edge modes',P:{layers:1,radius:5,mtwist:18,tBC:'free',tShow:'mode',tIdx:0,tAmp:.4,nodeColor:'layer'},ON:{moire:false,weyl:false,ising:false,sheaf:false,hyper:false},CPL:{}},
+ membranes:{cam:'top',label:'Tensegrity with k-body membranes',P:{layers:1,radius:5,mtwist:10,tBC:'free',tShow:'mode',density:.1,order:4,orderMax:6,locality:'local',hyperAlpha:.3,nodeColor:'layer',Kup:0,Kdn:0},ON:{moire:false,weyl:false,ising:false,sheaf:false,hyper:true},CPL:{'hyper|tense':true,'kagome|hyper':false}},
+ higher:{label:'Higher-order interactions',P:{layers:1,radius:5.5,J:-.6,Kup:.4,Kdn:-.4,Krand:.9,density:.14,order:3,orderMax:7,locality:'local',constraint:'nae',cScope:'rand',hyperColor:'order',nodeColor:'hoload',hyperAlpha:.32,T:.4},ON:{moire:false,weyl:false,sheaf:false,tense:false},CPL:{}},
 };
 
 /* ------------------------------------------------------------------ theme tokens */
@@ -408,6 +447,9 @@ function build(){
   const L=ON.moire?P.layers:1, R=P.radius, kag=ON.kagome, r=.5*(1+P.breath);
   const subs=kag?[[0,0],[r,0],[r/2,r*SQ3/2]]:[[0,0]];
   const ideal=kag?[[0,0],[.5,0],[.25,SQ3/4]]:[[0,0]];
+  // mechanical twist: rotate up triangles about their centres by α, shrink the lattice by cos α (bond lengths unchanged)
+  const al=kag?P.mtwist*D2R:0,ca=Math.cos(al),sa=Math.sin(al),cen=[r/2,r*SQ3/6];
+  const subsT=subs.map(v=>[cen[0]+ca*(v[0]-cen[0])-sa*(v[1]-cen[1]),cen[1]+sa*(v[0]-cen[0])+ca*(v[1]-cen[1])]);
   const nS=subs.length, n=Math.ceil(R*1.25)+2;
   const X=[],Y=[],LY=[],SB=[],IX=[],IY=[],idx=new Map(), LT=[], layerStart=[];
   const K=(l,i,j,s)=>((l*4096+i+2048)*4096+j+2048)*4+s;
@@ -418,7 +460,8 @@ function build(){
       const bx=i+j/2,by=j*SQ3/2,px=bx+subs[q][0],py=by+subs[q][1];
       if(px*px+py*py>R*R)continue;
       idx.set(K(l,i,j,q),X.length);
-      X.push(t.s*(c*px-s*py)+t.sx);Y.push(t.s*(s*px+c*py)+t.sy);LY.push(l);SB.push(q);IX.push(bx+ideal[q][0]);IY.push(by+ideal[q][1]);
+      const qx=al?bx*ca+subsT[q][0]:px,qy=al?by*ca+subsT[q][1]:py;
+      X.push(t.s*(c*qx-s*qy)+t.sx);Y.push(t.s*(s*qx+c*qy)+t.sy);LY.push(l);SB.push(q);IX.push(bx+ideal[q][0]);IY.push(by+ideal[q][1]);
     }
   }
   layerStart.push(X.length);
@@ -484,6 +527,7 @@ function build(){
   recouple();
   sweepCount=0;
   dirty=true;
+  scheduleMech();
 }
 function csr(N,M,pairFn){
   const deg=new Int32Array(N+1);const pairs=[];
@@ -510,14 +554,16 @@ function buildHyper(){
         push([i,best,j],2,1);}
     }
     const nR=Math.round(P.density*N);
+    const kLo=P.order,kHi=Math.max(P.order,P.orderMax);
     for(let r=0;r<nR;r++){
+      const ord=kHi>kLo?kLo+Math.floor(rng()*(kHi-kLo+1)):kLo; // no extra draw when min = max, so old seeds reproduce
       const set=new Set();let seed=Math.floor(rng()*N);set.add(seed);
-      if(P.locality==='global'){let guard=0;while(set.size<P.order&&guard++<100)set.add(Math.floor(rng()*N));}
+      if(P.locality==='global'){let guard=0;while(set.size<ord&&guard++<100)set.add(Math.floor(rng()*N));}
       else{const queue=[seed];let qi=0;
-        while(set.size<P.order&&qi<queue.length){const v=queue[qi++];const nb=[];
+        while(set.size<ord&&qi<queue.length){const v=queue[qi++];const nb=[];
           for(let q=G.adj.start[v];q<G.adj.start[v+1];q++){const b=G.adj.list[q];if(G.bt[b]===2)continue;nb.push(G.bi[b]===v?G.bj[b]:G.bi[b]);}
           for(let a=nb.length-1;a>0;a--){const z=Math.floor(rng()*(a+1));[nb[a],nb[z]]=[nb[z],nb[a]];}
-          for(const u of nb){if(set.size>=P.order)break;if(!set.has(u)){set.add(u);queue.push(u);}}}}
+          for(const u of nb){if(set.size>=ord)break;if(!set.has(u)){set.add(u);queue.push(u);}}}}
       if(set.size<3)continue;
       push([...set],3,rng()<P.negFrac?-1:1);
     }
@@ -592,6 +638,9 @@ function recouple(){
     G.hAct[h]=act?1:0;G.hK[h]=act?K:0;
     const scope=P.cScope;G.hCon[h]=act&&P.constraint!=='none'&&(scope==='all'||(scope==='tri'&&k<2)||(scope==='rand'&&k===3))?1:0;
   }
+  G.hoLoad=new Float32Array(G.N);
+  for(let h=0;h<G.nH;h++){if(!G.hAct[h])continue;const w=Math.abs(G.hK[h])+(G.hCon[h]?P.lamC:0);for(let q=G.hS[h];q<G.hS[h+1];q++)G.hoLoad[G.hN[q]]+=w;}
+  G.hoMax=Math.max(1e-9,...G.hoLoad);
   // sheaf maps
   gaugeOn=ON.sheaf&&ON.ising&&cp('ising|sheaf');
   const fk=cp('kagome|sheaf'),fm=cp('moire|sheaf'),fh=cp('hyper|sheaf'),sig=P.noise*D2R;
@@ -652,10 +701,11 @@ function sheafStep(){
 let E={};
 function energies(){
   const s=G.s;let EJ=0,EP=0,EK=0,EC=0,ES=0,EH=0,unsat=0,nJ=0,viol=0,nCon=0,mag=0;
+  const EbyK=new Float64Array(10),NbyK=new Int32Array(10); // energy and count of interactions by order k (k = 2: pair bonds)
   G.eLoc.fill(0);
   if(ON.ising){
     for(let e=0;e<G.M;e++){if(!G.bOn[e])continue;const i=G.bi[e],j=G.bj[e],v=-G.bJ[e]*s[i]*s[j];
-      if(G.bt[e]===3)EP+=v;else EJ+=v;G.eLoc[i]+=v/2;G.eLoc[j]+=v/2;
+      if(G.bt[e]===3)EP+=v;else EJ+=v;G.eLoc[i]+=v/2;G.eLoc[j]+=v/2;EbyK[2]+=v;if(G.bJ[e]!==0)NbyK[2]++;
       if(G.bt[e]<2&&G.bJ[e]!==0){nJ++;if(v>0)unsat++;}}
     for(let i=0;i<G.N;i++){const v=-G.hf[i]*s[i];EH+=v;G.eLoc[i]+=v;mag+=s[i];}
   }
@@ -663,13 +713,14 @@ function energies(){
     let prod=1;for(let p=G.hS[h];p<G.hS[h+1];p++)prod*=s[G.hN[p]];
     const v=G.hCon[h]?violRule(h):0;G.hViol[h]=v;
     if(G.hCon[h]){nCon++;viol+=v;}
-    if(hyperSpin){const k=G.hS[h+1]-G.hS[h],ek=-G.hK[h]*prod+(G.hCon[h]?P.lamC*v:0);EK+=-G.hK[h]*prod;EC+=G.hCon[h]?P.lamC*v:0;
+    const kk=Math.min(G.hS[h+1]-G.hS[h],9);NbyK[kk]++;
+    if(hyperSpin){const k=G.hS[h+1]-G.hS[h],ek=-G.hK[h]*prod+(G.hCon[h]?P.lamC*v:0);EK+=-G.hK[h]*prod;EC+=G.hCon[h]?P.lamC*v:0;EbyK[kk]+=ek;
       for(let p=G.hS[h];p<G.hS[h+1];p++)G.eLoc[G.hN[p]]+=ek/k;}
   }
   let nS=0;
   if(ON.sheaf)for(let e=0;e<G.sE;e++){if(!G.sw[e])continue;const v=P.lam*G.sw[e]*sheafEdgeE(e);ES+=v;nS++;G.eLoc[G.si[e]]+=v/2;G.eLoc[G.sj[e]]+=v/2;}
   const tot=EJ+EP+EK+EC+ES+EH;
-  E={EJ,EP,EK,EC,ES,EH,tot,unsat,nJ,viol,nCon,m:mag/G.N,nS};
+  E={EJ,EP,EK,EC,ES,EH,tot,unsat,nJ,viol,nCon,m:mag/G.N,nS,EbyK,NbyK};
 }
 
 /* ------------------------------------------------------------------ sheaf cohomology */
@@ -852,6 +903,125 @@ function bandsOnly(){ // recompute only the cut when kz slider moves
   save.bands=bands;save.bw=bw;
 }
 
+/* ------------------------------------------------------------------ tensegrity: rigidity matrix, self-stress, floppy modes */
+function mechCore(self){
+  function tred2(a,n,d,e,vec){
+    for(let i=n-1;i>0;i--){const l=i-1;let h=0,scale=0;const ri=i*n;
+      if(l>0){for(let k=0;k<=l;k++)scale+=Math.abs(a[ri+k]);
+        if(scale===0)e[i]=a[ri+l];
+        else{for(let k=0;k<=l;k++){a[ri+k]/=scale;h+=a[ri+k]*a[ri+k];}
+          let f=a[ri+l];let g=f>=0?-Math.sqrt(h):Math.sqrt(h);e[i]=scale*g;h-=f*g;a[ri+l]=f-g;f=0;
+          for(let j=0;j<=l;j++){const rj=j*n;if(vec)a[rj+i]=a[ri+j]/h;g=0;
+            for(let k=0;k<=j;k++)g+=a[rj+k]*a[ri+k];
+            for(let k=j+1;k<=l;k++)g+=a[k*n+j]*a[ri+k];
+            e[j]=g/h;f+=e[j]*a[ri+j];}
+          const hh=f/(h+h);
+          for(let j=0;j<=l;j++){const rj=j*n;f=a[ri+j];e[j]=g=e[j]-hh*f;for(let k=0;k<=j;k++)a[rj+k]-=(f*e[k]+g*a[ri+k]);}
+        }
+      }else e[i]=a[ri+l];
+      d[i]=h;}
+    if(vec)d[0]=0;e[0]=0;
+    for(let i=0;i<n;i++){const ri=i*n;
+      if(vec){if(d[i]!==0){for(let j=0;j<i;j++){let g=0;for(let k=0;k<i;k++)g+=a[ri+k]*a[k*n+j];for(let k=0;k<i;k++)a[k*n+j]-=g*a[k*n+i];}}
+        d[i]=a[ri+i];a[ri+i]=1;for(let j=0;j<i;j++){a[j*n+i]=0;a[ri+j]=0;}}
+      else d[i]=a[ri+i];}
+  }
+  function tqli(d,e,n,z){
+    for(let i=1;i<n;i++)e[i-1]=e[i];e[n-1]=0;
+    for(let l=0;l<n;l++){let iter=0,m;
+      do{for(m=l;m<n-1;m++){const dd=Math.abs(d[m])+Math.abs(d[m+1]);if(Math.abs(e[m])<=1e-15*dd)break;}
+        if(m!==l){if(iter++===60)break;
+          let g=(d[l+1]-d[l])/(2*e[l]),r=Math.hypot(g,1);g=d[m]-d[l]+e[l]/(g+(g>=0?r:-r));
+          let s=1,c=1,p=0,i;
+          for(i=m-1;i>=l;i--){let f=s*e[i];const b=c*e[i];e[i+1]=(r=Math.hypot(f,g));
+            if(r===0){d[i+1]-=p;e[m]=0;break;}
+            s=f/r;c=g/r;g=d[i+1]-p;r=(d[i]-g)*s+2*c*b;d[i+1]=g+(p=s*r);g=c*r-b;
+            if(z){for(let k=0;k<n;k++){const rk=k*n;f=z[rk+i+1];z[rk+i+1]=s*z[rk+i]+c*f;z[rk+i]=c*z[rk+i]-s*f;}}}
+          if(r===0&&i>=l)continue;
+          d[l]-=p;e[l]=g;e[m]=0;}
+      }while(m!==l);}
+  }
+  function eigFull(A,n){const d=new Float64Array(n),e=new Float64Array(n);tred2(A,n,d,e,true);tqli(d,e,n,A);return d;}
+  const dot=(a,b)=>{let s=0;for(let k=0;k<a.length;k++)s+=a[k]*b[k];return s;};
+  function gs(vs,basis){const out=[];for(const v0 of vs){const v=v0.slice();for(const b of basis.concat(out)){const c=dot(v,b);for(let k=0;k<v.length;k++)v[k]-=c*b[k];}
+    const n=Math.sqrt(dot(v,v));if(n>1e-6){for(let k=0;k<v.length;k++)v[k]/=n;out.push(v);}}return out;}
+  self.onmessage=ev=>{
+    const t=ev.data,t0=performance.now(),{dof,nRows,rs,rc,rv,rigid,bondRow}=t;
+    // M = CᵀC: its kernel is the floppy-mode space (rank of C from its spectrum)
+    const M=new Float64Array(dof*dof);
+    for(let r=0;r<nRows;r++){const a0=rs[r],a1=rs[r+1];for(let p=a0;p<a1;p++){const i=rc[p],vi=rv[p];for(let q=a0;q<a1;q++)M[i*dof+rc[q]]+=vi*rv[q];}}
+    const dM=dof?eigFull(M,dof):new Float64Array(0);
+    let lmax=1e-30;for(const v of dM)lmax=Math.max(lmax,Math.abs(v));const tol=1e-9*lmax;
+    const order=Array.from(dM.keys()).sort((a,b)=>dM[a]-dM[b]);
+    const zeroIdx=order.filter(i=>dM[i]<tol),rank=dof-zeroIdx.length;
+    const col=i=>{const v=new Float64Array(dof);for(let k=0;k<dof;k++)v[k]=M[k*dof+i];return v;};
+    let rb=[];
+    if(rigid){const nf=dof/2,tx=new Float64Array(dof),ty=new Float64Array(dof),ro=new Float64Array(dof);let cx=0,cy=0;
+      for(let i=0;i<nf;i++){cx+=rigid[2*i];cy+=rigid[2*i+1];}cx/=nf;cy/=nf;
+      for(let i=0;i<nf;i++){tx[2*i]=1;ty[2*i+1]=1;ro[2*i]=-(rigid[2*i+1]-cy);ro[2*i+1]=rigid[2*i]-cx;}
+      rb=gs([tx,ty,ro],[]);}
+    const floppy=gs(zeroIdx.map(col),rb); // rigid-body motions projected out
+    const modes=[],lam=[];
+    for(const v of floppy){if(modes.length>=60)break;modes.push(v);lam.push(0);}
+    for(const i of order){if(modes.length>=60)break;if(dM[i]<tol)continue;modes.push(col(i));lam.push(dM[i]/lmax);}
+    // S = CCᵀ: its kernel is the self-stress space (kernel of Cᵀ)
+    const nSS=nRows-rank;let stresses=[],uniform=null,uniFrac=null,ssFound=null;
+    if(nRows>0&&nRows<=1600){
+      const Cm=new Float64Array(nRows*dof);for(let r=0;r<nRows;r++)for(let q=rs[r];q<rs[r+1];q++)Cm[r*dof+rc[q]]+=rv[q];
+      const S=new Float64Array(nRows*nRows);
+      for(let a=0;a<nRows;a++)for(let b=a;b<nRows;b++){let v=0;const rb2=b*dof;for(let k=rs[a];k<rs[a+1];k++)v+=rv[k]*Cm[rb2+rc[k]];S[a*nRows+b]=v;S[b*nRows+a]=v;}
+      const dS=eigFull(S,nRows);let smax=1e-30;for(const v of dS)smax=Math.max(smax,Math.abs(v));
+      const nul=[];for(let i=0;i<nRows;i++)if(dS[i]<1e-9*smax)nul.push(i);ssFound=nul.length;
+      uniform=new Float64Array(nRows);let nb=0;for(let r=0;r<nRows;r++)nb+=bondRow[r];
+      for(const i of nul){let c=0;for(let r=0;r<nRows;r++)if(bondRow[r])c+=S[r*nRows+i];
+        for(let r=0;r<nRows;r++)uniform[r]+=c*S[r*nRows+i];
+        if(stresses.length<60){const v=new Float64Array(nRows);let sum=0;for(let r=0;r<nRows;r++){v[r]=S[r*nRows+i];if(bondRow[r])sum+=v[r];}
+          if(sum<0)for(let r=0;r<nRows;r++)v[r]=-v[r];stresses.push(v);}}
+      let nu=0;for(let r=0;r<nRows;r++)if(bondRow[r])nu+=uniform[r];uniFrac=nb?nu/nb:null; // |P b|² / |b|² for b = 1 on bonds
+    }
+    self.postMessage({gen:t.gen,rank,nZero:zeroIdx.length,nRigid:rb.length,nFloppy:floppy.length,nSS,ssFound,modes,lam,stresses,uniform,uniFrac,ms:performance.now()-t0});
+  };
+}
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let MECH=null,mechTimer=0,mechGen=0,mechW=null;
+function mechWorker(){
+  if(mechW)return mechW;
+  try{const url=URL.createObjectURL(new Blob([`(${mechCore.toString()})(self);`],{type:'text/javascript'}));mechW=new Worker(url);mechW.onmessage=e=>mechResult(e.data);}
+  catch(err){const fake={postMessage:m=>mechResult(m)};mechCore(fake);mechW={postMessage:t=>setTimeout(()=>fake.onmessage({data:t}),0)};}
+  return mechW;
+}
+function scheduleMech(){clearTimeout(mechTimer);mechTimer=setTimeout(runMech,150);}
+function runMech(){
+  if(!G||!ON.tense){MECH=null;dirty=true;statsDirty=true;return;}
+  const l=Math.min(P.tLayer,G.L-1),a0=G.layerStart[l],a1=G.layerStart[l+1],t=G.LT[l];
+  let rmax=0;for(let i=a0;i<a1;i++)rmax=Math.max(rmax,Math.hypot(G.X[i]-t.sx,G.Y[i]-t.sy));
+  const free=new Int32Array(G.N).fill(-1),pinned=[],coords=[];let nf=0;
+  for(let i=a0;i<a1;i++){if(P.tBC==='pinned'&&Math.hypot(G.X[i]-t.sx,G.Y[i]-t.sy)>rmax-P.tRim){pinned.push(i);continue;}free[i]=nf++;coords.push(G.X[i],G.Y[i]);}
+  const rs=[0],rc=[],rv=[],rowRef=[],bondRow=[];
+  for(const e of G.layerIdx[l].b){const ty=G.bt[e];if(ty>2||(ty===2&&!P.tNNN))continue;const a=G.bi[e],b=G.bj[e];if(free[a]<0&&free[b]<0)continue;
+    const dx=G.X[b]-G.X[a],dy=G.Y[b]-G.Y[a],len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len;
+    if(free[a]>=0){rc.push(2*free[a],2*free[a]+1);rv.push(-ux,-uy);}if(free[b]>=0){rc.push(2*free[b],2*free[b]+1);rv.push(ux,uy);}
+    rs.push(rc.length);rowRef.push(e);bondRow.push(1);}
+  if(ON.hyper&&cp('hyper|tense'))for(const h of G.layerIdx[l].h){if(!G.hAct[h]||G.hKind[h]===2)continue;
+    const vs=[];for(let q=G.hS[h];q<G.hS[h+1];q++)vs.push(G.hN[q]);
+    let cx=0,cy=0;for(const v of vs){cx+=G.X[v];cy+=G.Y[v];}cx/=vs.length;cy/=vs.length;
+    vs.sort((u,w)=>Math.atan2(G.Y[u]-cy,G.X[u]-cx)-Math.atan2(G.Y[w]-cy,G.X[w]-cx));
+    const k=vs.length,ent=[]; // gradient of the shoelace area of the polygon (k-body membrane)
+    for(let m=0;m<k;m++){const i=vs[m],ip=vs[(m+1)%k],im=vs[(m+k-1)%k];if(free[i]<0)continue;ent.push([2*free[i],.5*(G.Y[ip]-G.Y[im])],[2*free[i]+1,.5*(G.X[im]-G.X[ip])]);}
+    const nrm=Math.hypot(...ent.map(z=>z[1]));if(!ent.length||nrm<1e-12)continue;
+    for(const [c2,v] of ent){rc.push(c2);rv.push(v/nrm);}rs.push(rc.length);rowRef.push(h);bondRow.push(0);}
+  const dof=2*nf,nRows=rowRef.length,rowOf=new Map();rowRef.forEach((e,r)=>{if(bondRow[r])rowOf.set(e,r);});
+  MECH={pending:true,ready:false,gen:++mechGen,layer:l,free,pinned,rowRef,bondRow,rowOf,dof,nRows,nf};
+  mechWorker().postMessage({gen:mechGen,dof,nRows,rs:Int32Array.from(rs),rc:Int32Array.from(rc),rv:Float64Array.from(rv),rigid:P.tBC==='free'?Float64Array.from(coords):null,bondRow:Uint8Array.from(bondRow)});
+  dirty=true;statsDirty=true;
+}
+function mechResult(r){if(!MECH||r.gen!==MECH.gen)return;Object.assign(MECH,r,{pending:false,ready:true});dirty=true;statsDirty=true;}
+const mechOn=()=>ON.tense&&MECH&&MECH.ready&&G&&MECH.layer<G.L;
+function mechStress(){if(!mechOn())return null;if(P.tPick==='uniform'&&MECH.uniform&&MECH.uniFrac>1e-9)return MECH.uniform;
+  const s=MECH.stresses;return s&&s.length?s[Math.min(P.tIdx,s.length-1)]:null;}
+function mechMode(){if(!mechOn()||!MECH.modes.length)return null;return MECH.modes[Math.min(P.tIdx,MECH.modes.length-1)];}
+const animPhase=()=>P.tAnim&&!REDUCED?Math.sin(performance.now()/420):1;
+
 /* ------------------------------------------------------------------ 3D view */
 const cv=$('view'),ctx=cv.getContext('2d');
 const cam={yaw:-.55,pitch:.42,zoom:1};
@@ -875,6 +1045,9 @@ function projectAll(){
   if(spx.length!==G.slab.n){spx=new Float32Array(G.slab.n);spy=new Float32Array(G.slab.n);sps=new Float32Array(G.slab.n);}
   const pr=projector(),o=[px,py,ps],so=[spx,spy,sps];
   for(let i=0;i<G.N;i++)pr(G.X[i],G.Y[i],layerZ(G.LY[i]),o,i);
+  const mv=ON.tense&&P.tShow==='mode'?mechMode():null;
+  if(mv){let mx=1e-12;for(let k=0;k<mv.length;k++)mx=Math.max(mx,Math.abs(mv[k]));const amp=.5*P.tAmp*animPhase()/mx,l=MECH.layer;
+    for(let i=G.layerStart[l];i<G.layerStart[l+1];i++){const f=MECH.free[i];if(f<0)continue;pr(G.X[i]+amp*mv[2*f],G.Y[i]+amp*mv[2*f+1],layerZ(l),o,i);}}
   for(let i=0;i<G.slab.n;i++)pr(G.slab.X[i],G.slab.Y[i],slabZ(G.slab.Z[i]),so,i);
   return pr;
 }
@@ -885,6 +1058,7 @@ function nodeColor(i){
   if(m==='energy'){const v=clamp(G.eLoc[i]/2,-1,1);return v<0?rgba(C.accent,.35+.65*-v):rgba(C.viol,.35+.65*v);}
   if(m==='field'){const v=clamp(G.hf[i]/(Math.abs(P.g)+Math.abs(P.h)+1e-6),-1,1);return v>=0?rgba(C['chi-p'],.25+.75*v):rgba(C['chi-m'],.25+.75*-v);}
   if(m==='sub')return [C['spin-up'],C.accent,C.kneg][G.SB[i]];
+  if(m==='hoload'){const v=G.hoLoad?G.hoLoad[i]/G.hoMax:0;return v>0?rgba(C.kpos,.25+.75*v):rgba(C.muted,.35);}
   return C.layer[G.LY[i]%4];
 }
 function bondStyle(e){
@@ -923,16 +1097,19 @@ function draw(){
       ctx.fillText(hasNode?`Weyl block · ${WEYL.nodes.length} nodes`:'Weyl block · no nodes',o[0][0]-6,o[1][0]+4);ctx.textAlign='left';}
   }
   for(let l=0;l<G.L;l++){
-    const LI=G.layerIdx[l];
+    const LI=G.layerIdx[l],mechHere=mechOn()&&l===MECH.layer;
     drawHyper(LI.h);
+    if(mechHere&&P.tShow==='stress')drawMembranes();
     // bonds batched by style
     const buckets=new Map();
-    for(const e of LI.b){if(G.bt[e]===2&&!G.bOn[e])continue;const st=styleOf(e);if(!st)continue;const k=st[0]+'|'+st[1].toFixed(2);let arr=buckets.get(k);if(!arr){arr=[];buckets.set(k,arr);}arr.push(e);}
+    for(const e of LI.b){if(mechHere&&MECH.rowOf.has(e))continue;if(G.bt[e]===2&&!G.bOn[e])continue;const st=styleOf(e);if(!st)continue;const k=st[0]+'|'+st[1].toFixed(2);let arr=buckets.get(k);if(!arr){arr=[];buckets.set(k,arr);}arr.push(e);}
     for(const [k,arr] of buckets){const [col,al]=k.split('|');ctx.strokeStyle=rgba(col,+al);ctx.lineWidth=Math.max(.8,ps[arr[0]>=0?G.bi[arr[0]]:0]*.018);ctx.beginPath();
       for(const e of arr){ctx.moveTo(px[G.bi[e]],py[G.bi[e]]);ctx.lineTo(px[G.bj[e]],py[G.bj[e]]);}ctx.stroke();}
+    if(mechHere)drawMechBonds();
     // sites
     const a0=G.layerStart[l],a1=G.layerStart[l+1];
     for(let i=a0;i<a1;i++){const r=Math.max(1.2,.07*ps[i]*ns);ctx.fillStyle=nodeColor(i);ctx.beginPath();ctx.arc(px[i],py[i],r,0,TAU);ctx.fill();}
+    if(mechHere){ctx.fillStyle=rgba(C.muted,.95);for(const i of MECH.pinned){const r=Math.max(2,.075*ps[i]*ns);ctx.fillRect(px[i]-r,py[i]-r,2*r,2*r);}}
     if(showSheaf){
       const al=G.LT[l].a,c=Math.cos(al),s=Math.sin(al),o=[[0],[0],[0]];
       ctx.strokeStyle=rgba(C.ink,.75);ctx.lineWidth=1;ctx.beginPath();
@@ -954,13 +1131,16 @@ function draw(){
   drawLegend();
   // hud
   const t=Tcur;
-  $('hud').textContent=`${G.N} sites · ${G.L} layer${G.L>1?'s':''}${ON.ising?` · T ${t.toFixed(3)}`:''}${ON.ising?` · ${sweepCount.toFixed(0)} sweeps`:''}`;
+  $('hud').textContent=`${G.N} sites · ${G.L} layer${G.L>1?'s':''}${ON.ising?` · T ${t.toFixed(3)}`:''}${ON.ising?` · ${sweepCount.toFixed(0)} sweeps`:''}`+
+    (ON.tense?(MECH&&MECH.pending?` · solving rigidity of L${MECH.layer}…`:mechOn()?` · L${MECH.layer}: ${MECH.nSS} self-stresses, ${MECH.nFloppy} floppy modes`:''):'');
 }
 function drawHyper(list,global,dim){
   if(!ON.hyper||P.hyperAlpha<=0||!list.length)return;
   const a=P.hyperAlpha*(dim||1);
   for(const h of list){if(!G.hAct[h])continue;
-    const s=G.hS[h],e=G.hS[h+1],k=e-s,K=G.hK[h],col=K>0?C.kpos:K<0?C.kneg:C.muted,viol=G.hCon[h]&&G.hViol[h];
+    const s=G.hS[h],e=G.hS[h+1],k=e-s,K=G.hK[h],viol=G.hCon[h]&&G.hViol[h];
+    if(k<P.kMin||k>Math.max(P.kMin,P.kMax))continue;
+    const col=P.hyperColor==='order'?orderColor(k):K>0?C.kpos:K<0?C.kneg:C.muted;
     let cx=0,cy=0;for(let q=s;q<e;q++){cx+=px[G.hN[q]];cy+=py[G.hN[q]];}cx/=k;cy/=k;
     if(global||G.hKind[h]===3&&k>3&&P.locality==='global'){
       ctx.strokeStyle=rgba(viol?C.viol:col,Math.min(1,a*(viol?1.4:.9)));ctx.lineWidth=1;ctx.beginPath();
@@ -971,6 +1151,28 @@ function drawHyper(list,global,dim){
     ctx.fillStyle=rgba(col,K===0?a*.25:a*(.35+.4*Math.min(1,Math.abs(K))));ctx.fill();
     if(viol){ctx.strokeStyle=rgba(C.viol,Math.min(1,a*2.2));ctx.lineWidth=1.3;ctx.stroke();}
   }
+}
+function orderColor(k){return k<=2?C.ink:[C.kpos,C.kneg,C['chi-p'],C['chi-m'],C.weyl,C.accent][Math.min(k-3,5)];}
+function mechPoly(h){const vs=[];let cx=0,cy=0;for(let q=G.hS[h];q<G.hS[h+1];q++){const v=G.hN[q];vs.push(v);cx+=px[v];cy+=py[v];}cx/=vs.length;cy/=vs.length;
+  return vs.map(v=>[Math.atan2(py[v]-cy,px[v]-cx),v]).sort((a,b)=>a[0]-b[0]).map(z=>z[1]);}
+function drawMembranes(){
+  const sv=mechStress();if(!sv)return;let mx=1e-12;for(let r=0;r<MECH.nRows;r++)mx=Math.max(mx,Math.abs(sv[r]));
+  for(let r=0;r<MECH.nRows;r++){if(MECH.bondRow[r])continue;const v=sv[r]/mx;if(Math.abs(v)<.02)continue;
+    const vs=mechPoly(MECH.rowRef[r]);ctx.beginPath();vs.forEach((u,n)=>n?ctx.lineTo(px[u],py[u]):ctx.moveTo(px[u],py[u]));ctx.closePath();
+    ctx.fillStyle=rgba(v>0?C.kpos:C.kneg,.12+.5*Math.abs(v));ctx.fill();}
+}
+function drawMechBonds(){
+  const sv=P.tShow==='stress'?mechStress():null;let mx=1e-12;
+  if(sv)for(let r=0;r<MECH.nRows;r++)if(MECH.bondRow[r])mx=Math.max(mx,Math.abs(sv[r]));
+  ctx.lineCap='round';
+  for(let r=0;r<MECH.nRows;r++){if(!MECH.bondRow[r])continue;const e=MECH.rowRef[r],a=G.bi[e],b=G.bj[e],base=Math.max(1.1,ps[a]*.028);
+    if(!sv){ctx.strokeStyle=rgba(C.ink,.6);ctx.lineWidth=base*1.1;}
+    else{const v=sv[r]/mx,m=Math.abs(v);
+      if(m<.02){ctx.strokeStyle=rgba(C.muted,.35);ctx.lineWidth=base*.7;}
+      else if(v>0){ctx.strokeStyle=rgba(C.accent,.45+.55*m);ctx.lineWidth=base*(.7+1.3*m);}   // cable: tension
+      else{ctx.strokeStyle=rgba(C.ink,.55+.45*m);ctx.lineWidth=base*(1.6+3.6*m);}}               // strut: compression
+    ctx.beginPath();ctx.moveTo(px[a],py[a]);ctx.lineTo(px[b],py[b]);ctx.stroke();}
+  ctx.lineCap='butt';
 }
 const FONTS={mono:'"IBM Plex Mono", ui-monospace, monospace',ui:'"IBM Plex Sans", system-ui, sans-serif'};
 const getFont=k=>FONTS[k];
@@ -983,11 +1185,14 @@ function drawLegend(){
   else if(m==='energy')items.push(['dot',C.accent,'low local energy'],['dot',C.viol,'high']);
   else if(m==='field')items.push(['dot',C['chi-p'],'h > 0'],['dot',C['chi-m'],'h < 0']);
   else if(m==='sub')items.push(['dot',C['spin-up'],'A'],['dot',C.accent,'B'],['dot',C.kneg,'C']);
+  else if(m==='hoload')items.push(['dot',C.kpos,'higher-order load (Σ|K| of incident hyperedges)']);
   else for(let l=0;l<G.L;l++)items.push(['dot',C.layer[l%4],'layer '+l]);
-  if(P.bondColor==='coupling')items.push(['sq',C.afm,'J < 0 bond'],['sq',C.fm,'J > 0 bond']);
-  else if(P.bondColor==='sat')items.push(['sq',C.kpos,'frustrated bond']);
-  else items.push(['sq',C.accent,'sheaf tension']);
-  if(ON.hyper)items.push(['sq',C.kpos,'K > 0 hyperedge'],['sq',C.kneg,'K < 0'],['sq',C.viol,'constraint broken']);
+  if(P.bondColor==='coupling'){if(ON.ising)items.push(['sq',C.afm,'J < 0 bond'],['sq',C.fm,'J > 0 bond']);}
+  else if(P.bondColor==='sat'){if(ON.ising)items.push(['sq',C.kpos,'frustrated bond']);}
+  else if(ON.sheaf)items.push(['sq',C.accent,'sheaf tension']);
+  if(ON.hyper){if(P.hyperColor==='order'){for(let k=Math.max(3,P.kMin);k<=Math.min(8,Math.max(P.kMin,P.kMax));k++)items.push(['sq',orderColor(k),k+'-body']);}
+    else items.push(['sq',C.kpos,'K > 0 hyperedge'],['sq',C.kneg,'K < 0']);items.push(['sq',C.viol,'constraint broken']);}
+  if(ON.tense)items.push(['sq',C.accent,'cable (tension)'],['sq',C.ink,'strut (compression)'],['sq',C.muted,'pinned site']);
   if(ON.weyl&&P.showSlab)items.push(['sq',C.weyl,'Weyl block']);
   const key=JSON.stringify(items);if(key===legendKey)return;legendKey=key;
   $('legend').innerHTML=items.map(([t,c,l])=>`<span><i class="${t==='sq'?'sq':''}" style="background:${c}"></i>${l}</span>`).join('');
@@ -1065,6 +1270,7 @@ function onParam(p){
   else if(p.kind==='coup'){recouple();}
   else if(p.kind==='weyl'){scheduleWeyl();}
   else if(p.kind==='band'){bandsOnly();drawWeyl();}
+  else if(p.kind==='mech'){scheduleMech();}
   if(p.k==='breath')scheduleWeyl();
   dirty=true;statsDirty=true;renderFormula();
 }
@@ -1072,7 +1278,7 @@ function onComp(id){
   secEls[id].classList.toggle('off',!ON[id]&&id!=='kagome');
   if(id==='moire'||id==='hyper'||id==='kagome'){build();}
   if(id==='weyl'||id==='kagome')scheduleWeyl();
-  recouple();renderMatrix();renderFormula();dirty=true;statsDirty=true;
+  recouple();renderMatrix();renderFormula();dirty=true;statsDirty=true;scheduleMech();
 }
 function scheduleWeyl(){clearTimeout(weylTimer);weylTimer=setTimeout(()=>{weylCompute();recouple();drawWeyl();statsDirty=true;},60);}
 
@@ -1085,7 +1291,7 @@ function buildMatrix(){
       else{const k=ckey(a,b);btn.setAttribute('aria-label',`${COMP_NAME[a]} × ${COMP_NAME[b]} coupling`);void k;}
       btn.addEventListener('click',()=>{
         if(a===b){ON[a]=!ON[a];onComp(a);syncUI();}
-        else{const k=ckey(a,b),info=COUPLINGS[k];if(info.kind==='toggle'){CPL[k]=!CPL[k];if(k==='kagome|hyper'||k==='moire|hyper'||k==='hyper|sheaf'){recouple();}else recouple();renderMatrix();renderFormula();statsDirty=true;}}
+        else{const k=ckey(a,b),info=COUPLINGS[k];if(info.kind==='toggle'){CPL[k]=!CPL[k];recouple();renderMatrix();renderFormula();statsDirty=true;scheduleMech();}}
         caption(a,b);
       });
       btn.addEventListener('mouseenter',()=>caption(a,b));btn.addEventListener('focus',()=>caption(a,b));
@@ -1094,7 +1300,7 @@ function buildMatrix(){
 }
 function caption(a,b){
   const el=$('mcap');
-  if(a===b){el.innerHTML=`<b>${COMP_NAME[a]}</b> sector is ${ON[a]?'on':'off'}. ${a==='kagome'?'Off swaps in the triangular parent lattice.':a==='moire'?'Off keeps a single layer.':'Click to switch.'}`;return;}
+  if(a===b){el.innerHTML=`<b>${COMP_NAME[a]}</b> sector is ${ON[a]?'on':'off'}. ${a==='kagome'?'Off swaps in the triangular parent lattice.':a==='moire'?'Off keeps a single layer.':a==='tense'?'Solves the rigidity of one layer: self-stresses and floppy modes.':'Click to switch.'}`;return;}
   const k=ckey(a,b),info=COUPLINGS[k];
   const st=info.kind==='toggle'?(cp(k)?'active':CPL[k]?'switched on, but a sector is off':'switched off'):info.kind==='struct'?'structural':'not modeled';
   el.innerHTML=`<b>${COMP_NAME[k.split('|')[0]]} × ${COMP_NAME[k.split('|')[1]]}</b> · ${st}. ${info.d}`;
@@ -1190,7 +1396,58 @@ function renderStats(){
   pill('hyper',ON.hyper?`${Array.from(G.hAct).reduce((a,b)=>a+b,0)} edges`:'off');
   pill('sheaf',ON.sheaf?`H⁰ = ${COH.h0}`:'off');
   $('subline').textContent=`${G.kag?'kagome':'triangular'} · ${L} layer${L>1?'s':''} · ${N} sites · ${G.M} bonds · ${G.nH} hyperedges · ${G.sE} sheaf edges`;
+  pill('tense',ON.tense?(mechOn()?`${MECH.nSS} stresses · ${MECH.nFloppy} floppy`:MECH&&MECH.pending?'solving…':'…'):'off');
+  renderMech();renderOrders();
   drawMoire(LM);
+}
+function renderMech(){
+  const kv=$('mechKV');
+  if(!ON.tense){$('mechInfo').textContent='off';kv.innerHTML='<dt>sector</dt><dd>off</dd>';fitCanvas($('cStress'),74);return;}
+  if(!mechOn()){$('mechInfo').textContent=MECH&&MECH.pending?'solving…':'';kv.innerHTML='<dt>status</dt><dd>solving the rigidity matrix…</dd>';fitCanvas($('cStress'),74);return;}
+  const M_=MECH,nb=M_.bondRow.reduce((a,b)=>a+b,0),nm=M_.nRows-nb,lhs=M_.nZero-M_.nSS,rhs=M_.dof-M_.nRows;
+  $('mechInfo').textContent=`layer ${M_.layer} · ${M_.ms.toFixed(0)} ms`;
+  let shown='';
+  if(P.tShow==='stress'){const usingUni=P.tPick==='uniform'&&M_.uniform&&M_.uniFrac>1e-9;
+    shown=M_.nSS?(usingUni?'self-stress closest to uniform tension':`self-stress basis state ${Math.min(P.tIdx,M_.stresses.length-1)+1} of ${M_.nSS}`):'no self-stress exists';}
+  else{const i=Math.min(P.tIdx,M_.modes.length-1);shown=M_.modes.length?(M_.lam[i]===0?`floppy mode ${i+1} of ${M_.nFloppy}`:`softest mode (λ/λmax = ${M_.lam[i].toExponential(1)}), no floppy mode left`):'no modes';}
+  kv.innerHTML=`<dt>free sites · pinned</dt><dd>${M_.nf} · ${M_.pinned.length}</dd><dt>degrees of freedom</dt><dd>${M_.dof}</dd>`+
+    `<dt>constraints (bonds + membranes)</dt><dd>${nb} + ${nm}</dd><dt>rank of C</dt><dd>${M_.rank}</dd>`+
+    `<dt>zero modes</dt><dd>${M_.nZero}${M_.nRigid?` (${M_.nRigid} rigid)`:''}</dd><dt>floppy modes</dt><dd>${M_.nFloppy}</dd>`+
+    `<dt>self-stresses</dt><dd>${M_.nSS}${M_.ssFound!=null&&M_.ssFound!==M_.nSS?` (direct count ${M_.ssFound})`:''}</dd>`+
+    `<dt>Maxwell–Calladine</dt><dd>${lhs} = ${rhs} ${lhs===rhs?'✓':'✗'}</dd>`+
+    `<dt>uniform tension reachable</dt><dd>${M_.uniFrac==null?'–':(100*M_.uniFrac).toFixed(1)+'%'}</dd><dt>showing</dt><dd>${shown}</dd>`;
+  // stress histogram of the displayed state
+  const [x,w,h]=fitCanvas($('cStress'),74),sv=P.tShow==='stress'?mechStress():null;
+  x.font='10px '+FONTS.mono;x.fillStyle=C.muted;
+  if(!sv){x.fillText(P.tShow==='mode'?'mode view: bonds keep their length to first order':'no self-stress to show',4,14);return;}
+  let mx=1e-12;for(let r=0;r<M_.nRows;r++)if(M_.bondRow[r])mx=Math.max(mx,Math.abs(sv[r]));
+  const B=21,hist=new Int32Array(B);let nT=0,nC=0;
+  for(let r=0;r<M_.nRows;r++){if(!M_.bondRow[r])continue;const v=sv[r]/mx;hist[Math.min(B-1,Math.floor((v+1)/2*B))]++;if(v>.02)nT++;else if(v<-.02)nC++;}
+  const hm=Math.max(...hist),pl=4,pb=14,bw=(w-2*pl)/B;
+  for(let b=0;b<B;b++){const c=-1+(b+.5)*2/B,hh=(h-pb-4)*hist[b]/hm;x.fillStyle=Math.abs(c)<.05?C.muted:c>0?C.accent:C.ink;x.fillRect(pl+b*bw+1,h-pb-hh,bw-2,hh);}
+  x.fillStyle=C.muted;x.textAlign='left';x.fillText(`struts ${nC}`,pl,h-2);x.textAlign='right';x.fillText(`cables ${nT}`,w-pl,h-2);x.textAlign='center';x.fillText('0',w/2,h-2);x.textAlign='left';
+}
+function renderOrders(){
+  const [x,w,h]=fitCanvas($('cOrder'),132),N=G.N;
+  const NK=E.NbyK||new Int32Array(10),EK=E.EbyK||new Float64Array(10);
+  let kmax=4;for(let k=3;k<10;k++)if(NK[k])kmax=Math.max(kmax,k);
+  const ks=[];for(let k=2;k<=kmax;k++)ks.push(k);
+  const pl=26,pr=8,top=16,mid=74,bot=h-14,cw=(w-pl-pr)/ks.length,cmax=Math.max(1,...ks.map(k=>NK[k])),emax=Math.max(1e-6,...ks.map(k=>Math.abs(EK[k]/N)));
+  x.font='10px '+FONTS.mono;x.strokeStyle=C.soft;x.beginPath();x.moveTo(pl,mid);x.lineTo(w-pr,mid);x.moveTo(pl,(mid+bot)/2+4);x.lineTo(w-pr,(mid+bot)/2+4);x.stroke();
+  x.fillStyle=C.muted;x.textAlign='right';x.fillText('n',pl-6,top+9);x.fillText('E',pl-6,(mid+bot)/2+8);
+  const e0=(mid+bot)/2+4,eh=(bot-mid)/2-4;
+  ks.forEach((k,i)=>{const cx=pl+i*cw+cw/2,col=orderColor(k),bh=(mid-top-4)*NK[k]/cmax;
+    x.fillStyle=rgba(col,.75);x.fillRect(cx-cw*.3,mid-bh,cw*.6,bh);
+    x.fillStyle=C.ink;x.textAlign='center';if(NK[k])x.fillText(NK[k],cx,mid-bh-3);
+    const ev=EK[k]/N,ey=e0-eh*ev/emax;x.strokeStyle=rgba(col,.9);x.lineWidth=1.5;x.beginPath();x.moveTo(cx,e0);x.lineTo(cx,ey);x.stroke();
+    x.fillStyle=col;x.beginPath();x.arc(cx,ey,3,0,TAU);x.fill();
+    x.fillStyle=C.muted;x.fillText(k===2?'pair':k+'-body',cx,h-2);});
+  x.textAlign='left';
+  let tot=0,hi=0,nh=0,sk=0;for(const k of ks){tot+=Math.abs(EK[k]);if(k>=3){hi+=Math.abs(EK[k]);nh+=NK[k];sk+=k*NK[k];}}
+  $('hoInfo').textContent=nh?`${nh} k ≥ 3 terms`:'none active';
+  $('hoKV').innerHTML=`<dt>share of |E| from k ≥ 3</dt><dd>${tot>0?(100*hi/tot).toFixed(1)+'%':'–'}</dd><dt>mean order of hyperedges</dt><dd>${nh?(sk/nh).toFixed(2):'–'}</dd>`+
+    `<dt>largest order present</dt><dd>${nh?kmax:'–'}</dd><dt>spins coupled to k ≥ 3 terms</dt><dd>${G.hoLoad?Array.from(G.hoLoad).filter(v=>v>0).length:0} of ${N}</dd>`+
+    `<dt>acting on spins</dt><dd>${hyperSpin?'yes':'no (Ising × Hypergraph off)'}</dd>`;
 }
 function drawMoire(LM){
   const c=$('cMoire'),[x,w,h]=fitCanvas(c,150);
@@ -1290,7 +1547,7 @@ function applyState(p,on,cpl,fromDefaults=true){
   Tcur=P.schedule==='anneal'?P.T0:P.T;
   syncUI();build();weylCompute();recouple();drawWeyl();TR.i=0;TR.full=false;statsDirty=true;
 }
-function applyPreset(id){const pr=PRESETS[id];applyState(pr.P,pr.ON,pr.CPL,true);cam.zoom=1;}
+function applyPreset(id){const pr=PRESETS[id];applyState(pr.P,pr.ON,pr.CPL,true);if(pr.cam==='top'){cam.yaw=0;cam.pitch=Math.PI/2;cam.zoom=1.15;}else{cam.yaw=-.55;cam.pitch=.42;cam.zoom=1;}}
 $('preset').innerHTML=Object.entries(PRESETS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
 $('preset').addEventListener('change',e=>applyPreset(e.target.value));
 
@@ -1315,6 +1572,7 @@ function tick(force){
 function loop(){
   tick(false);
   if(statsDirty&&G){energies();cohomology();renderStats();drawSparks();statsDirty=false;}
+  if(ON.tense&&P.tShow==='mode'&&P.tAnim&&!REDUCED&&mechOn())dirty=true;
   if(dirty&&G){draw();dirty=false;}
   requestAnimationFrame(loop);
 }
