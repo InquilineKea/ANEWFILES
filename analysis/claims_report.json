@@ -1,0 +1,427 @@
+{
+ "elapsed_s": 31.920207977294922,
+ "quick": false,
+ "checks": [
+  {
+   "id": "M1",
+   "claim": "m=3 defaults: manifold width 0.425 t, 17 gapped pieces, narrowest band 4.3e-4 t",
+   "measured": {
+    "page_sampling": {
+     "manifold_width": 0.42519273668989777,
+     "narrowest_width": 0.00043424787816936927,
+     "narrowest_band": 220,
+     "pieces": 17,
+     "gap_below": -0.0003513821404392825
+    },
+    "dense_sampling": {
+     "manifold_width": 0.4255146213969858,
+     "narrowest_width": 0.00047326056243512937,
+     "narrowest_band": 220,
+     "pieces": 13,
+     "gap_below": -0.0019229079689278006
+    }
+   },
+   "verdict": "partly holds",
+   "note": "piece count depends on k sampling (sparse sampling overcounts gaps). page sampling: W=0.4252, pieces=17, narrowest=4.34e-04; dense (20/seg + 10x10): W=0.4255, pieces=13, narrowest=4.73e-04"
+  },
+  {
+   "id": "M2",
+   "claim": "Narrowest manifold states sit on AA patches (x3.4 over an even spread), ~17% participation",
+   "measured": {
+    "participation": 0.0916198332213298,
+    "aa_enhancement": 6.8334063712285955,
+    "layer1_share": 0.5000000000000003,
+    "states": 1,
+    "E0": 2.2134155133087328
+   },
+   "verdict": "holds",
+   "note": "AA enhancement x6.83, participation 9.2% (1 states)"
+  },
+  {
+   "id": "M3",
+   "claim": "Narrowest sub-band width falls ~exponentially with moire period (1e-2 t at 21.8 deg to 6e-6 t at 6 deg); 5-k values are lower bounds",
+   "measured": {
+    "sweep": [
+     {
+      "m": 1,
+      "theta_deg": 21.78678929826181,
+      "L_M": 2.6457513110645907,
+      "manifold_width": 0.3883108219843254,
+      "narrowest_width": 0.015896435653475205,
+      "narrowest_band": 34,
+      "pieces": 3,
+      "gap_below": -0.006091258670504862,
+      "loc_participation": 0.3738368861001075,
+      "loc_aa_enhancement": 0.06849411282348157,
+      "loc_layer1_share": 0.49999999999999994,
+      "loc_states": 2,
+      "loc_E0": 2.0117675525432714
+     },
+     {
+      "m": 2,
+      "theta_deg": 13.173551107258918,
+      "L_M": 4.358898943540674,
+      "manifold_width": 0.4100188974057766,
+      "narrowest_width": 0.003358010360880126,
+      "narrowest_band": 111,
+      "pieces": 9,
+      "gap_below": -0.0012403305105801454,
+      "loc_participation": 0.18429303580999454,
+      "loc_aa_enhancement": 4.502546612119156,
+      "loc_layer1_share": 0.4999999999999998,
+      "loc_states": 1,
+      "loc_E0": 2.184259412041939
+     },
+     {
+      "m": 3,
+      "theta_deg": 9.430007907896421,
+      "L_M": 6.082762530298219,
+      "manifold_width": 0.4246740082549998,
+      "narrowest_width": 0.0004681384661862076,
+      "narrowest_band": 220,
+      "pieces": 14,
+      "gap_below": -0.0012074576638425594,
+      "loc_participation": 0.0916198332213298,
+      "loc_aa_enhancement": 6.8334063712285955,
+      "loc_layer1_share": 0.5000000000000003,
+      "loc_states": 1,
+      "loc_E0": 2.213413816095704
+     },
+     {
+      "m": 4,
+      "theta_deg": 7.340993016630217,
+      "L_M": 7.810249675906654,
+      "manifold_width": 0.43420446832175386,
+      "narrowest_width": 7.549679698293232e-05,
+      "narrowest_band": 364,
+      "pieces": 18,
+      "gap_below": -0.001237637112311063,
+      "loc_participation": 0.05591616767841317,
+      "loc_aa_enhancement": 6.683420082008867,
+      "loc_layer1_share": 0.5,
+      "loc_states": 1,
+      "loc_E0": 2.227335048028179
+     },
+     {
+      "m": 5,
+      "theta_deg": 6.008983197766148,
+      "L_M": 9.539392014169456,
+      "manifold_width": 0.44422808001021474,
+      "narrowest_width": 7.173327326803758e-06,
+      "narrowest_band": 539,
+      "pieces": 18,
+      "gap_below": 6.621137118134612e-06,
+      "loc_participation": 0.06492337745381102,
+      "loc_aa_enhancement": 6.429801943101435,
+      "loc_layer1_share": 0.49999999999999933,
+      "loc_states": 1,
+      "loc_E0": 2.2134698315731245
+     }
+    ],
+    "dense_over_5k_ratio": [
+     1.6558787139036673,
+     1.7673738741474347,
+     1.7338461710600281,
+     1.5407509588353536,
+     1.1386233852069456
+    ],
+    "fit_log_width_vs_LM": {
+     "slope": -1.1140122076602033,
+     "rms_resid": 0.18203417582200254
+    }
+   },
+   "verdict": "holds",
+   "note": "dense/5-k width ratios m=1:1.66, m=2:1.77, m=3:1.73, m=4:1.54, m=5:1.14; log(width) vs L_M slope -1.11/a, rms residual 0.18"
+  },
+  {
+   "id": "M4",
+   "claim": "Flux 60 deg (V=0.2) delocalises the flat states and kills the AA preference (manifold ~1.45 t)",
+   "measured": {
+    "stats": {
+     "manifold_width": 1.4478238688820826,
+     "narrowest_width": 0.005558373313292675,
+     "narrowest_band": 149,
+     "pieces": 5,
+     "gap_below": 0.8973284165716973
+    },
+    "loc": {
+     "participation": 0.23912977935943855,
+     "aa_enhancement": 4.420408863727444,
+     "layer1_share": 0.2189289728536013,
+     "states": 2,
+     "E0": 1.7545356330859843
+    },
+    "monolayer_top_band_width_at_flux60": 0.4226963886767363
+   },
+   "verdict": "fails",
+   "note": "narrowest band now: AA x4.42, participation 23.9%, manifold 1.448 t. The page's x0.92 came from a stale LDOS energy (bug since fixed). Flux does widen the narrowest band ~10x. The folded monolayer top band is no longer flat (0.42 t wide, measured in the m=1 cell), yet AA confinement survives."
+  },
+  {
+   "id": "M5",
+   "claim": "Untested before: does the AA preference survive breathing (delta != 0, flux 0)? CLS reading predicts yes",
+   "measured": [
+    {
+     "delta": 0,
+     "tp": 0.15,
+     "aa": 6.81545885627832,
+     "part": 0.09437199301153015,
+     "narrowest": 0.00038225286179738305,
+     "monolayer_flat_width": 3.9968028886505635e-15
+    },
+    {
+     "delta": 0,
+     "tp": 0.35,
+     "aa": 6.8334063712285955,
+     "part": 0.0916198332213298,
+     "narrowest": 0.0004590042727525834,
+     "monolayer_flat_width": 3.9968028886505635e-15
+    },
+    {
+     "delta": 0,
+     "tp": 0.6,
+     "aa": 4.586879390023062,
+     "part": 0.1732249112743938,
+     "narrowest": 0.00024903827664957134,
+     "monolayer_flat_width": 3.9968028886505635e-15
+    },
+    {
+     "delta": 0.1,
+     "tp": 0.15,
+     "aa": 6.786696692179682,
+     "part": 0.08971209544911214,
+     "narrowest": 0.000343409711000664,
+     "monolayer_flat_width": 3.1086244689504383e-15
+    },
+    {
+     "delta": 0.1,
+     "tp": 0.35,
+     "aa": 6.8021134891809325,
+     "part": 0.08489235892343626,
+     "narrowest": 0.0003970889158915192,
+     "monolayer_flat_width": 3.1086244689504383e-15
+    },
+    {
+     "delta": 0.1,
+     "tp": 0.6,
+     "aa": 6.818592996159917,
+     "part": 0.0792506939278678,
+     "narrowest": 0.0003309639203994408,
+     "monolayer_flat_width": 3.1086244689504383e-15
+    },
+    {
+     "delta": 0.2,
+     "tp": 0.15,
+     "aa": 5.55169959053501,
+     "part": 0.0813822201226894,
+     "narrowest": 0.00028439333646179676,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    },
+    {
+     "delta": 0.2,
+     "tp": 0.35,
+     "aa": 5.565164876214351,
+     "part": 0.07456235732713068,
+     "narrowest": 0.0002740287012104048,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    },
+    {
+     "delta": 0.2,
+     "tp": 0.6,
+     "aa": 5.578627006743358,
+     "part": 0.06720598083198465,
+     "narrowest": 0.0002030033631164052,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    },
+    {
+     "delta": 0.3,
+     "tp": 0.15,
+     "aa": 5.5297363730797695,
+     "part": 0.07169856107803642,
+     "narrowest": 0.0001781429854035288,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    },
+    {
+     "delta": 0.3,
+     "tp": 0.35,
+     "aa": 5.548108721375398,
+     "part": 0.06491245422518825,
+     "narrowest": 0.00013584542811306832,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    },
+    {
+     "delta": 0.3,
+     "tp": 0.6,
+     "aa": 5.565016213003963,
+     "part": 0.058422138783499555,
+     "narrowest": 6.683724353440113e-05,
+     "monolayer_flat_width": 2.6645352591003757e-15
+    }
+   ],
+   "verdict": "holds",
+   "note": "d=0,t\u22a5=0.15: AA x6.82; d=0,t\u22a5=0.35: AA x6.83; d=0,t\u22a5=0.6: AA x4.59; d=0.1,t\u22a5=0.15: AA x6.79; d=0.1,t\u22a5=0.35: AA x6.80; d=0.1,t\u22a5=0.6: AA x6.82; d=0.2,t\u22a5=0.15: AA x5.55; d=0.2,t\u22a5=0.35: AA x5.57; d=0.2,t\u22a5=0.6: AA x5.58; d=0.3,t\u22a5=0.15: AA x5.53; d=0.3,t\u22a5=0.35: AA x5.55; d=0.3,t\u22a5=0.6: AA x5.57. Monolayer flat band under breathing stays flat (width 4.0e-15 t), so delta does not distinguish the two readings as cleanly as I implied."
+  },
+  {
+   "id": "W1",
+   "claim": "Defaults (flux 90, dz 0.8): 2 nodes on gap 1|2 at kz = \u00b12.556, 2 nodes on gap 2|3 at kz = \u00b10.59",
+   "measured": {
+    "detector_12": 2,
+    "detector_23": 2,
+    "brute_12": [
+     [
+      -3.141592653589793,
+      -3.141592653589793,
+      -2.555907104155773,
+      7.929214174140498e-09
+     ],
+     [
+      -3.141592653589793,
+      -3.141592653589793,
+      2.5559071041557733,
+      7.929214174140498e-09
+     ]
+    ],
+    "brute_23": [
+     [
+      -3.141592653589793,
+      -3.141592653589793,
+      -0.5856855494340207,
+      7.929214174140498e-09
+     ],
+     [
+      -3.141592653589793,
+      -3.141592653589793,
+      0.5856855494340207,
+      7.929214174140498e-09
+     ]
+    ]
+   },
+   "verdict": "holds",
+   "note": "detector 2/2, brute force 2/2; brute kz: -2.556, +2.556, -0.586, +0.586"
+  },
+  {
+   "id": "W2",
+   "claim": "Implied: the C(kz)-jump detector finds the Weyl nodes (no stated error rate)",
+   "measured": {
+    "agree_first_pass": 34,
+    "detector_correct_after_referee": 37,
+    "n": 40,
+    "missed": [
+     {
+      "params": {
+       "t": 1,
+       "breath": 0.08479690148362495,
+       "flux": 306.94782185303643,
+       "mA": 0.37176407241713605,
+       "tz": -0.28788306271533215,
+       "dz": 1.0196445630942264
+      },
+      "detector": 0,
+      "brute": 2,
+      "ungapped_planes": 2,
+      "referee_brute": 2,
+      "referee_detector_fine": 2,
+      "fault": "detector"
+     },
+     {
+      "params": {
+       "t": 1,
+       "breath": -0.2096851017472935,
+       "flux": 173.59645975176116,
+       "mA": 1.578863448784694,
+       "tz": -0.09273971166547523,
+       "dz": 0.2685061862521443
+      },
+      "detector": 0,
+      "brute": 2,
+      "ungapped_planes": 2,
+      "referee_brute": 2,
+      "referee_detector_fine": 0,
+      "fault": "detector"
+     }
+    ],
+    "extra": [
+     {
+      "params": {
+       "t": 1,
+       "breath": 0.15021880357803152,
+       "flux": 100.94715287497438,
+       "mA": -0.05923610227345977,
+       "tz": 0.5768846397614863,
+       "dz": 1.38497158099136
+      },
+      "detector": 2,
+      "brute": 0,
+      "ungapped_planes": 0,
+      "referee_brute": 2,
+      "referee_detector_fine": 2,
+      "fault": "brute-force scan (too coarse)"
+     },
+     {
+      "params": {
+       "t": 1,
+       "breath": 0.09621322831231399,
+       "flux": 88.39881620754393,
+       "mA": 1.0740679955850174,
+       "tz": -0.34599030887098736,
+       "dz": 0.9938245039933835
+      },
+      "detector": 2,
+      "brute": 0,
+      "ungapped_planes": 0,
+      "referee_brute": 0,
+      "referee_detector_fine": 0,
+      "fault": "detector"
+     },
+     {
+      "params": {
+       "t": 1,
+       "breath": 0.2789806463878414,
+       "flux": 144.5890405998663,
+       "mA": -0.8190629773492168,
+       "tz": 0.4163980447604755,
+       "dz": -1.1266190024535605
+      },
+      "detector": 2,
+      "brute": 0,
+      "ungapped_planes": 0,
+      "referee_brute": 2,
+      "referee_detector_fine": 2,
+      "fault": "brute-force scan (too coarse)"
+     },
+     {
+      "params": {
+       "t": 1,
+       "breath": 0.18362142451627417,
+       "flux": 226.91439195965216,
+       "mA": -0.5492125717686065,
+       "tz": 0.312946541500179,
+       "dz": -1.420546353288083
+      },
+      "detector": 2,
+      "brute": 0,
+      "ungapped_planes": 0,
+      "referee_brute": 2,
+      "referee_detector_fine": 2,
+      "fault": "brute-force scan (too coarse)"
+     }
+    ]
+   },
+   "verdict": "partly holds",
+   "note": "first pass 34/40 agree; after refereeing disagreements at higher resolution the page's detector is right in 37/40. Faults: detector, detector, brute-force scan (too coarse), detector, brute-force scan (too coarse), brute-force scan (too coarse)"
+  },
+  {
+   "id": "S1",
+   "claim": "Twist-locked interlayer maps (kappa) are pure gauge: H0 unchanged",
+   "measured": "omega = kappa*(alpha_l - alpha_{l+1}) = g_{l+1} - g_l with g_l = -kappa*alpha_l, so every cycle holonomy cancels",
+   "verdict": "holds",
+   "note": "exact by construction (a coboundary); no numerics needed"
+  },
+  {
+   "id": "S2",
+   "claim": "Spin gauge with gamma = 1 is a pure Z2 gauge",
+   "measured": "Rot(omega + pi(1 - s_i s_j)/2) = s_i s_j Rot(omega); x_i -> s_i x_i removes it",
+   "verdict": "holds",
+   "note": "exact; fractional gamma gives holonomy pi*gamma*(#anti-aligned edges), which can be nonzero"
+  }
+ ]
+}

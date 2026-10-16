@@ -1,0 +1,14 @@
+{
+  "idea_id": "idea_kagome_aa_bias_001",
+  "title": "Bias-isolated AA bound states at the smallest twist",
+  "hypothesis": "At m=4 the narrowest top-manifold band is AA-confined; an interlayer bias V can push one layer's AA states out of the manifold and open a gap on both sides.",
+  "implementation_plan": [
+    "Scan V and tp at m=3 with kagome_core to find bands isolated by >= 0.01 t",
+    "Refine the best region with a local search, then confirm at m=4",
+    "Ablate flux and slide to test whether the mechanism is AA confinement"
+  ],
+  "target_rubrics": [
+    {"id": "isolated_band_ratio_100", "description": "Finds a band isolated by >= 0.01 t with gap/width above 100 (combined_score > 2)", "type": "metric"}
+  ],
+  "notes_for_agent": "The evaluator re-solves the parameters you return; only the parameter dict matters for the score."
+}

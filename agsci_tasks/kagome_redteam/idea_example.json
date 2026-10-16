@@ -1,0 +1,14 @@
+{
+  "idea_id": "idea_weyl_redteam_nearTRS_001",
+  "title": "Near-time-reversal flux to starve the gap guard",
+  "hypothesis": "Near flux = 0 or 180 degrees, nodes sit close to planes where the gap is below 0.01 t, so the guard discards the Chern jump and the detector misses them.",
+  "implementation_plan": [
+    "Scan flux near 0 and 180 degrees with weyl_detect_like_js and weyl_gap_scan",
+    "Keep cases where the two disagree and the referee resolutions agree",
+    "Spread cases apart so they are not deduplicated"
+  ],
+  "target_rubrics": [
+    {"id": "five_distinct_failures", "description": "Finds at least five distinct verified failures (combined_score >= 5)", "type": "metric"}
+  ],
+  "notes_for_agent": "Near-duplicates within 0.03 normalised parameter distance count once."
+}

@@ -1,0 +1,5 @@
+[
+  {"id": "five_distinct_failures", "description": "Finds at least five distinct verified failures (combined_score >= 5)", "type": "metric"},
+  {"id": "both_failure_kinds", "description": "Finds both missed nodes and false nodes", "type": "metric"},
+  {"id": "failure_mechanism", "description": "Identifies the parameter-space mechanism behind each failure kind and proposes a concrete detector fix, checked on the failures found", "type": "implementation"}
+]

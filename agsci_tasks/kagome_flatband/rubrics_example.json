@@ -1,0 +1,5 @@
+[
+  {"id": "isolated_band_ratio_100", "description": "Finds a band isolated by >= 0.01 t with gap/width above 100 (combined_score > 2)", "type": "metric"},
+  {"id": "two_distinct_mechanisms", "description": "Reports at least two parameter regimes with different flattening mechanisms (e.g. AA confinement vs flux/Chern vs bias) and compares them", "type": "implementation"},
+  {"id": "mechanism_ablation", "description": "Ablates the winning configuration (flux on/off, tp sign, slide) and reports how the score and aa_enhancement respond", "type": "implementation"}
+]

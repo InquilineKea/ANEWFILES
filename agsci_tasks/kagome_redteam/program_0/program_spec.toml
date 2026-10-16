@@ -1,0 +1,15 @@
+schema_version = 1
+code_root = "src"
+
+[entrypoint]
+path = "program.py"
+language = "python"
+type = "script"
+
+[copy]
+exclude = ["**/__pycache__/**", "**/*.pyc", ".venv/**", ".git/**"]
+include = []
+
+[integration]
+kind = "generic"
+notes = "solution() returns a list of Weyl-block parameter sets"
