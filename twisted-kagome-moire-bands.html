@@ -1,0 +1,667 @@
+<title>Twisted Kagome Moiré Bands</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* Layout: lab notebook spread — parameter rail on the left, the band structure as the full-width lead figure, real-space and sweep figures paired beneath */
+:root{
+  --bg:#E6E9EC; --panel:#F3F5F6; --stage:#EEF1F3; --ink:#121922; --muted:#586472; --line:#C4CCD4; --soft:#D9DFE4;
+  --accent:#0E7A6F; --accent-ink:#FFFFFF;
+  --l0:#2B5EC8; --l1:#CC4426; --flat:#0E7A6F; --ghost:#9AA5B1; --win:#BC800C; --hot:#BC800C; --cool:#36619E;
+  --f-display:"Newsreader", "Iowan Old Style", Georgia, serif;
+  --f-ui:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0C1116; --panel:#121920; --stage:#090D12; --ink:#E1E6EB; --muted:#8B97A4; --line:#27313C; --soft:#1B242D;
+  --accent:#3BC3AF; --accent-ink:#06201C;
+  --l0:#5F90F6; --l1:#FF7656; --flat:#3BC3AF; --ghost:#4A5663; --win:#EFB136; --hot:#EFB136; --cool:#6E95D6;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0C1116; --panel:#121920; --stage:#090D12; --ink:#E1E6EB; --muted:#8B97A4; --line:#27313C; --soft:#1B242D;
+  --accent:#3BC3AF; --accent-ink:#06201C;
+  --l0:#5F90F6; --l1:#FF7656; --flat:#3BC3AF; --ghost:#4A5663; --win:#EFB136; --hot:#EFB136; --cool:#6E95D6;
+  color-scheme:dark }
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:13px;line-height:1.4}
+*{box-sizing:border-box}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:10px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:10px 12px;
+  grid-template-areas:"head head" "ctrl main"}
+header{grid-area:head;display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.brand h1{font-family:var(--f-display);font-weight:500;font-size:22px;letter-spacing:-.01em;margin:0;line-height:1.1;text-wrap:balance}
+.brand .sub{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{width:150px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap;font-size:12px}
+.btn:hover{border-color:var(--muted)}
+.btn.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.controls{grid-area:ctrl;min-height:0;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.main{grid-area:main;min-height:0;overflow-y:auto;display:grid;gap:10px;align-content:start;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:8px;min-width:0;align-content:start}
+.card.wide{grid-column:1/-1}
+.card h2{font-family:var(--f-display);font-weight:500;font-size:17px;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.card h2 small{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);font-weight:400}
+.tools{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-left:auto}
+.cap{font-size:11.5px;color:var(--muted);margin:0;line-height:1.45;max-width:78ch}
+.cap b{color:var(--ink);font-weight:600}
+.bandwrap{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:6px}
+canvas{display:block;width:100%}
+#cBands{height:440px;cursor:crosshair;touch-action:none}
+#cDos{height:440px}
+#cReal{height:360px;cursor:crosshair}
+#cFlat,#cSweep{height:240px}
+.legend{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:11px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.legend i.dot{width:9px;height:9px;border-radius:50%}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:1px 7px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip b{color:var(--ink);font-weight:500}
+.chip.hl{border-color:var(--accent);color:var(--accent)}
+.sec{border-bottom:1px solid var(--line);padding:11px 12px;display:grid;gap:9px}
+.sec h3{font-family:var(--f-display);font-weight:500;font-size:16px;margin:0}
+.note{font-size:11.5px;color:var(--muted);margin:0;line-height:1.45}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center}
+.prm label{font-size:12px;min-width:0}
+.prm label i{font-family:var(--f-display);font-size:13.5px}
+.prm output{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.prm input[type=range]{grid-column:1/-1;width:100%;margin:0;accent-color:var(--accent);height:16px}
+.prm select{border:1px solid var(--line);background:var(--bg);border-radius:5px;padding:2px 4px;font-size:12px}
+.prm.chk{grid-template-columns:auto minmax(0,1fr)}
+.prm.chk input{margin:0;accent-color:var(--accent)}
+.prm .hint{grid-column:1/-1;font-size:10.5px;color:var(--muted)}
+.angles{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);display:grid;grid-template-columns:repeat(4,auto);gap:1px 10px;font-variant-numeric:tabular-nums}
+.angles b{color:var(--ink);font-weight:500}
+.kv{display:grid;grid-template-columns:auto auto;gap:2px 12px;font-size:11.5px;align-content:start}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  html,body{height:auto}
+  .app{display:flex;flex-direction:column;height:auto}
+  .main{order:1;overflow:visible}
+  .controls{order:2;overflow:visible}
+  .prog{margin-left:0}
+  #cBands,#cDos{height:360px}
+  .bandwrap{grid-template-columns:minmax(0,1fr) 80px}
+  .two{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>Twisted Kagome Moiré Bands</h1>
+      <div class="sub" id="subline">starting solver…</div>
+    </div>
+    <div class="prog">
+      <span id="progTxt">idle</span>
+      <span class="bar"><i id="progBar"></i></span>
+      <button class="btn" id="stop">Stop</button>
+    </div>
+  </header>
+
+  <aside class="controls" id="controls" aria-label="Model parameters"></aside>
+
+  <main class="main">
+    <section class="card wide">
+      <h2>Supercell band structure <small id="bInfo"></small>
+        <span class="tools">
+          <button class="btn on" data-view="manifold">Top-band manifold</button>
+          <button class="btn" data-view="full">Full spectrum</button>
+          <button class="btn" data-view="zin">Zoom in</button>
+          <button class="btn" data-view="zout">Zoom out</button>
+        </span>
+      </h2>
+      <div class="bandwrap">
+        <canvas id="cBands" aria-label="Moiré band structure along Γ–K–M–Γ. Click to choose the energy for the local density of states."></canvas>
+        <canvas id="cDos" aria-label="Density of states"></canvas>
+      </div>
+      <div class="legend" id="bLegend"></div>
+      <div class="chips" id="bChips"></div>
+      <p class="cap">Exact tight-binding diagonalisation of a commensurate twisted bilayer. The two kagome sheets are rotated by ∓θ/2 and solved together in one moiré unit cell, so every band shown is a true supercell eigenvalue, with no continuum approximation. <b>Click</b> a band to choose an energy, <b>scroll</b> to zoom, <b>drag</b> to pan.</p>
+    </section>
+
+    <section class="card">
+      <h2>Where the states live <small id="rInfo"></small>
+        <span class="tools">
+          <select class="btn" id="layerSel" aria-label="Layer shown"><option value="both">both layers</option><option value="0">layer 0</option><option value="1">layer 1</option></select>
+        </span>
+      </h2>
+      <canvas id="cReal" aria-label="Real-space local density of states over tiled moiré cells"></canvas>
+      <div class="chips" id="rChips"></div>
+      <p class="cap">Local density of states summed over eigenstates inside the amber energy window, at one moiré momentum. Dot area is the weight on each site. The background shading is the stacking registry: warm patches are AA-stacked, cool patches are AB or BA.</p>
+    </section>
+
+    <section class="card">
+      <h2>Flatness spectrum <small id="fInfo"></small></h2>
+      <canvas id="cFlat" aria-label="Bandwidth of each moiré band against its mean energy"></canvas>
+      <dl class="kv" id="fKV"></dl>
+    </section>
+
+    <section class="card wide">
+      <h2>Twist sweep <small id="sInfo">not run</small>
+        <span class="tools"><button class="btn primary" id="runSweep">Run sweep</button></span>
+      </h2>
+      <div class="two">
+        <canvas id="cSweep" aria-label="Width of the top-band manifold against twist angle"></canvas>
+        <div style="display:grid;gap:8px;align-content:start">
+          <dl class="kv" id="sKV"></dl>
+          <p class="cap">For each commensurate angle up to the chosen limit, the solver samples five moiré momenta (Γ, K, M and two generic points). It reports how wide the descendant of the monolayer top band is, how narrow its narrowest sub-band gets, and how many gapped pieces it breaks into. Five momenta give lower bounds on widths and can miss band touchings, so treat this as a screen, not a measurement.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+"use strict";
+/* =================================================================== solver core (runs inside each Web Worker) */
+function solverCore(self){
+  const SQ3=Math.sqrt(3);
+  function tred2(a,n,d,e,vec){
+    for(let i=n-1;i>0;i--){const l=i-1;let h=0,scale=0;const ri=i*n;
+      if(l>0){for(let k=0;k<=l;k++)scale+=Math.abs(a[ri+k]);
+        if(scale===0)e[i]=a[ri+l];
+        else{for(let k=0;k<=l;k++){a[ri+k]/=scale;h+=a[ri+k]*a[ri+k];}
+          let f=a[ri+l];let g=f>=0?-Math.sqrt(h):Math.sqrt(h);e[i]=scale*g;h-=f*g;a[ri+l]=f-g;f=0;
+          for(let j=0;j<=l;j++){const rj=j*n;if(vec)a[rj+i]=a[ri+j]/h;g=0;
+            for(let k=0;k<=j;k++)g+=a[rj+k]*a[ri+k];
+            for(let k=j+1;k<=l;k++)g+=a[k*n+j]*a[ri+k];
+            e[j]=g/h;f+=e[j]*a[ri+j];}
+          const hh=f/(h+h);
+          for(let j=0;j<=l;j++){const rj=j*n;f=a[ri+j];e[j]=g=e[j]-hh*f;for(let k=0;k<=j;k++)a[rj+k]-=(f*e[k]+g*a[ri+k]);}
+        }
+      }else e[i]=a[ri+l];
+      d[i]=h;}
+    if(vec)d[0]=0;e[0]=0;
+    for(let i=0;i<n;i++){const ri=i*n;
+      if(vec){if(d[i]!==0){for(let j=0;j<i;j++){let g=0;for(let k=0;k<i;k++)g+=a[ri+k]*a[k*n+j];for(let k=0;k<i;k++)a[k*n+j]-=g*a[k*n+i];}}
+        d[i]=a[ri+i];a[ri+i]=1;for(let j=0;j<i;j++){a[j*n+i]=0;a[ri+j]=0;}}
+      else d[i]=a[ri+i];}
+  }
+  function tqli(d,e,n,z){
+    for(let i=1;i<n;i++)e[i-1]=e[i];e[n-1]=0;
+    for(let l=0;l<n;l++){let iter=0,m;
+      do{for(m=l;m<n-1;m++){const dd=Math.abs(d[m])+Math.abs(d[m+1]);if(Math.abs(e[m])<=1e-15*dd)break;}
+        if(m!==l){if(iter++===60)break;
+          let g=(d[l+1]-d[l])/(2*e[l]),r=Math.hypot(g,1);g=d[m]-d[l]+e[l]/(g+(g>=0?r:-r));
+          let s=1,c=1,p=0,i;
+          for(i=m-1;i>=l;i--){let f=s*e[i];const b=c*e[i];e[i+1]=(r=Math.hypot(f,g));
+            if(r===0){d[i+1]-=p;e[m]=0;break;}
+            s=f/r;c=g/r;g=d[i+1]-p;r=(d[i]-g)*s+2*c*b;d[i+1]=g+(p=s*r);g=c*r-b;
+            if(z){for(let k=0;k<n;k++){const rk=k*n;f=z[rk+i+1];z[rk+i+1]=s*z[rk+i]+c*f;z[rk+i]=c*z[rk+i]-s*f;}}}
+          if(r===0&&i>=l)continue;
+          d[l]-=p;e[l]=g;e[m]=0;}
+      }while(m!==l);}
+  }
+  function build(p){
+    const m=p.m,N=3*m*m+3*m+1,th=Math.acos((3*m*m+3*m+.5)/N);
+    const rot=(v,a)=>[Math.cos(a)*v[0]-Math.sin(a)*v[1],Math.sin(a)*v[0]+Math.cos(a)*v[1]];
+    const S1=rot([m+(m+1)/2,(m+1)*SQ3/2],-th/2),S2=rot(S1,Math.PI/3),det=S1[0]*S2[1]-S1[1]*S2[0];
+    const frac=v=>[(v[0]*S2[1]-v[1]*S2[0])/det,(S1[0]*v[1]-S1[1]*v[0])/det];
+    const r=.5*(1+p.breath),subs=[[0,0],[r,0],[r/2,r*SQ3/2]],ang=[-th/2,th/2];
+    const X=[],Y=[],L=[],Q=[],R=Math.ceil(Math.hypot(S1[0],S1[1]))*2+3;
+    for(let l=0;l<2;l++){let cnt=0;
+      for(let i=-R;i<=R;i++)for(let j=-R;j<=R;j++){
+        const o=rot([i+j/2+(l?p.sx:0),j*SQ3/2+(l?p.sy:0)],ang[l]),f=frac(o);
+        if(f[0]>=-1e-9&&f[0]<1-1e-9&&f[1]>=-1e-9&&f[1]<1-1e-9){cnt++;
+          for(let q=0;q<3;q++){const s=rot(subs[q],ang[l]);X.push(o[0]+s[0]);Y.push(o[1]+s[1]);L.push(l);Q.push(q);}}}
+      if(cnt!==N)throw new Error('supercell has '+cnt+' cells, expected '+N);}
+    const n=X.length,tu=p.t*(1-p.breath),td=p.t*(1+p.breath),ph=p.flux*Math.PI/180/3;
+    const bi=[],bj=[],br=[],bim=[],bx=[],by=[];let nInter=0;
+    const cyc=(a,b)=>(a===0&&b===1)||(a===1&&b===2)||(a===2&&b===0);
+    const rc=Math.min(p.rc,4*p.xi+.05);
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+      const same=L[i]===L[j];if(same&&!cyc(Q[i],Q[j]))continue;if(!same&&L[i]!==0)continue;
+      for(let u=-1;u<=1;u++)for(let v=-1;v<=1;v++){
+        const dx=X[j]+u*S1[0]+v*S2[0]-X[i],dy=Y[j]+u*S1[1]+v*S2[1]-Y[i],d=Math.hypot(dx,dy);
+        if(same){let amp;if(Math.abs(d-r)<1e-6)amp=tu;else if(Math.abs(d-(1-r))<1e-6)amp=td;else continue;
+          bi.push(i);bj.push(j);br.push(-amp*Math.cos(ph));bim.push(-amp*Math.sin(ph));bx.push(dx);by.push(dy);}
+        else if(d<rc&&p.tp!==0){bi.push(i);bj.push(j);br.push(p.tp*Math.exp(-d*d/(2*p.xi*p.xi)));bim.push(0);bx.push(dx);by.push(dy);nInter++;}
+      }}
+    return {m,N,th,n,S1,S2,X,Y,L,Q,nInter,bi:Int32Array.from(bi),bj:Int32Array.from(bj),br:Float64Array.from(br),bim:Float64Array.from(bim),bx:Float64Array.from(bx),by:Float64Array.from(by)};
+  }
+  function hk(G,kx,ky,V){
+    const n=G.n,N2=2*n,A=new Float64Array(N2*N2);
+    for(let b=0;b<G.bi.length;b++){const i=G.bi[b],j=G.bj[b],ph=kx*G.bx[b]+ky*G.by[b],c=Math.cos(ph),s=Math.sin(ph);
+      const hr=G.br[b]*c-G.bim[b]*s,hi=G.br[b]*s+G.bim[b]*c;
+      A[j*N2+i]+=hr;A[(j+n)*N2+i+n]+=hr;A[(j+n)*N2+i]+=hi;A[j*N2+i+n]-=hi;
+      A[i*N2+j]+=hr;A[(i+n)*N2+j+n]+=hr;A[(i+n)*N2+j]-=hi;A[i*N2+j+n]+=hi;}
+    for(let i=0;i<n;i++){const v=G.L[i]?V/2:-V/2;A[i*N2+i]+=v;A[(i+n)*N2+i+n]+=v;}
+    return A;
+  }
+  const cache=new Map();
+  function getG(p){const k=[p.m,p.t,p.breath,p.flux,p.tp,p.xi,p.rc,p.sx,p.sy].join(',');let G=cache.get(k);
+    if(!G){G=build(p);cache.set(k,G);if(cache.size>3)cache.delete(cache.keys().next().value);}return G;}
+  self.onmessage=ev=>{
+    const t=ev.data;
+    try{
+      const G=getG(t.p),n=G.n,N2=2*n,t0=performance.now();
+      if(t.cmd==='geom'){
+        self.postMessage({type:'geom',gen:t.gen,job:t.job,g:{m:G.m,N:G.N,th:G.th,n,S1:G.S1,S2:G.S2,X:G.X,Y:G.Y,L:G.L,Q:G.Q,nInter:G.nInter,nIntra:G.bi.length-G.nInter}});return;}
+      const A=hk(G,t.k[0],t.k[1],t.p.V),d=new Float64Array(N2),e=new Float64Array(N2),vec=t.cmd==='vecs';
+      tred2(A,N2,d,e,vec);tqli(d,e,N2,vec?A:null);
+      const ord=Array.from(d.keys()).sort((a,b)=>d[a]-d[b]),ev2=new Float64Array(n);
+      for(let j=0;j<n;j++)ev2[j]=(d[ord[2*j]]+d[ord[2*j+1]])/2;
+      const out={type:t.cmd,gen:t.gen,job:t.job,idx:t.idx,ev:ev2,ms:performance.now()-t0};
+      if(vec){const w=new Float32Array(n*n);
+        for(let j=0;j<n;j++)for(const q of [ord[2*j],ord[2*j+1]])for(let i=0;i<n;i++){const a=A[i*N2+q],b=A[(i+n)*N2+q];w[j*n+i]+=(a*a+b*b)/2;}
+        out.w=w;}
+      self.postMessage(out);
+    }catch(err){self.postMessage({type:'error',gen:t.gen,job:t.job,msg:String(err&&err.message||err)});}
+  };
+}
+
+/* =================================================================== helpers */
+const SQ3=Math.sqrt(3),TAU=2*Math.PI,D2R=Math.PI/180;
+const $=id=>document.getElementById(id);
+const clamp=(x,a,b)=>x<a?a:x>b?b:x;
+const thetaOf=m=>Math.acos((3*m*m+3*m+.5)/(3*m*m+3*m+1))/D2R;
+const cellsOf=m=>3*m*m+3*m+1;
+const C={};
+function readTokens(){const cs=getComputedStyle(document.documentElement);
+  ['bg','panel','stage','ink','muted','line','soft','accent','l0','l1','flat','ghost','win','hot','cool'].forEach(k=>C[k]=cs.getPropertyValue('--'+k).trim()||'#888');}
+function rgb(hx){let h=hx.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+const rgba=(hx,a)=>{const c=rgb(hx);return `rgba(${c[0]},${c[1]},${c[2]},${clamp(a,0,1).toFixed(3)})`;};
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+function fit(c){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),w=Math.max(10,r.width),h=Math.max(10,r.height);
+  if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}
+  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return [x,w,h];}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r)));const m=r/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+const fmtE=v=>Math.abs(v)<1e-3&&v!==0?v.toExponential(1):v.toFixed(Math.abs(v)<.1?4:3);
+
+/* =================================================================== parameters */
+const SPEC=[
+ {sec:'Commensurate supercell',note:'Twist angles where both lattices repeat exactly: cos θ = (3m²+3m+½)/(3m²+3m+1). Each layer contributes 3m²+3m+1 kagome cells, three sites each.',ps:[
+  {k:'m',l:'Index <i>m</i>',min:1,max:7,step:1,v:3,f:v=>`m = ${v}`,heavy:true},
+ ]},
+ {sec:'Kagome sheets',note:'Nearest-neighbour hopping −t. With Φ = 0 and δ = 0 each sheet has an exactly flat band at E = 2t; the bilayer folds it into 2N moiré bands, the top-band manifold.',ps:[
+  {k:'t',l:'Hopping <i>t</i>',min:.2,max:2,step:.05,v:1,f:v=>v.toFixed(2)},
+  {k:'breath',l:'Breathing <i>δ</i>',min:-.4,max:.4,step:.01,v:0,f:v=>v.toFixed(2),hint:'t▲ = t(1−δ), t▽ = t(1+δ); up triangles scale by 1+δ.'},
+  {k:'flux',l:'Flux per triangle <i>Φ</i>',min:0,max:360,step:1,v:0,f:v=>v+'°',hint:'Breaks time reversal and bends the flat band into a Chern band.'},
+ ]},
+ {sec:'Interlayer coupling',note:'Hopping t⊥·exp(−ρ²/2ξ²) between sites of opposite layers at in-plane distance ρ, cut off at r_c. AA patches, where sites sit on top of each other, couple hardest.',ps:[
+  {k:'tp',l:'Interlayer <i>t</i>⊥',min:-1,max:1,step:.01,v:.35,f:v=>v.toFixed(2)},
+  {k:'xi',l:'Decay length <i>ξ</i>',min:.08,max:.6,step:.01,v:.25,f:v=>v.toFixed(2)+' a'},
+  {k:'rc',l:'Cutoff <i>r</i><sub>c</sub>',min:.2,max:1.2,step:.05,v:.8,f:v=>v.toFixed(2)+' a',hint:'Capped at 4ξ, since longer hoppings are numerically zero.'},
+  {k:'V',l:'Interlayer bias <i>V</i>',min:-1,max:1,step:.01,v:0,f:v=>v.toFixed(2),hint:'Layer 0 at −V/2, layer 1 at +V/2 (a displacement field).'},
+  {k:'sx',l:'Layer-1 slide <i>x</i>',min:0,max:1,step:.05,v:0,f:v=>v.toFixed(2)+' a'},
+  {k:'sy',l:'Layer-1 slide <i>y</i>',min:0,max:1,step:.05,v:0,f:v=>v.toFixed(2)+' a',hint:'A slide keeps the cell commensurate but moves the AA patches.'},
+ ]},
+ {sec:'Sampling',ps:[
+  {k:'nseg',l:'k-points per path segment',min:4,max:40,step:1,v:14,f:v=>v},
+  {k:'nk',l:'DOS grid',min:0,max:8,step:1,v:4,f:v=>v?`${v}×${v}`:'off'},
+  {k:'eta',l:'DOS broadening <i>η</i>',min:.001,max:.1,step:.001,v:.008,f:v=>v.toFixed(3),light:true},
+  {k:'ghost',l:'Also solve decoupled layers (t⊥ = 0) as grey reference bands',type:'check',v:true},
+ ]},
+ {sec:'Local density of states',ps:[
+  {k:'kL',l:'Momentum',type:'select',v:'G',opts:[['G','Γ'],['K','K'],['M','M']]},
+  {k:'win',l:'Window half-width',min:.0005,max:.2,step:.0005,v:.01,f:v=>'±'+v.toFixed(4),light:true},
+  {k:'tiles',l:'Tiles',min:1,max:4,step:1,v:2,f:v=>`${v}×${v}`,light:true},
+ ]},
+ {sec:'Twist sweep',ps:[
+  {k:'mmax',l:'Largest index',min:2,max:7,step:1,v:5,f:v=>`m ≤ ${v} · θ ≥ ${thetaOf(v).toFixed(2)}°`,light:true},
+ ]},
+];
+const PS={};SPEC.forEach(s=>s.ps.forEach(p=>PS[p.k]=p));
+const P={};for(const k in PS)P[k]=PS[k].v;
+function estMs(m){const n2=2*3*2*cellsOf(m);return 1e-6*n2*n2*n2;}
+
+function buildControls(){
+  const host=$('controls');
+  host.innerHTML=SPEC.map(s=>`<div class="sec"><h3>${s.sec}</h3>${s.note?`<p class="note">${s.note}</p>`:''}${s.ps.map(p=>{
+    const id='p-'+p.k;
+    if(p.type==='select')return `<div class="prm"><label for="${id}">${p.l}</label><select id="${id}">${p.opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div>`;
+    if(p.type==='check')return `<div class="prm chk"><input type="checkbox" id="${id}"><label for="${id}">${p.l}</label></div>`;
+    return `<div class="prm"><label for="${id}">${p.l}</label><output id="o-${p.k}"></output><input type="range" id="${id}" min="${p.min}" max="${p.max}" step="${p.step}">${p.hint?`<div class="hint">${p.hint}</div>`:''}</div>`;
+  }).join('')}${s.sec==='Commensurate supercell'?'<div class="angles" id="angles"></div><p class="note" id="cost"></p>':''}</div>`).join('');
+  for(const k in PS){const p=PS[k],el=$('p-'+k);
+    if(p.type==='check')el.checked=P[k];else el.value=P[k];
+    el.addEventListener(p.type?'change':'input',()=>{P[k]=p.type==='check'?el.checked:p.type==='select'?el.value:+el.value;out(k);changed(p);});
+    out(k);}
+  $('angles').innerHTML='<span>m</span><span>θ</span><span>sites</span><span>matrix</span>'+[1,2,3,4,5,6,7].map(m=>`<${m===P.m?'b':'span'}>${m}</${m===P.m?'b':'span'}><${m===P.m?'b':'span'}>${thetaOf(m).toFixed(2)}°</${m===P.m?'b':'span'}><span>${6*cellsOf(m)}</span><span>${12*cellsOf(m)}²</span>`).join('');
+}
+function out(k){const o=$('o-'+k);if(o)o.textContent=PS[k].f(P[k]);
+  if(k==='m'){const a=$('angles');if(a)buildAngles();const ms=estMs(P.m),kpts=3*P.nseg+1+(P.nk*P.nk);
+    $('cost').textContent=`About ${ms<1000?Math.round(ms)+' ms':(ms/1000).toFixed(1)+' s'} per momentum on one core, ${kpts} momenta per run${P.ghost?' (twice, with the reference)':''}, spread over ${NW} worker${NW>1?'s':''}.`+(P.m>=6?' Heavy: expect a few minutes.':'');}}
+function buildAngles(){$('angles').innerHTML='<span>m</span><span>θ</span><span>sites</span><span>matrix</span>'+[1,2,3,4,5,6,7].map(m=>{const t=m===P.m?'b':'span';return `<${t}>${m}</${t}><${t}>${thetaOf(m).toFixed(2)}°</${t}><${t}>${6*cellsOf(m)}</${t}><${t}>${12*cellsOf(m)}²</${t}>`;}).join('');}
+let recomputeTimer=0;
+function changed(p){
+  if(p.light){if(p.k==='win'||p.k==='tiles')drawReal();if(p.k==='eta')drawBands();if(p.k==='mmax')drawSweep();return;}
+  if(p.k==='kL'){requestVecs();return;}
+  if(p.k==='nseg'||p.k==='nk'||p.k==='ghost')out('m');
+  clearTimeout(recomputeTimer);recomputeTimer=setTimeout(recompute,180);
+}
+
+/* =================================================================== worker pool */
+let NW=1;const pool=[];let queue=[];let gen=0;
+function makePool(){
+  NW=clamp((navigator.hardwareConcurrency||4)-1,1,6);
+  try{
+    const url=URL.createObjectURL(new Blob([`(${solverCore.toString()})(self);`],{type:'text/javascript'}));
+    for(let i=0;i<NW;i++){const w=new Worker(url),slot={w,busy:false,task:null};
+      w.onmessage=e=>onResult(slot,e.data);w.onerror=e=>{slot.busy=false;showErr('Worker error: '+(e.message||'unknown'));pump();};pool.push(slot);}
+  }catch(err){
+    // inline fallback: same code, on the main thread, one task per timer tick
+    NW=1;pool.length=0;const fake={postMessage:m=>onResult(slot,m)},slot={busy:false,task:null};solverCore(fake);
+    slot.w={postMessage:t=>setTimeout(()=>fake.onmessage({data:t}),0)};pool.push(slot);
+  }
+}
+function enqueue(t){t.gen=gen;queue.push(t);pump();}
+function pump(){for(const s of pool){if(!s.busy&&queue.length){const t=queue.shift();s.busy=true;s.task=t;s.w.postMessage(t);}}}
+function onResult(slot,msg){slot.busy=false;slot.task=null;pump();
+  if(msg.gen!==gen&&msg.job!=='sweep')return;
+  if(msg.job==='sweep'&&msg.gen!==SW.gen)return;
+  handle(msg);}
+$('stop').addEventListener('click',()=>{queue=[];gen++;SW.gen=-1;setProg();$('progTxt').textContent='stopped';});
+
+/* =================================================================== state + jobs */
+let GEO=null;
+const ST={path:null,ghost:null,dos:null,vec:null,stats:null,err:null,msPerK:[]};
+let view={mode:'manifold',lo:0,hi:1};
+function physP(over){return {m:P.m,t:P.t,breath:P.breath,flux:P.flux,tp:P.tp,xi:P.xi,rc:P.rc,sx:P.sx,sy:P.sy,V:P.V,...(over||{})};}
+function recip(S1,S2){const det=S1[0]*S2[1]-S1[1]*S2[0];return [[TAU*S2[1]/det,-TAU*S2[0]/det],[-TAU*S1[1]/det,TAU*S1[0]/det]];}
+function hsPoints(S1,S2){const [b1,b2]=recip(S1,S2);
+  return {G:[0,0],K:[(2*b1[0]+b2[0])/3,(2*b1[1]+b2[1])/3],M:[(b1[0]+b2[0])/2,(b1[1]+b2[1])/2],b1,b2};}
+function pathKs(S1,S2,nseg){const H=hsPoints(S1,S2),pts=[H.G,H.K,H.M,H.G],ks=[],xs=[],ticks=[0];
+  const seg=[0,1,2].map(a=>Math.hypot(pts[a+1][0]-pts[a][0],pts[a+1][1]-pts[a][1])),tl=seg.reduce((a,b)=>a+b,0);let acc=0;
+  for(let a=0;a<3;a++){const ns=Math.max(2,Math.round(nseg*seg[a]/(tl/3)));
+    for(let s=0;s<ns+(a===2?1:0);s++){const u=s/ns;ks.push([pts[a][0]+u*(pts[a+1][0]-pts[a][0]),pts[a][1]+u*(pts[a+1][1]-pts[a][1])]);xs.push((acc+u*seg[a])/tl);}
+    acc+=seg[a];ticks.push(acc/tl);}
+  return {ks,xs,ticks};}
+let runStart=0,totalTasks=0,doneTasks=0;
+function recompute(){
+  gen++;queue=queue.filter(t=>t.job==="sweep");ST.err=null;ST.msPerK=[];
+  ST.path=ST.ghost=ST.dos=ST.vec=ST.stats=null;ST.E0=null;GEO=null;doneTasks=0;totalTasks=0;runStart=performance.now();
+  enqueue({cmd:'geom',job:'geom',p:physP()});totalTasks++;
+  setProg();drawAll();
+}
+function startJobs(){
+  const {ks,xs,ticks}=pathKs(GEO.S1,GEO.S2,P.nseg);
+  ST.path={ks,xs,ticks,ev:new Array(ks.length).fill(null)};
+  ks.forEach((k,i)=>enqueue({cmd:'evals',job:'path',idx:i,k,p:physP()}));totalTasks+=ks.length;
+  requestVecs(true);
+  if(P.nk>0){const H=hsPoints(GEO.S1,GEO.S2),dk=[];
+    for(let i=0;i<P.nk;i++)for(let j=0;j<P.nk;j++){const u=(i+.5)/P.nk,v=(j+.5)/P.nk;dk.push([u*H.b1[0]+v*H.b2[0],u*H.b1[1]+v*H.b2[1]]);}
+    ST.dos={ev:new Array(dk.length).fill(null)};dk.forEach((k,i)=>enqueue({cmd:'evals',job:'dos',idx:i,k,p:physP()}));totalTasks+=dk.length;}
+  if(P.ghost&&P.tp!==0){ST.ghost={ev:new Array(ks.length).fill(null)};ks.forEach((k,i)=>enqueue({cmd:'evals',job:'ghost',idx:i,k,p:physP({tp:0})}));totalTasks+=ks.length;}
+  setProg();
+}
+function requestVecs(initial){
+  if(!GEO)return;const H=hsPoints(GEO.S1,GEO.S2),k=H[P.kL];ST.vec=null;
+  if(initial){enqueue({cmd:'vecs',job:'vecs',k,p:physP()});totalTasks++;}
+  else{queue.unshift({cmd:'vecs',job:'vecs',k,p:physP(),gen});totalTasks++;pump();}
+  setProg();drawReal();
+}
+function handle(msg){
+  if(msg.type==='error'){ST.err=msg.msg;showErr(msg.msg);return;}
+  doneTasks++;
+  if(msg.type==='geom'){GEO=msg.g;GEO.reg=registry(GEO);if(view.mode!=='custom')view.mode=view.mode;startJobs();updateSub();drawReal();}
+  else if(msg.job==='path'){ST.path.ev[msg.idx]=msg.ev;ST.msPerK.push(msg.ms);schedule();}
+  else if(msg.job==='ghost'){if(ST.ghost)ST.ghost.ev[msg.idx]=msg.ev;schedule();}
+  else if(msg.job==='dos'){if(ST.dos)ST.dos.ev[msg.idx]=msg.ev;schedule();}
+  else if(msg.job==='vecs'){ST.vec={ev:msg.ev,w:msg.w,k:P.kL};if(ST.E0==null)ST.E0=null;schedule();}
+  else if(msg.job==='sweep'){sweepResult(msg);}
+  setProg();
+}
+let drawPending=false;
+function schedule(){if(drawPending)return;drawPending=true;requestAnimationFrame(()=>{drawPending=false;computeStats();drawAll();});}
+function setProg(){
+  const busy=pool.some(s=>s.busy)||queue.length>0,frac=totalTasks?doneTasks/totalTasks:0;
+  $('progBar').style.width=(100*(busy?frac:1))+'%';
+  const ms=ST.msPerK.length?ST.msPerK.reduce((a,b)=>a+b,0)/ST.msPerK.length:0;
+  $('progTxt').textContent=busy?`solving ${doneTasks}/${totalTasks}${ms?` · ${(ms/1000).toFixed(2)} s per k · ${NW} worker${NW>1?'s':''}`:''}`:
+    (totalTasks?`done in ${((performance.now()-runStart)/1000).toFixed(1)} s`:'idle');
+}
+function showErr(m){$('progTxt').textContent='error: '+m;}
+function updateSub(){if(!GEO)return;$('subline').textContent=`θ = ${(GEO.th/D2R).toFixed(3)}° · L_M = ${Math.hypot(...GEO.S1).toFixed(2)} a · ${GEO.N} cells per layer · ${GEO.n} sites · ${2*GEO.n}×${2*GEO.n} real-symmetric problem · ${GEO.nInter} interlayer hoppings`;}
+
+/* =================================================================== registry (AA / AB map) */
+function registry(g){
+  const th=g.th,a=[-th/2,th/2],b=[[TAU,-TAU/SQ3],[0,2*TAU/SQ3]];b.push([-b[0][0]-b[1][0],-b[0][1]-b[1][1]]);
+  const rot=(v,t)=>[Math.cos(t)*v[0]-Math.sin(t)*v[1],Math.sin(t)*v[0]+Math.cos(t)*v[1]];
+  const G0=b.map(v=>rot(v,a[0])),G1=b.map(v=>rot(v,a[1])),sh=rot([P.sx,P.sy],a[1]);
+  const f=(x,y)=>{let s=0;for(let m=0;m<3;m++)s+=Math.cos((G0[m][0]-G1[m][0])*x+(G0[m][1]-G1[m][1])*y+G1[m][0]*sh[0]+G1[m][1]*sh[1]);return s;};
+  const site=new Float32Array(g.n);for(let i=0;i<g.n;i++)site[i]=f(g.X[i],g.Y[i]);
+  return {f,site};
+}
+
+/* =================================================================== statistics */
+function computeStats(){
+  if(!GEO||!ST.path)return;const n=GEO.n,N=GEO.N,lo=new Float64Array(n).fill(Infinity),hi=new Float64Array(n).fill(-Infinity);let cnt=0;
+  const acc=arr=>arr&&arr.forEach(ev=>{if(!ev)return;cnt++;for(let b=0;b<n;b++){if(ev[b]<lo[b])lo[b]=ev[b];if(ev[b]>hi[b])hi[b]=ev[b];}});
+  acc(ST.path.ev);acc(ST.dos&&ST.dos.ev);if(!cnt){ST.stats=null;return;}
+  const m0=n-2*N,tol=1e-3*P.t;
+  const manLo=lo[m0],manHi=hi[n-1];let groups=1,bigGap=0,narrow=Infinity,narrowB=-1;
+  for(let b=m0;b<n;b++){const w=hi[b]-lo[b];if(w<narrow){narrow=w;narrowB=b;}
+    if(b<n-1){const g=lo[b+1]-hi[b];if(g>tol){groups++;bigGap=Math.max(bigGap,g);}}}
+  const gapBelow=m0>0?lo[m0]-hi[m0-1]:NaN;
+  ST.stats={lo,hi,m0,manLo,manHi,groups,bigGap,narrow,narrowB,gapBelow,cnt};
+}
+
+/* =================================================================== band plot */
+const cB=$('cBands'),cD=$('cDos');
+function energyRange(){
+  const s=ST.stats;if(!s)return [-4.5*P.t,2.5*P.t];
+  if(view.mode==='custom')return [view.lo,view.hi];
+  let a,b;if(view.mode==='full'){a=Infinity;b=-Infinity;for(let q=0;q<s.lo.length;q++){a=Math.min(a,s.lo[q]);b=Math.max(b,s.hi[q]);}}
+  else{a=s.manLo;b=s.manHi;}
+  const pad=Math.max((b-a)*.12,.004*P.t);return [a-pad,b+pad];
+}
+let bandMap=null;
+function drawBands(){
+  const [x,w,h]=fit(cB),pl=46,pr=8,pt=10,pb=22;
+  const [lo,hi]=energyRange();view.lo=lo;view.hi=hi;
+  const X=u=>pl+u*(w-pl-pr),Y=e=>pt+(hi-e)/(hi-lo)*(h-pt-pb);
+  bandMap={pl,pr,pt,pb,w,h,lo,hi};
+  x.font='10px '+getComputedStyle(document.body).getPropertyValue('--f-mono');
+  x.fillStyle=C.muted;x.strokeStyle=C.soft;x.lineWidth=1;
+  if(!ST.path){x.fillText(GEO?'diagonalising…':'building supercell…',pl+8,pt+16);drawDos(lo,hi);return;}
+  const step=niceStep((hi-lo)/6);x.textAlign='right';
+  for(let v=Math.ceil(lo/step)*step;v<=hi+1e-12;v+=step){const y=Y(v);x.beginPath();x.moveTo(pl,y);x.lineTo(w-pr,y);x.stroke();x.fillText((+v.toPrecision(6)).toString(),pl-5,y+3);}
+  x.textAlign='center';
+  ['Γ','K','M','Γ'].forEach((t,i)=>{const xx=X(ST.path.ticks[i]);x.strokeStyle=C.line;x.beginPath();x.moveTo(xx,pt);x.lineTo(xx,h-pb);x.stroke();x.fillStyle=C.muted;x.fillText(t,xx,h-6);});
+  x.save();x.translate(11,(pt+h-pb)/2);x.rotate(-Math.PI/2);x.fillText('E / t',0,0);x.restore();
+  // window
+  if(ST.E0!=null){x.fillStyle=rgba(C.win,.16);const y1=Y(ST.E0+P.win),y2=Y(ST.E0-P.win);x.fillRect(pl,y1,w-pl-pr,Math.max(1,y2-y1));
+    x.strokeStyle=rgba(C.win,.8);x.setLineDash([4,3]);x.beginPath();x.moveTo(pl,Y(ST.E0));x.lineTo(w-pr,Y(ST.E0));x.stroke();x.setLineDash([]);}
+  x.save();x.beginPath();x.rect(pl,pt,w-pl-pr,h-pt-pb);x.clip();
+  const n=GEO.n,xs=ST.path.xs,s=ST.stats;
+  const visible=b=>s?!(s.hi[b]<lo||s.lo[b]>hi):true;
+  const line=(evs,b)=>{x.beginPath();let pen=false;for(let i=0;i<evs.length;i++){const ev=evs[i];if(!ev){pen=false;continue;}const px=X(xs[i]),py=Y(ev[b]);pen?x.lineTo(px,py):x.moveTo(px,py);pen=true;}x.stroke();};
+  if(ST.ghost){x.strokeStyle=rgba(C.ghost,.75);x.lineWidth=1;x.setLineDash([2,3]);for(let b=0;b<n;b++)line(ST.ghost.ev,b);x.setLineDash([]);}
+  const m0=s?s.m0:n-2*GEO.N;
+  for(let b=0;b<n;b++){if(!visible(b))continue;
+    if(b>=m0){const wdt=s?s.hi[b]-s.lo[b]:1,fl=s?clamp(1-Math.log10(Math.max(wdt/P.t,1e-6)+1e-12)/-5,0,1):0;
+      x.strokeStyle=rgba(C.flat,.55+.45*(1-fl));x.lineWidth=1.5;}
+    else{x.strokeStyle=rgba(C.ink,.55);x.lineWidth=1.1;}
+    line(ST.path.ev,b);}
+  // done markers
+  ST.path.ev.forEach((ev,i)=>{if(!ev){x.fillStyle=rgba(C.muted,.3);x.fillRect(X(xs[i])-1,h-pb-3,2,3);}});
+  x.restore();
+  drawDos(lo,hi);
+}
+function drawDos(lo,hi){
+  const [x,w,h]=fit(cD),pt=10,pb=22,Y=e=>pt+(hi-e)/(hi-lo)*(h-pt-pb);
+  x.fillStyle=C.muted;x.font='10px '+getComputedStyle(document.body).getPropertyValue('--f-mono');x.textAlign='center';x.fillText('DOS',w/2,h-6);
+  x.strokeStyle=C.line;x.beginPath();x.moveTo(.5,pt);x.lineTo(.5,h-pb);x.stroke();
+  if(!ST.dos||!GEO)return;
+  const evs=ST.dos.ev.filter(Boolean);if(!evs.length){x.fillText('…',w/2,h/2);return;}
+  const R=260,dE=(hi-lo)/R,eta=Math.max(P.eta,dE*.6),D=new Float64Array(R+1),n=GEO.n,cut=5*eta;
+  for(const ev of evs)for(let b=0;b<n;b++){const e=ev[b];if(e<lo-cut||e>hi+cut)continue;
+    const i0=Math.max(0,Math.floor((e-cut-lo)/dE)),i1=Math.min(R,Math.ceil((e+cut-lo)/dE));
+    for(let i=i0;i<=i1;i++){const z=(lo+i*dE-e)/eta;D[i]+=Math.exp(-.5*z*z);}}
+  const norm=1/(evs.length*n*eta*Math.sqrt(TAU));let mx=0;for(let i=0;i<=R;i++){D[i]*=norm;mx=Math.max(mx,D[i]);}
+  if(!(mx>0))return;
+  x.fillStyle=rgba(C.flat,.25);x.strokeStyle=C.flat;x.lineWidth=1.2;x.beginPath();x.moveTo(1,Y(lo));
+  for(let i=0;i<=R;i++)x.lineTo(1+(w-6)*D[i]/mx,Y(lo+i*dE));x.lineTo(1,Y(hi));x.closePath();x.fill();
+  x.beginPath();for(let i=0;i<=R;i++){const px=1+(w-6)*D[i]/mx,py=Y(lo+i*dE);i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
+  x.textAlign='right';x.fillStyle=C.muted;x.fillText(`${evs.length}/${ST.dos.ev.length} k`,w-3,pt+9);
+  if(ST.E0!=null){x.fillStyle=rgba(C.win,.16);const y1=Y(ST.E0+P.win),y2=Y(ST.E0-P.win);x.fillRect(0,y1,w,Math.max(1,y2-y1));}
+}
+// band interactions
+let bDrag=null;
+cB.addEventListener('pointerdown',e=>{if(!bandMap)return;bDrag={y:e.clientY,lo:view.lo,hi:view.hi,moved:0};cB.setPointerCapture(e.pointerId);});
+cB.addEventListener('pointermove',e=>{if(!bDrag)return;const dy=e.clientY-bDrag.y;bDrag.moved=Math.max(bDrag.moved,Math.abs(dy));
+  if(bDrag.moved>3){const m=bandMap,dE=dy/(m.h-m.pt-m.pb)*(bDrag.hi-bDrag.lo);view={mode:'custom',lo:bDrag.lo+dE,hi:bDrag.hi+dE};setViewBtns();drawBands();}});
+cB.addEventListener('pointerup',e=>{if(bDrag&&bDrag.moved<=3&&bandMap){const r=cB.getBoundingClientRect(),m=bandMap,yy=e.clientY-r.top;
+  ST.E0=m.hi-(yy-m.pt)/(m.h-m.pt-m.pb)*(m.hi-m.lo);drawBands();drawReal();drawFlat();}bDrag=null;});
+cB.addEventListener('wheel',e=>{if(!bandMap)return;e.preventDefault();const r=cB.getBoundingClientRect(),m=bandMap,yy=e.clientY-r.top;
+  const ec=m.hi-(yy-m.pt)/(m.h-m.pt-m.pb)*(m.hi-m.lo),f=Math.exp(e.deltaY*.0015);
+  view={mode:'custom',lo:ec-(ec-m.lo)*f,hi:ec+(m.hi-ec)*f};setViewBtns();drawBands();},{passive:false});
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.view;
+  if(v==='zin'||v==='zout'){const c=(view.lo+view.hi)/2,hw=(view.hi-view.lo)/2*(v==='zin'?.5:2);view={mode:'custom',lo:c-hw,hi:c+hw};}
+  else view={mode:v,lo:view.lo,hi:view.hi};
+  setViewBtns();drawBands();}));
+function setViewBtns(){document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('on',b.dataset.view===view.mode));}
+
+/* =================================================================== real-space LDOS */
+const cR=$('cReal');
+let regImg=null,regKey='';
+function drawReal(){
+  const [x,w,h]=fit(cR);
+  x.font='11px '+getComputedStyle(document.body).getPropertyValue('--f-ui');x.fillStyle=C.muted;
+  if(!GEO){x.fillText('building supercell…',10,20);return;}
+  const g=GEO,T=P.tiles,S1=g.S1,S2=g.S2;
+  // bounding box of tiled cells
+  const corners=[[0,0],[T,0],[0,T],[T,T]].map(([u,v])=>[u*S1[0]+v*S2[0],u*S1[1]+v*S2[1]]);
+  const minX=Math.min(...corners.map(c=>c[0])),maxX=Math.max(...corners.map(c=>c[0])),minY=Math.min(...corners.map(c=>c[1])),maxY=Math.max(...corners.map(c=>c[1]));
+  const sc=Math.min((w-16)/(maxX-minX),(h-16)/(maxY-minY)),ox=(w-(maxX-minX)*sc)/2-minX*sc,oy=(h+(maxY-minY)*sc)/2+minY*sc;
+  const PX=xx=>ox+xx*sc,PY=yy=>oy-yy*sc;
+  // registry background
+  const key=[w,h,T,g.m,P.sx,P.sy,C.bg,C.hot].join('|');
+  if(key!==regKey){const res=110,img=x.createImageData(res,Math.round(res*h/w)),rh=img.height,base=rgb(C.stage),hot=rgb(C.hot),cool=rgb(C.cool);
+    for(let j=0;j<rh;j++)for(let i=0;i<res;i++){const wx=((i+.5)/res*w-ox)/sc,wy=(oy-(j+.5)/rh*h)/sc,f=g.reg.f(wx,wy);
+      const u=(f+1.5)/4.5,c=u>.5?mix(base,hot,(u-.5)*1.1):mix(base,cool,(.5-u)*.9),o=(j*res+i)*4;img.data[o]=c[0];img.data[o+1]=c[1];img.data[o+2]=c[2];img.data[o+3]=255;}
+    const off=document.createElement('canvas');off.width=res;off.height=rh;off.getContext('2d').putImageData(img,0,0);regImg=off;regKey=key;}
+  x.imageSmoothingEnabled=true;x.drawImage(regImg,0,0,w,h);
+  // cell outlines
+  x.strokeStyle=rgba(C.ink,.35);x.setLineDash([3,3]);x.lineWidth=1;
+  for(let u=0;u<T;u++)for(let v=0;v<T;v++){const o=[u*S1[0]+v*S2[0],u*S1[1]+v*S2[1]];x.beginPath();x.moveTo(PX(o[0]),PY(o[1]));
+    x.lineTo(PX(o[0]+S1[0]),PY(o[1]+S1[1]));x.lineTo(PX(o[0]+S1[0]+S2[0]),PY(o[1]+S1[1]+S2[1]));x.lineTo(PX(o[0]+S2[0]),PY(o[1]+S2[1]));x.closePath();x.stroke();}
+  x.setLineDash([]);
+  // weights
+  let wt=null,nStates=0;
+  if(ST.vec&&ST.E0!=null){wt=new Float64Array(g.n);const ev=ST.vec.ev;
+    for(let j=0;j<g.n;j++){if(Math.abs(ev[j]-ST.E0)>P.win)continue;nStates++;for(let i=0;i<g.n;i++)wt[i]+=ST.vec.w[j*g.n+i];}
+    if(!nStates)wt=null;}
+  const lay=$('layerSel').value;let mx=0;if(wt)for(let i=0;i<g.n;i++)mx=Math.max(mx,wt[i]);
+  const rmax=clamp(sc*.42,2.5,14),rdot=Math.max(.7,sc*.06);
+  for(let u=0;u<T;u++)for(let v=0;v<T;v++){const dx=u*S1[0]+v*S2[0],dy=u*S1[1]+v*S2[1];
+    for(let i=0;i<g.n;i++){if(lay!=='both'&&String(g.L[i])!==lay)continue;const px=PX(g.X[i]+dx),py=PY(g.Y[i]+dy);
+      if(px<-5||px>w+5||py<-5||py>h+5)continue;
+      if(wt&&wt[i]>0){const r=rmax*Math.sqrt(wt[i]/mx);if(r>.4){x.fillStyle=rgba(g.L[i]?C.l1:C.l0,.78);x.beginPath();x.arc(px,py,r,0,TAU);x.fill();}}
+      else{x.fillStyle=rgba(C.ink,.22);x.fillRect(px-rdot/2,py-rdot/2,rdot,rdot);}}}
+  // stats
+  const chips=[];
+  $('rInfo').textContent=ST.vec?`k = ${({G:'Γ',K:'K',M:'M'})[ST.vec.k]}`:'eigenvectors pending';
+  if(!ST.vec)chips.push('<span class="chip">computing eigenvectors…</span>');
+  else if(ST.E0==null)chips.push('<span class="chip hl">Click the band plot to choose an energy</span>');
+  else if(!wt)chips.push(`<span class="chip">No states within ±${P.win} of E = ${ST.E0.toFixed(4)} at this k. Widen the window or click on a band.</span>`);
+  else{let s=0,s2=0,l1=0,aa=0,aaSites=0;for(let i=0;i<g.n;i++){s+=wt[i];s2+=wt[i]*wt[i];if(g.L[i])l1+=wt[i];if(g.reg.site[i]>1.5){aa+=wt[i];aaSites++;}}
+    const pr=s*s/(g.n*s2),aaShare=aa/s,aaBase=aaSites/g.n;
+    chips.push(`<span class="chip">E = <b>${ST.E0.toFixed(4)}</b> ± ${P.win}</span>`,`<span class="chip">states <b>${nStates}</b></span>`,
+      `<span class="chip">participation <b>${(100*pr).toFixed(1)}%</b> of sites</span>`,`<span class="chip">layer 1 share <b>${(100*l1/s).toFixed(1)}%</b></span>`,
+      `<span class="chip ${aaBase&&aaShare/aaBase>1.3?'hl':''}">AA-patch weight <b>${(100*aaShare).toFixed(1)}%</b> vs ${(100*aaBase).toFixed(1)}% of sites${aaBase?` (×${(aaShare/aaBase).toFixed(2)})`:''}</span>`);}
+  $('rChips').innerHTML=chips.join('');
+}
+$('layerSel').addEventListener('change',drawReal);
+
+/* =================================================================== flatness scatter */
+const cF=$('cFlat');
+function drawFlat(){
+  const [x,w,h]=fit(cF),pl=40,pr=8,pt=8,pb=34,s=ST.stats;
+  x.font='10px '+getComputedStyle(document.body).getPropertyValue('--f-mono');x.fillStyle=C.muted;
+  if(!s){x.fillText('waiting for bands…',pl,pt+14);$('fKV').innerHTML='';$('fInfo').textContent='';return;}
+  const n=s.lo.length;let eLo=Infinity,eHi=-Infinity;for(let b=0;b<n;b++){eLo=Math.min(eLo,s.lo[b]);eHi=Math.max(eHi,s.hi[b]);}
+  const yMin=-6,yMax=1,X=e=>pl+(e-eLo)/(eHi-eLo)*(w-pl-pr),Y=v=>pt+(yMax-v)/(yMax-yMin)*(h-pt-pb);
+  x.strokeStyle=C.soft;x.textAlign='right';
+  for(let v=yMin;v<=yMax;v++){x.beginPath();x.moveTo(pl,Y(v));x.lineTo(w-pr,Y(v));x.stroke();x.fillText(v===0?'1':`1e${v}`,pl-4,Y(v)+3);}
+  x.textAlign='center';const st=niceStep((eHi-eLo)/5);for(let v=Math.ceil(eLo/st)*st;v<=eHi;v+=st)x.fillText((+v.toPrecision(4)).toString(),X(v),h-pb+13);
+  x.fillText('mean energy / t',(pl+w-pr)/2,h-3);
+  x.save();x.translate(9,(pt+h-pb)/2);x.rotate(-Math.PI/2);x.fillText('bandwidth / t',0,0);x.restore();
+  if(ST.E0!=null){x.fillStyle=rgba(C.win,.15);x.fillRect(X(ST.E0-P.win)-1,pt,Math.max(2,X(ST.E0+P.win)-X(ST.E0-P.win)+2),h-pt-pb);}
+  for(let b=0;b<n;b++){const wd=Math.max((s.hi[b]-s.lo[b])/P.t,1e-6),e=(s.hi[b]+s.lo[b])/2,man=b>=s.m0;
+    x.fillStyle=man?C.flat:rgba(C.ink,.45);x.beginPath();x.arc(X(e),Y(clamp(Math.log10(wd),yMin,yMax)),man?2.6:1.8,0,TAU);x.fill();}
+  $('fInfo').textContent=`${s.cnt} momenta`;
+  const W=s.manHi-s.manLo;
+  $('fKV').innerHTML=`<dt>top-band manifold</dt><dd>${2*GEO.N} bands</dd><dt>manifold width</dt><dd>${fmtE(W)} t</dd>`+
+    `<dt>narrowest band</dt><dd>${fmtE(s.narrow)} t at E ≈ ${((s.lo[s.narrowB]+s.hi[s.narrowB])/2).toFixed(3)}</dd>`+
+    `<dt>gapped pieces in manifold</dt><dd>${s.groups}${s.groups>1?` · widest gap ${fmtE(s.bigGap)} t`:''}</dd>`+
+    `<dt>gap to dispersive bands</dt><dd>${isNaN(s.gapBelow)?'–':s.gapBelow>0?fmtE(s.gapBelow)+' t':'overlap'}</dd>`;
+  const chips=[`<span class="chip">θ <b>${(GEO.th/D2R).toFixed(2)}°</b></span>`,`<span class="chip">bands <b>${GEO.n}</b></span>`,
+    `<span class="chip hl">manifold width <b>${fmtE(W)} t</b></span>`,`<span class="chip">pieces <b>${s.groups}</b></span>`];
+  if(ST.ghost){const gl=ST.ghost.ev.filter(Boolean);if(gl.length){let a=Infinity,b2=-Infinity;const m0=s.m0;for(const ev of gl){a=Math.min(a,ev[m0]);b2=Math.max(b2,ev[GEO.n-1]);}
+    chips.push(`<span class="chip">decoupled width <b>${fmtE(b2-a)} t</b></span>`);}}
+  $('bChips').innerHTML=chips.join('');
+  $('bInfo').textContent=`${s.cnt} momenta solved`;
+}
+
+/* =================================================================== twist sweep */
+const SW={gen:-1,res:{},pending:{}};
+$('runSweep').addEventListener('click',()=>{
+  SW.gen=Math.random();SW.res={};SW.pending={};
+  for(let m=1;m<=P.mmax;m++){
+    const N=cellsOf(m),th=Math.acos((3*m*m+3*m+.5)/N),rot=(v,a)=>[Math.cos(a)*v[0]-Math.sin(a)*v[1],Math.sin(a)*v[0]+Math.cos(a)*v[1]];
+    const S1=rot([m+(m+1)/2,(m+1)*SQ3/2],-th/2),S2=rot(S1,Math.PI/3),H=hsPoints(S1,S2);
+    const ks=[H.G,H.K,H.M,[.31*H.b1[0]+.17*H.b2[0],.31*H.b1[1]+.17*H.b2[1]],[.43*H.b1[0]+.62*H.b2[0],.43*H.b1[1]+.62*H.b2[1]]];
+    SW.pending[m]=ks.length;SW.res[m]={th:th/D2R,N,evs:[]};
+    ks.forEach(k=>{const t={cmd:'evals',job:'sweep',idx:m,k,p:physP({m}),gen:SW.gen};queue.push(t);});
+  }
+  pump();$('sInfo').textContent='running…';drawSweep();
+});
+function sweepResult(msg){
+  const r=SW.res[msg.idx];if(!r)return;r.evs.push(msg.ev);SW.pending[msg.idx]--;
+  if(SW.pending[msg.idx]===0){const n=6*r.N,m0=n-2*r.N,lo=new Float64Array(n).fill(Infinity),hi=new Float64Array(n).fill(-Infinity);
+    for(const ev of r.evs)for(let b=0;b<n;b++){lo[b]=Math.min(lo[b],ev[b]);hi[b]=Math.max(hi[b],ev[b]);}
+    let narrow=Infinity,groups=1;for(let b=m0;b<n;b++){narrow=Math.min(narrow,hi[b]-lo[b]);if(b<n-1&&lo[b+1]-hi[b]>1e-3*P.t)groups++;}
+    r.W=hi[n-1]-lo[m0];r.narrow=narrow;r.groups=groups;r.done=true;}
+  const done=Object.values(SW.res).filter(r=>r.done).length;$('sInfo').textContent=`${done}/${Object.keys(SW.res).length} angles`;drawSweep();
+}
+const cS=$('cSweep');
+function drawSweep(){
+  const [x,w,h]=fit(cS),pl=44,pr=10,pt=22,pb=30;
+  x.font='10px '+getComputedStyle(document.body).getPropertyValue('--f-mono');x.fillStyle=C.muted;
+  const rs=Object.entries(SW.res).filter(([,r])=>r.done).map(([m,r])=>({m:+m,...r})).sort((a,b)=>a.th-b.th);
+  if(!rs.length){x.fillText(Object.keys(SW.res).length?'solving…':'Press “Run sweep” to scan commensurate angles with the current couplings.',pl-30,pt+16);$('sKV').innerHTML='';return;}
+  const thMax=thetaOf(1)*1.05,thMin=0,X=t=>pl+(t-thMin)/(thMax-thMin)*(w-pl-pr);
+  let vmin=Infinity,vmax=-Infinity;rs.forEach(r=>{[r.W,r.narrow].forEach(v=>{const l=Math.log10(Math.max(v,1e-7));vmin=Math.min(vmin,l);vmax=Math.max(vmax,l);});});
+  vmin=Math.floor(vmin);vmax=Math.ceil(vmax+.01)+1;if(vmax-vmin<2)vmin=vmax-2;const Y=v=>pt+(vmax-v)/(vmax-vmin)*(h-pt-pb);
+  x.strokeStyle=C.soft;x.textAlign='right';for(let v=vmin;v<=vmax;v++){x.beginPath();x.moveTo(pl,Y(v));x.lineTo(w-pr,Y(v));x.stroke();x.fillText(`1e${v}`,pl-4,Y(v)+3);}
+  x.textAlign='center';for(let t=0;t<=thMax;t+=5)x.fillText(t+'°',X(t),h-pb+13);x.fillText('twist θ',(pl+w-pr)/2,h-3);
+  const ser=(key,col,dash)=>{x.strokeStyle=col;x.lineWidth=1.6;x.setLineDash(dash);x.beginPath();rs.forEach((r,i)=>{const px=X(r.th),py=Y(Math.log10(Math.max(r[key],1e-7)));i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();x.setLineDash([]);
+    rs.forEach(r=>{x.fillStyle=col;x.beginPath();x.arc(X(r.th),Y(Math.log10(Math.max(r[key],1e-7))),3,0,TAU);x.fill();});};
+  ser('W',C.flat,[]);ser('narrow',C.l1,[4,3]);
+  const cur=thetaOf(P.m);x.strokeStyle=C.win;x.setLineDash([2,3]);x.beginPath();x.moveTo(X(cur),pt);x.lineTo(X(cur),h-pb);x.stroke();x.setLineDash([]);
+  x.fillStyle=C.muted;x.textAlign='right';x.fillText('gapped pieces:',X(rs[0].th)-14,pt-8);x.textAlign='center';rs.forEach(r=>x.fillText(r.groups,X(r.th),pt-8));
+  x.textAlign='right';x.fillStyle=C.flat;x.fillText('— manifold width',w-pr-4,Y(vmin)-20);x.fillStyle=C.l1;x.fillText('- - narrowest sub-band',w-pr-4,Y(vmin)-8);
+  $('sKV').innerHTML=rs.map(r=>`<dt>m=${r.m} · ${r.th.toFixed(2)}°</dt><dd>W ${fmtE(r.W)} · min ${fmtE(r.narrow)} · ${r.groups} pcs</dd>`).join('');
+}
+
+/* =================================================================== legend + boot */
+function drawLegend(){
+  $('bLegend').innerHTML=`<span><i style="background:${C.flat}"></i>top-band manifold (2N bands)</span><span><i style="background:${C.ink}"></i>dispersive bands</span>`+
+    (P.ghost&&P.tp!==0?`<span><i style="background:${C.ghost}"></i>decoupled layers, t⊥ = 0</span>`:'')+`<span><i style="background:${C.win}"></i>LDOS window</span>`+
+    `<span><i class="dot" style="background:${C.l0}"></i>layer 0 weight</span><span><i class="dot" style="background:${C.l1}"></i>layer 1 weight</span>`;
+}
+function drawAll(){drawLegend();drawBands();drawReal();drawFlat();drawSweep();}
+readTokens();
+const retheme=()=>{readTokens();regKey='';drawAll();};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',retheme);
+new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+makePool();
+buildControls();out('m');
+let rsT=0;new ResizeObserver(()=>{clearTimeout(rsT);rsT=setTimeout(()=>{regKey='';drawAll();},60);}).observe(document.querySelector('.main'));
+// pick a sensible default energy once the first bands arrive: middle of the manifold
+const _cs=computeStats;computeStats=function(){_cs();if(ST.E0==null&&ST.stats&&ST.stats.cnt>=4){const s=ST.stats;ST.E0=s.lo[s.narrowB]*.5+s.hi[s.narrowB]*.5;}};
+recompute();
+</script>
