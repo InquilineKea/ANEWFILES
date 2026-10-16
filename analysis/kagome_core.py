@@ -327,3 +327,107 @@ def weyl_detect_like_js(p: WeylParams, gap_sel: str = "12", nk: int = 18, nz: in
     n_nodes = sum(abs(t["dC"]) for t in transitions)
     return {"kz": kz, "C": C, "gap": G, "transitions": transitions, "n_nodes": n_nodes,
             "ungapped_planes": int(sum(g < gap_tol for g in G))}
+
+
+def weyl_berry_charge(p: WeylParams, k1: float, k2: float, kz: float, band: int, r: float = 0.03,
+                      nt: int = 10, nph: int = 20) -> int:
+    """Berry flux of one band out of a small sphere around a point, in units of 2*pi."""
+    th = math.pi * np.arange(nt + 1) / nt
+    ph = TAU * np.arange(nph) / nph
+    T, F = np.meshgrid(th, ph, indexing="ij")
+    _, v = np.linalg.eigh(weyl_h(p, k1 + r * np.sin(T) * np.cos(F), k2 + r * np.sin(T) * np.sin(F), kz + r * np.cos(T)))
+    u = v[..., :, band]
+    U1 = np.einsum("ijc,ijc->ij", u[:-1].conj(), u[1:])                       # theta links
+    U2 = np.einsum("ijc,ijc->ij", u.conj(), np.roll(u, -1, 1))                 # phi links
+    flux = np.angle(U1 * U2[1:] * np.conj(np.roll(U1, -1, 1)) * np.conj(U2[:-1]))
+    return int(round(flux.sum() / TAU))
+
+
+def weyl_detect_v2(p: WeylParams, gap_sel: str = "12", nk: int = 18, nz: int = 48, gap_tol: float = 0.01,
+                   node_tol: float = 1e-3):
+    """Mirror of the page's fixed detector (after the AI-Scientist-v3 red team).
+
+    Search windows: Chern jumps between gapped planes, and runs of nearly gapless planes (which the
+    old detector skipped). In each window, gap minima on a 36x36 grid are refined in 3D; a point
+    counts only if its gap falls below node_tol*t, and it is a Weyl node only if its Berry charge
+    is nonzero. Jumps with no converged touching are reported as Chern-grid flicker.
+    """
+    band = 0 if gap_sel == "12" else 2
+    gl = 0 if band == 0 else 1
+    old = weyl_detect_like_js(p, gap_sel, nk, nz, gap_tol)
+    kz, C, G = old["kz"], old["C"], old["gap"]
+    sg = 1 if band == 0 else -1
+
+    def gap(x):
+        w = np.linalg.eigvalsh(weyl_h(p, *x))
+        return w[gl + 1] - w[gl]
+
+    windows = []
+    for q in range(nz):
+        if C[q] != C[q + 1] and G[q] >= gap_tol and G[q + 1] >= gap_tol:
+            lo, hi = kz[q], kz[q + 1]
+            for _ in range(7):
+                mid = (lo + hi) / 2
+                if round(sg * weyl_chern(p, mid, band, nk)[0]) == C[q]:
+                    lo = mid
+                else:
+                    hi = mid
+            windows.append((kz[q], kz[q + 1], [(lo + hi) / 2], True))
+    q = 0
+    while q <= nz:
+        if G[q] < gap_tol:
+            r = q
+            while r < nz and G[r + 1] < gap_tol:
+                r += 1
+            lo, hi = kz[max(q - 1, 0)], kz[min(r + 1, nz)]
+            windows.append((lo, hi, list(np.arange(lo, hi + 1e-9, TAU / nz / 2)), False))
+            q = r
+        q += 1
+    M = 36
+    g = TAU * np.arange(M) / M
+    K1, K2 = np.meshgrid(g, g, indexing="ij")
+    nodes, neutral, found, flicker, extended = [], [], [], 0, False
+    for lo, hi, slices, jump in windows:
+        cand = []
+        for kc in slices:
+            w = np.linalg.eigvalsh(weyl_h(p, K1, K2, kc))
+            gg = w[..., gl + 1] - w[..., gl]
+            is_min = np.ones_like(gg, bool)
+            for a in (-1, 0, 1):
+                for b in (-1, 0, 1):
+                    if a or b:
+                        is_min &= gg <= np.roll(np.roll(gg, a, 0), b, 1)
+            for i, j in np.argwhere(is_min & (gg <= 0.08)):
+                cand.append((gg[i, j], g[i], g[j], kc))
+        cand = sorted(cand)[: 6 if jump else 24]
+        accepted = 0
+        for _, a1, a2, kc in cand:
+            x, fx, st = np.array([a1, a2, kc]), None, 0.15
+            fx = gap(x)
+            for _ in range(400):
+                if st <= 1e-6:
+                    break
+                moved = False
+                for d in range(3):
+                    for sgn in (1, -1):
+                        y = x.copy(); y[d] += sgn * st
+                        if d == 2:
+                            y[2] = min(max(y[2], lo - .05), hi + .05)
+                        fy = gap(y)
+                        if fy < fx:
+                            x, fx, moved = y, fy, True
+                if not moved:
+                    st /= 2
+            if fx > node_tol * p.t:
+                continue
+            x = (x + math.pi) % TAU - math.pi
+            if any(np.linalg.norm((f - x + math.pi) % TAU - math.pi) < .05 for f in found):
+                continue
+            found.append(x); accepted += 1
+            chi = weyl_berry_charge(p, *x, gl)
+            (nodes if chi else neutral).append({"k": x.tolist(), "gap": float(fx), "chi": chi})
+        if jump and not accepted:
+            flicker += 1
+        if not jump and accepted > 6:
+            extended = True
+    return {"n_nodes": len(nodes), "nodes": nodes, "neutral": neutral, "flicker": flicker, "extended": extended}

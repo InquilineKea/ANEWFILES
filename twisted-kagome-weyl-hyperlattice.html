@@ -223,7 +223,7 @@ select.btn{padding-right:6px}
       <p class="cap" id="wVerdict"></p>
       <canvas class="plot" id="cBands" height="170"></canvas>
       <canvas class="plot" id="cChern" height="120"></canvas>
-      <p class="cap">Click the C(k<sub>z</sub>) strip to move the band cut. A jump in C between two k<sub>z</sub> planes means a Weyl node sits between them; its chirality is the size of the jump.</p>
+      <p class="cap">Click the C(k<sub>z</sub>) strip to move the band cut. Jumps in C, and stretches where the gap nearly closes, mark where to look. A node counts only if the gap there converges to zero and the Berry flux through a small sphere around it is nonzero; that flux is its chirality χ.</p>
       <div class="two">
         <canvas class="plot" id="cBZ" height="150"></canvas>
         <div class="tw"><table class="nodes" id="nodeTab"></table></div>
@@ -277,7 +277,7 @@ const SECTIONS=[
   {k:'phiC',l:'Coupling phase <i>φ</i>',min:0,max:180,step:1,v:0,f:deg,kind:'coup',hint:'J⊥ ∝ cos(φ + gradient·πx/R). φ = 180° flips interlayer bonds to antiferromagnetic.'},
   {k:'phiGrad',l:'Phase gradient',min:0,max:4,step:.1,v:0,f:v=>v.toFixed(1)+' π/R',kind:'coup'},
  ]},
- {id:'weyl',name:'Weyl',short:'Wy',note:'A separate 3D block: kagome planes with flux Φ, stacked along z with sublattice-dependent vertical hopping. Its 3×3 Bloch Hamiltonian is diagonalised exactly; Weyl nodes are located from jumps in the Chern number C(k<sub>z</sub>). Not the moiré supercell spectrum.',params:[
+ {id:'weyl',name:'Weyl',short:'Wy',note:'A separate 3D block: kagome planes with flux Φ, stacked along z with sublattice-dependent vertical hopping. Its 3×3 Bloch Hamiltonian is diagonalised exactly; Weyl nodes are searched for at jumps in the Chern number C(k<sub>z</sub>) and wherever the gap nearly closes, then confirmed by gap convergence and Berry flux. Not the moiré supercell spectrum.',params:[
   {k:'t',l:'Hopping <i>t</i>',min:.2,max:2,step:.05,v:1,f:f2,kind:'weyl'},
   {k:'flux',l:'Flux per triangle <i>Φ</i>',min:0,max:360,step:1,v:90,f:deg,kind:'weyl',hint:'Φ = 0 restores time reversal and the exact flat band at E = 2t.'},
   {k:'mA',l:'Sublattice mass <i>m</i><sub>A</sub>',min:-3,max:3,step:.05,v:0,f:f2,kind:'weyl'},
@@ -758,34 +758,68 @@ function foldBZ(kx,ky){
   return best;
 }
 let WEYL=null;
-const GAPTOL=.01;
+const GAPTOL=.01, NODETOL=1e-3;
+const wrapPi=a=>{a=(a+Math.PI)%TAU;if(a<0)a+=TAU;return a-Math.PI;};
+const SPH=new Float64Array(11*20*6);
+function berryCharge(k1,k2,kz,band){
+  // Berry flux of one band out of a small sphere around (k1,k2,kz), in units of 2π (Fukui lattice
+  // on a latitude-longitude mesh). A Weyl node gives ±1; a touching without charge gives 0.
+  const NT=10,NP=20,r=.03;
+  for(let i=0;i<=NT;i++)for(let j=0;j<NP;j++){const th=Math.PI*i/NT,ph=TAU*j/NP;
+    blochH(k1+r*Math.sin(th)*Math.cos(ph),k2+r*Math.sin(th)*Math.sin(ph),kz+r*Math.cos(th));evec(eig3()[band],SPH,(i*NP+j)*6);}
+  const link=(a,b)=>{let x=0,y=0;for(let c=0;c<3;c++){const ar=SPH[a*6+2*c],ai=SPH[a*6+2*c+1],br=SPH[b*6+2*c],bi=SPH[b*6+2*c+1];x+=ar*br+ai*bi;y+=ar*bi-ai*br;}return [x,y];};
+  let tot=0;
+  for(let i=0;i<NT;i++)for(let j=0;j<NP;j++){
+    const a=i*NP+j,b=(i+1)*NP+j,c=(i+1)*NP+(j+1)%NP,d=i*NP+(j+1)%NP;
+    const [r1,i1]=link(a,b),[r2,i2]=link(b,c),[r3,i3]=link(d,c),[r4,i4]=link(a,d);
+    const xr=r1*r2-i1*i2,xi=r1*i2+i1*r2,yr=r3*r4-i3*i4,yi=r3*i4+i3*r4;
+    tot+=Math.atan2(xi*yr-xr*yi,xr*yr+xi*yi);
+  }
+  return CHARGE_SIGN*Math.round(tot/TAU);
+}
+const CHARGE_SIGN=1; // orientation convention: matches the sign of the Chern jump across the node
 function weylCompute(){
   if(!ON.weyl){WEYL=null;return;}
   const N=P.Nk,NZ=48,band=P.gapSel==='12'?0:2,sg=band===0?1:-1,gl=band===0?0:1;
   const kz=[],Cs=[],gaps=[];
   for(let q=0;q<=NZ;q++){const z=-Math.PI+TAU*q/NZ;const r=chernAt(z,band,N);kz.push(z);Cs.push(Math.round(sg*r.C));gaps.push(r.gap);}
-  const nodes=[];
-  for(let q=0;q<NZ&&nodes.length<12;q++){
-    if(Cs[q]===Cs[q+1])continue;
-    if(gaps[q]<GAPTOL||gaps[q+1]<GAPTOL)continue; // Chern number undefined where the gap is closed
+  const nodes=[],neutral=[];let flicker=0,extended=false;
+  // Candidate kz windows: Chern jumps between gapped planes, plus runs of nearly gapless planes
+  // (where C is undefined; skipping those used to lose real nodes).
+  const windows=[];
+  for(let q=0;q<NZ;q++)if(Cs[q]!==Cs[q+1]&&gaps[q]>=GAPTOL&&gaps[q+1]>=GAPTOL){
     let lo=kz[q],hi=kz[q+1];const cLo=Cs[q];
     for(let it=0;it<7;it++){const mid=(lo+hi)/2;const c=Math.round(sg*chernAt(mid,band,N).C);if(c===cLo)lo=mid;else hi=mid;}
-    const kc=(lo+hi)/2,dC=Cs[q+1]-Cs[q],need=Math.min(Math.abs(dC),4);
-    const M=36,gg=new Float64Array(M*M);
-    for(let i=0;i<M;i++)for(let j=0;j<M;j++)gg[i*M+j]=gapAt(TAU*i/M,TAU*j/M,kc,gl);
-    const mins=[];
-    for(let i=0;i<M;i++)for(let j=0;j<M;j++){const v=gg[i*M+j];let ok=true;
-      for(let a=-1;a<=1&&ok;a++)for(let b=-1;b<=1;b++){if(!a&&!b)continue;if(gg[((i+a+M)%M)*M+(j+b+M)%M]<v){ok=false;break;}}
-      if(ok)mins.push([v,i,j]);}
-    mins.sort((a,b)=>a[0]-b[0]);
-    for(let m=0;m<need&&m<mins.length;m++){
-      let x=[TAU*mins[m][1]/M,TAU*mins[m][2]/M,kc],fx=gapAt(x[0],x[1],x[2],gl),st=.15;
+    windows.push({lo:kz[q],hi:kz[q+1],slices:[(lo+hi)/2],jump:true});
+  }
+  for(let q=0;q<=NZ;q++){if(gaps[q]>=GAPTOL)continue;let r=q;while(r<NZ&&gaps[r+1]<GAPTOL)r++;
+    const lo=kz[Math.max(q-1,0)],hi=kz[Math.min(r+1,NZ)],sl=[];for(let z=lo;z<=hi+1e-9;z+=TAU/NZ/2)sl.push(z);
+    windows.push({lo,hi,slices:sl,jump:false});q=r;}
+  const found=[];
+  for(const w of windows){
+    let cand=[];
+    for(const kc of w.slices){const M=36,gg=new Float64Array(M*M);
+      for(let i=0;i<M;i++)for(let j=0;j<M;j++)gg[i*M+j]=gapAt(TAU*i/M,TAU*j/M,kc,gl);
+      for(let i=0;i<M;i++)for(let j=0;j<M;j++){const v=gg[i*M+j];if(v>.08)continue;let ok=true;
+        for(let a=-1;a<=1&&ok;a++)for(let b=-1;b<=1;b++){if(!a&&!b)continue;if(gg[((i+a+M)%M)*M+(j+b+M)%M]<v){ok=false;break;}}
+        if(ok)cand.push([v,TAU*i/M,TAU*j/M,kc]);}}
+    cand.sort((a,b)=>a[0]-b[0]);cand=cand.slice(0,w.jump?6:24);
+    let accepted=0;
+    for(const c of cand){
+      let x=[c[1],c[2],c[3]],fx=gapAt(x[0],x[1],x[2],gl),st=.15;
       for(let it=0;it<400&&st>1e-6;it++){let moved=false;
-        for(let d=0;d<3;d++)for(const sgn of [1,-1]){const y=x.slice();y[d]+=sgn*st;if(d===2)y[2]=clamp(y[2],lo-.05,hi+.05);const fy=gapAt(y[0],y[1],y[2],gl);if(fy<fx){x=y;fx=fy;moved=true;}}
+        for(let d=0;d<3;d++)for(const sgn of [1,-1]){const y=x.slice();y[d]+=sgn*st;if(d===2)y[2]=clamp(y[2],w.lo-.05,w.hi+.05);const fy=gapAt(y[0],y[1],y[2],gl);if(fy<fx){x=y;fx=fy;moved=true;}}
         if(!moved)st/=2;}
+      if(fx>NODETOL*P.t)continue;
+      x=[wrapPi(x[0]),wrapPi(x[1]),wrapPi(x[2])];
+      if(found.some(f=>Math.hypot(wrapPi(f[0]-x[0]),wrapPi(f[1]-x[1]),wrapPi(f[2]-x[2]))<.05))continue;
+      found.push(x);accepted++;
+      const chi=berryCharge(x[0],x[1],x[2],gl);
       const [kx,ky]=foldBZ(...toCart(x[0],x[1]));
-      nodes.push({k1:x[0],k2:x[1],kz:x[2],kx,ky,gap:fx,chi:Math.sign(dC)});
+      (chi!==0?nodes:neutral).push({k1:x[0],k2:x[1],kz:x[2],kx,ky,gap:fx,chi});
     }
+    if(w.jump&&!accepted)flicker++;          // a Chern jump with no converged touching: grid artefact
+    if(!w.jump&&accepted>6)extended=true;     // many touchings in one run: a nodal line or a metal
   }
   // band structure along Γ–K–M–Γ at the cut
   const pts=[[0,0],[4*Math.PI/3,0],[Math.PI,Math.PI/SQ3],[0,0]],seg=[];let tl=0;
@@ -800,7 +834,7 @@ function weylCompute(){
   for(let i=0;i<24;i++)for(let j=0;j<24;j++){blochH(TAU*i/24,TAU*j/24,kzc);const e=eig3();for(let b=0;b<3;b++){bw[b][0]=Math.min(bw[b][0],e[b]);bw[b][1]=Math.max(bw[b][1],e[b]);}}
   const Q=nodes.length?[nodes[0].kx,nodes[0].ky]:[0,0];
   const ungapped=gaps.filter(g=>g<GAPTOL).length;
-  WEYL={ungapped,kz,Cs,gaps,nodes,bands,xs,ticks,bw,Q,band,gl,chiSum:nodes.reduce((s,n)=>s+n.chi,0)};
+  WEYL={ungapped,kz,Cs,gaps,nodes,neutral,flicker,extended,bands,xs,ticks,bw,Q,band,gl,chiSum:nodes.reduce((s,n)=>s+n.chi,0)};
 }
 function bandsOnly(){ // recompute only the cut when kz slider moves
   if(!WEYL)return;const save=WEYL;
@@ -1184,8 +1218,11 @@ function drawWeyl(){
   $('wInfo').textContent=`gap ${P.gapSel==='12'?'1|2':'2|3'} · ${P.Nk}² grid`;
   const Cset=[...new Set(Wd.Cs.filter((c,i)=>Wd.gaps[i]>=GAPTOL))];
   const gapNote=Wd.ungapped?` The gap is closed on ${Wd.ungapped} of ${Wd.kz.length} k<sub>z</sub> planes (a metal, a nodal line, or the flat band touching), where C is undefined.`:'';
-  $('wVerdict').innerHTML=n?`<b style="color:var(--ink)">${n} Weyl node${n>1?'s':''}</b> on this gap. Σχ = ${Wd.chiSum} ${Wd.chiSum===0?'(Nielsen–Ninomiya balanced)':'(unbalanced: refine the grid)'}. Chern numbers seen: ${Cset.join(', ')}.${gapNote}`:
-    `No isolated band touching on this gap: C(k<sub>z</sub>) stays at ${Cset.join(', ')||'—'} wherever it is defined. The block is a ${Cset.length===1&&Cset[0]!==0?'stacked Chern insulator':'trivial insulator or metal'} here, not a Weyl semimetal.${gapNote}`;
+  const extra=(Wd.neutral.length?` ${Wd.neutral.length} further band touching${Wd.neutral.length>1?'s':''} carr${Wd.neutral.length>1?'y':'ies'} no Berry charge, so ${Wd.neutral.length>1?'they are':'it is'} not counted as Weyl nodes.`:'')+
+    (Wd.flicker?` ${Wd.flicker} jump${Wd.flicker>1?'s':''} in C(k<sub>z</sub>) had no real touching behind ${Wd.flicker>1?'them':'it'} (Chern grid too coarse) and ${Wd.flicker>1?'were':'was'} rejected.`:'')+
+    (Wd.extended?' The gap closes along an extended region (nodal line or metal); the list is not exhaustive there.':'');
+  $('wVerdict').innerHTML=(n?`<b style="color:var(--ink)">${n} Weyl node${n>1?'s':''}</b> on this gap, each confirmed by a gap below ${NODETOL} t and a nonzero Berry flux through a small sphere. Σχ = ${Wd.chiSum} ${Wd.chiSum===0?'(Nielsen–Ninomiya balanced)':'(unbalanced: some partners lie outside the search; refine the grid)'}. Chern numbers seen: ${Cset.join(', ')}.`:
+    `No Weyl node on this gap: C(k<sub>z</sub>) stays at ${Cset.join(', ')||'—'} wherever it is defined and no charged touching was found. The block is a ${Cset.length===1&&Cset[0]!==0?'stacked Chern insulator':'trivial insulator or metal'} here, not a Weyl semimetal.`)+extra+gapNote;
   // bands
   {const c=$('cBands'),[x,w,h]=fitCanvas(c,170),pl=30,pr=8,pt=8,pb=18;
     let lo=1e9,hi=-1e9;Wd.bands.forEach(b=>b.forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);}));const pad=(hi-lo)*.08+1e-3;lo-=pad;hi+=pad;
@@ -1225,7 +1262,7 @@ function drawWeyl(){
       x.fillStyle=C.panel;x.font='bold 9px '+FONTS.mono;x.textAlign='center';x.fillText(nd.chi>0?'+':'−',X,Y+3);x.textAlign='left';});
     if(n&&cp('weyl|ising')){const Q=Wd.Q;x.strokeStyle=C.kpos;x.lineWidth=1.4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Q[0]*sc,cy-Q[1]*sc);x.stroke();x.fillStyle=C.kpos;x.fillText('Q',cx+Q[0]*sc*.5+4,cy-Q[1]*sc*.5-4);}
   }
-  $('nodeTab').innerHTML=n?`<tr><th>χ</th><th>k<sub>x</sub></th><th>k<sub>y</sub></th><th>k<sub>z</sub></th><th>gap</th></tr>`+Wd.nodes.map(nd=>`<tr><td style="color:${nd.chi>0?C['chi-p']:C['chi-m']}">${nd.chi>0?'+1':'−1'}</td><td>${nd.kx.toFixed(2)}</td><td>${nd.ky.toFixed(2)}</td><td>${nd.kz.toFixed(2)}</td><td>${nd.gap<1e-3?nd.gap.toExponential(0):nd.gap.toFixed(3)}</td></tr>`).join(''):`<tr><td style="text-align:left;color:var(--muted)">No nodes to list.</td></tr>`;
+  $('nodeTab').innerHTML=n?`<tr><th>χ</th><th>k<sub>x</sub></th><th>k<sub>y</sub></th><th>k<sub>z</sub></th><th>gap</th></tr>`+Wd.nodes.map(nd=>`<tr><td style="color:${nd.chi>0?C['chi-p']:C['chi-m']}">${nd.chi>0?'+'+nd.chi:'−'+(-nd.chi)}</td><td>${nd.kx.toFixed(2)}</td><td>${nd.ky.toFixed(2)}</td><td>${nd.kz.toFixed(2)}</td><td>${nd.gap<1e-3?nd.gap.toExponential(0):nd.gap.toFixed(3)}</td></tr>`).join(''):`<tr><td style="text-align:left;color:var(--muted)">No nodes to list.</td></tr>`;
 }
 function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r)));const m=r/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
 $('cChern').addEventListener('click',e=>{const c=$('cChern'),m=c._map;if(!m)return;const r=c.getBoundingClientRect();const u=(e.clientX-r.left-m.pl)/(m.w-m.pl-m.pr);
