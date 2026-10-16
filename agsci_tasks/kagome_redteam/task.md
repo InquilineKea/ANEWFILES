@@ -1,6 +1,6 @@
 # Goal
 - Find parameter sets where the Weyl-node detector of the Twisted Kagome–Weyl Hyperlattice page gives the wrong node count.
-- Score: one point per distinct verified failure (near-duplicates count once), plus 0.5 if you find both kinds: missed nodes and false nodes. Higher is better.
+- Score: one point per distinct verified failure (near-duplicates count once, compared in physically meaningful coordinates: tz is ignored because it never changes a gap, flux is folded with 360−flux, and mA, dz are measured in units of t), plus 0.5 if you find both kinds: missed nodes and false nodes. Higher is better.
 - Then explain the failure modes. A good result says *why* the detector fails (which assumption breaks) and proposes a fix, rather than listing random hits.
 
 # Model

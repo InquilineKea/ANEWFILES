@@ -20,8 +20,20 @@ TIMEOUT_S = 900
 MAX_CASES = 12
 BOUNDS = {"t": (0.2, 2.0), "breath": (-0.45, 0.45), "flux": (0.0, 360.0), "mA": (-3.0, 3.0),
           "tz": (-1.0, 1.0), "dz": (-1.5, 1.5)}
-SCALE = np.array([1.8, 0.9, 360.0, 6.0, 2.0, 3.0])
-DEDUP = 0.03  # normalised parameter distance below which two failures count as one
+DEDUP = 0.03  # distance in canonical coordinates below which two failures count as one
+
+
+def canonical(p):
+    """Coordinates that can change node counts.
+
+    tz shifts all three sublattices by the same 2*tz*cos(kz), so it never changes a gap and is
+    dropped. Flux and 360-flux are mirror images (complex conjugation, k -> -k). Scaling t, mA, dz
+    together only rescales the spectrum, so mA and dz are measured in units of t. An earlier
+    version deduplicated on raw parameters, and an agent scored 12 by sweeping tz across one failure.
+    """
+    f = p.flux % 360.0
+    f = min(f, 360.0 - f)
+    return np.array([p.breath / 0.9, f / 180.0, p.mA / p.t / 6.0, p.dz / p.t / 3.0])
 
 
 def check_case(c):
@@ -64,7 +76,7 @@ def score(result):
             row["status"] = "page correct"
         else:
             row["status"] = "page misses nodes" if page < ref_bf else "page reports false nodes"
-            v = np.array([p.t, p.breath, p.flux, p.mA, p.tz, p.dz]) / SCALE
+            v = canonical(p)
             if all(np.linalg.norm(v - f["v"]) > DEDUP for f in failures if f["gap"] == gap):
                 failures.append({"v": v, "gap": gap, "kind": row["status"]})
                 row["counted"] = True
