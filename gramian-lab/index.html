@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Restoration Gramian Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,500;0,600;1,500&display=swap">
+<style>
+/* Layout: an instrument bench. Knobs on the left, the state plane in the middle, gauges on the right, strip charts underneath. */
+:root {
+  --bg: #eceff2;
+  --panel: #fbfcfd;
+  --ink: #18212c;
+  --muted: #5a6676;
+  --rule: #d3d9e0;
+  --grid: #e1e6ec;
+  --reach: #1d6a86;
+  --cap: #6b4fae;
+  --plan: #b8501d;
+  --u2: #a07012;
+  --free: #6f7d90;
+  --bad: #b8262e;
+  --good: #2d7a4c;
+  --warn: #a26a00;
+  --focus: #1d6a86;
+  --f-display: "Spectral", "Iowan Old Style", Georgia, serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151b; --panel: #181e26; --ink: #e3e8ee; --muted: #97a2b2; --rule: #2b3440; --grid: #212934;
+    --reach: #5cb2d1; --cap: #a68ae6; --plan: #f08a4f; --u2: #ddb24e; --free: #8996a8;
+    --bad: #f0706f; --good: #5ec48c; --warn: #e3ad3d; --focus: #5cb2d1; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151b; --panel: #181e26; --ink: #e3e8ee; --muted: #97a2b2; --rule: #2b3440; --grid: #212934;
+  --reach: #5cb2d1; --cap: #a68ae6; --plan: #f08a4f; --u2: #ddb24e; --free: #8996a8;
+  --bad: #f0706f; --good: #5ec48c; --warn: #e3ad3d; --focus: #5cb2d1; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+h1 em { font-style: italic; font-weight: 500; color: var(--reach); }
+.lede { margin: 0; max-width: 72ch; color: var(--muted); }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 19px; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--f-mono); font-weight: 500; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.presets .set { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.presets .lbl { font-family: var(--f-mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-right: 2px; }
+button {
+  font: 500 13px/1 var(--f-body); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 999px; padding: 7px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--muted); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.bench { display: grid; grid-template-columns: 280px minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; min-width: 0; }
+.controls { display: grid; gap: 16px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+legend { padding: 0; margin-bottom: 4px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; align-items: baseline; }
+.row label { font-size: 13px; }
+.row output { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.row input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--reach); margin: 2px 0 0; }
+.row .note { grid-column: 1 / -1; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.check { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.check input { accent-color: var(--reach); margin: 0; }
+.hyps { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+.sub { font-size: 12px; color: var(--muted); margin: 0; }
+
+.plane-wrap { display: grid; gap: 10px; }
+.plane-box { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 100%; }
+canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+#plane { cursor: crosshair; border-radius: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 18px; height: 10px; border-radius: 2px; display: inline-block; }
+.sw.line { height: 0; border-top: 2px solid; border-radius: 0; }
+.sw.dash { height: 0; border-top: 2px dashed; border-radius: 0; }
+.plane-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; }
+.hint { font-size: 12.5px; color: var(--muted); }
+
+.gauges { display: grid; gap: 16px; }
+.big { display: grid; gap: 4px; }
+.big .num { font-family: var(--f-display); font-size: 44px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+.big .num small { font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--f-body); padding: 5px 9px; border-radius: 999px; border: 1px solid currentColor; width: fit-content; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.s0 { color: var(--good); } .chip.s1 { color: var(--reach); } .chip.s2 { color: var(--warn); } .chip.s3 { color: var(--bad); }
+dl.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; margin: 0; font-size: 13px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; font-family: var(--f-mono); font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; }
+.matrix { display: inline-grid; grid-template-columns: auto auto; gap: 0 14px; padding: 2px 8px; border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); border-radius: 3px; font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
+.wline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.modes { display: grid; gap: 8px; }
+.mode { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: 12.5px; }
+.mode .bar { grid-column: 1 / -1; height: 8px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mode .bar i { display: block; height: 100%; background: var(--plan); }
+.mode b { font-weight: 500; }
+.mode span:last-of-type { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.status { font-size: 12.5px; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--rule); }
+.status.bad { border-color: var(--bad); color: var(--bad); }
+.status.ok { color: var(--muted); }
+
+.strips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.strip { display: grid; gap: 8px; }
+.strip p { margin: 0; font-size: 12.5px; color: var(--muted); }
+.chart-box { width: 100%; aspect-ratio: 16 / 10; max-width: 100%; }
+
+.notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.notes section { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.notes p, .notes li { margin: 0; max-width: 68ch; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.eq { font-family: var(--f-display); font-size: 17px; line-height: 1.7; overflow-x: auto; padding: 4px 0; }
+.eq i { font-style: italic; }
+footer { font-size: 12.5px; color: var(--muted); }
+footer a, .notes a { color: var(--reach); }
+
+@media (max-width: 1120px) {
+  .bench { grid-template-columns: 280px minmax(0, 1fr); }
+  .gauges { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+}
+@media (max-width: 760px) {
+  .bench { grid-template-columns: minmax(0, 1fr); }
+  .strips, .notes { grid-template-columns: minmax(0, 1fr); }
+  .plane-wrap { order: -1; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Control biological age · two-state toy model</div>
+    <h1>Restoration <em>Gramian</em> Lab</h1>
+    <p class="lede">Biological age, redefined as how hard it is to steer a body back to function. Drag the start and the target, age the system, add or remove a drug channel, and watch the controllability Gramian, the minimum restoration effort and the dose-capped reachable set respond.</p>
+  </header>
+
+  <nav class="presets" aria-label="Presets">
+    <div class="set" role="group" aria-label="Life stages">
+      <span class="lbl">Stage</span>
+      <button type="button" id="p-young" data-preset="young">Young</button>
+      <button type="button" id="p-middle" data-preset="middle">Middle-aged</button>
+      <button type="button" id="p-frail" data-preset="frail">Frail</button>
+      <button type="button" id="p-terminal" data-preset="terminal">Terminally damaged</button>
+    </div>
+    <div class="set" role="group" aria-label="Thought experiments">
+      <span class="lbl">Cases</span>
+      <button type="button" id="p-paradox" data-preset="paradox">Weaker repair, bigger Gramian</button>
+      <button type="button" id="p-onedrug" data-preset="onedrug">One drug, two axes</button>
+      <button type="button" id="p-redundant" data-preset="redundant">Redundant drugs</button>
+      <button type="button" id="p-runaway" data-preset="runaway">Runaway loop</button>
+    </div>
+  </nav>
+
+  <div class="bench">
+    <aside class="panel controls" id="controls" aria-label="Model parameters"></aside>
+
+    <section class="panel plane-wrap" aria-label="State plane">
+      <div class="plane-bar">
+        <h2>State plane</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="hint">Drag ■ start or ✚ target</span>
+          <button type="button" id="play" aria-pressed="true">Pause</button>
+        </div>
+      </div>
+      <div class="plane-box"><canvas id="plane" aria-label="Phase plane showing the state, reachable sets and the restoration plan" role="img"></canvas></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw dash" style="border-color:var(--free)"></i>untreated path</span>
+        <span><i class="sw" style="background:color-mix(in srgb, var(--reach) 30%, transparent);border:1px solid var(--reach)"></i>reachable with effort ≤ budget (W ellipse)</span>
+        <span><i class="sw" style="border:1.5px dashed var(--cap)"></i>reachable with doses capped</span>
+        <span><i class="sw line" style="border-color:var(--plan)"></i>cheapest plan</span>
+        <span><i class="sw dash" style="border-color:var(--plan)"></i>uncapped plan</span>
+      </div>
+    </section>
+
+    <aside class="panel gauges" id="gauges" aria-live="polite">
+      <div class="big">
+        <h3 id="v-label">Restoration cost V</h3>
+        <div class="num" id="v-num">–</div>
+        <span class="chip s0" id="stage">–</span>
+      </div>
+      <dl class="kv">
+        <dt>Min. effort, no cap (E*)</dt><dd id="o-E">–</dd>
+        <dt>Peak dose of that plan</dt><dd id="o-peak">–</dd>
+        <dt>Gap closed by own repair</dt><dd id="o-share">–</dd>
+        <dt>Eigenvalues of A</dt><dd id="o-eigA">–</dd>
+        <dt>rank [B AB]</dt><dd id="o-kalman">–</dd>
+      </dl>
+      <div style="display:grid;gap:8px">
+        <h3>Gramian W(T)</h3>
+        <div class="wline"><span class="matrix" id="o-W"></span><span id="o-wvals"></span></div>
+      </div>
+      <div class="modes">
+        <h3>Where E* comes from</h3>
+        <div class="mode"><b>Easy direction q₁</b><span id="m1v">–</span><div class="bar"><i id="m1b"></i></div></div>
+        <div class="mode"><b>Hard direction q₂</b><span id="m2v">–</span><div class="bar"><i id="m2b"></i></div></div>
+        <p class="sub">E* = Σ (qᵢ·d)² / wᵢ. A small wᵢ only hurts when the correction d points along qᵢ.</p>
+      </div>
+      <div class="status ok" id="safety">–</div>
+    </aside>
+  </div>
+
+  <div class="strips">
+    <section class="panel strip">
+      <h3>Doses over time u(t)</h3>
+      <div class="chart-box"><canvas id="c-u" role="img" aria-label="Control signals over time"></canvas></div>
+      <p>Solid: cheapest plan within the cap. Dashed: the uncapped minimum-energy plan. When the cap binds the plan saturates and starts earlier.</p>
+    </section>
+    <section class="panel strip">
+      <h3>Ageing the same system</h3>
+      <div class="chart-box"><canvas id="c-age" role="img" aria-label="Cost and smallest Gramian eigenvalue versus age"></canvas></div>
+      <p>x-axis: age a. V, E* and the Gramian eigenvalues as age runs 0 → 1 under the hypotheses ticked on the left. Shaded: no admissible plan.</p>
+    </section>
+    <section class="panel strip">
+      <h3>Changing the horizon T</h3>
+      <div class="chart-box"><canvas id="c-T" role="img" aria-label="Cost and Gramian eigenvalues versus horizon"></canvas></div>
+      <p>x-axis: horizon T. More time always enlarges W. With a dose cap there is a shortest horizon that works at all. In the runaway loop the current T sits right at that edge.</p>
+    </section>
+  </div>
+
+  <div class="panel notes">
+    <section>
+      <h2>The three equations</h2>
+      <div class="eq">ẋ = <i>A</i>(<i>a</i>) <i>x</i> + <i>B</i>(<i>a</i>) <i>u</i></div>
+      <div class="eq"><i>W</i>(<i>T</i>) = ∫<sub>0</sub><sup><i>T</i></sup> e<sup><i>Aτ</i></sup> <i>B B</i><sup>⊤</sup> e<sup><i>A</i><sup>⊤</sup><i>τ</i></sup> d<i>τ</i></div>
+      <div class="eq"><i>E</i>* = <i>d</i><sup>⊤</sup><i>W</i><sup>−1</sup><i>d</i>,&nbsp; <i>d</i> = <i>x<sub>T</sub></i> − e<sup><i>AT</i></sup><i>x</i><sub>0</sub></div>
+      <p><i>x</i> is the deviation from a healthy reference (the origin). <i>A</i> is what the body does on its own: the diagonal is repair (−k₁, −k₂), the off-diagonal is one problem feeding another. Each column of <i>B</i> is one drug's push in state space. <i>d</i> is the correction treatment has to supply on top of what repair already does, which is why the ellipse is centred on the untreated endpoint and not on the start.</p>
+    </section>
+    <section>
+      <h2>Things to try</h2>
+      <ul>
+        <li><b>Weaker repair, bigger Gramian.</b> Slide age up. The smallest eigenvalue of W rises and restoration still gets harder. Weak repair lets a drug push further, and it also leaves more damage for the drug to remove. W only measures movement relative to the untreated endpoint.</li>
+        <li><b>One drug, two axes.</b> One channel acts on x₁ only, but x₁ feeds x₂, so [B AB] has rank 2 and both are steerable. Then switch on drug 2 and watch W_new = W_old + W₂ fatten the ellipse.</li>
+        <li><b>Redundant drugs.</b> Two drugs, nearly parallel pushes. Two names, about one direction. The ellipse is a needle and the cost lives in the hard mode.</li>
+        <li><b>Terminally damaged.</b> Same body as Young, aged. The violet set no longer contains the target, so V = ∞. Raise the cap or lengthen T and it comes back, so “terminal” here is relative to the toolkit.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>What V means here</h2>
+      <p>With the cap off, V = E*, the plain minimum of ∫|u|² dt. With the cap on, V is the minimum of ∫|u|² dt over plans with every |u<sub>k</sub>(t)| ≤ U that land exactly on the target. That one is solved exactly for this linear model (dual Newton on u<sub>k</sub> = clip(λ·e<sup>A(T−t)</sup>b<sub>k</sub>, ±U)), and it is +∞ when the target sits outside the capped reachable set, which is checked with its support function. The stage chip uses arbitrary bands (0.25 and 1.5) that only make sense inside this toy.</p>
+    </section>
+    <section>
+      <h2>What this toy leaves out</h2>
+      <ul>
+        <li>The axes are illustrative labels on a 2-D linearisation. Real A(a) and B(a) are unknown, nonlinear and drift along the treatment path.</li>
+        <li>“Energy” is quadratic control effort. Not ATP, not money, not toxicity.</li>
+        <li>The safe-region box is only checked. The plan is not re-optimised to avoid it, so a red segment means “this plan is unacceptable”, not “nothing works”.</li>
+        <li>Gramian eigenvalues depend on the units of x. Rescale an axis and the spectrum changes.</li>
+        <li>Whether ageing really shrinks the smallest eigenvalues is a biological hypothesis. The paradox case shows the maths does not force it.</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>Built to explain the “control biological age” passage from <a href="https://www.aging-us.com/article/206422/text" target="_blank" rel="noopener">Aging (Albany NY), article 206422</a>, sections on the controllability Gramian, minimum restoration energy, and viability-constrained reachability. All numbers are unitless and illustrative.</footer>
+</div>
+
+<script>
+// ---- ENGINE START ----
+// 2-state linear model  x' = A x + B u, all 2x2 matrices row-major [a, b, c, d].
+const H = 0.01, TMAX = 6;
+const I2 = [1, 0, 0, 1];
+function mm(a, b) { return [a[0]*b[0] + a[1]*b[2], a[0]*b[1] + a[1]*b[3], a[2]*b[0] + a[3]*b[2], a[2]*b[1] + a[3]*b[3]]; }
+function mv(a, v) { return [a[0]*v[0] + a[1]*v[1], a[2]*v[0] + a[3]*v[1]]; }
+function expm(A, t) {
+  let term = I2, S = I2;
+  const At = A.map(x => x * t);
+  for (let k = 1; k < 20; k++) { term = mm(term, At).map(x => x / k); S = S.map((s, i) => s + term[i]); }
+  return S;
+}
+function eigSym(a, b, c) { // [[a,b],[b,c]]
+  const m = (a + c) / 2, r = Math.hypot((a - c) / 2, b);
+  const w1 = m + r, w2 = m - r;
+  let q = a >= c ? [w1 - c, b] : [b, w1 - a];
+  let n = Math.hypot(q[0], q[1]);
+  if (!(n > 0)) { q = a >= c ? [1, 0] : [0, 1]; n = 1; }
+  q = [q[0] / n, q[1] / n];
+  return { w: [w1, w2], q: [q, [-q[1], q[0]]] };
+}
+function eigGen(A) {
+  const tr = A[0] + A[3], det = A[0]*A[3] - A[1]*A[2], disc = tr*tr/4 - det;
+  if (disc >= 0) { const s = Math.sqrt(disc); return { re: [tr/2 + s, tr/2 - s], im: [0, 0] }; }
+  const s = Math.sqrt(-disc); return { re: [tr/2, tr/2], im: [s, -s] };
+}
+
+// Apply the chosen ageing hypotheses at age a in [0,1] to the young (base) parameters.
+function effective(p, a) {
+  const h = p.hyp;
+  const k = [p.k1, p.k2].map(k0 => h.repair ? k0 - 0.85 * a * Math.abs(k0) : k0);
+  const gs = h.suscept ? 1 - 0.7 * a : 1;
+  const U = p.capOn ? p.U * (h.cap ? 1 - 0.6 * a : 1) : Infinity;
+  const grow = h.damage ? 1 + 1.2 * a : 1;
+  const x0 = [p.x0[0] * grow, p.x0[1] * grow];
+  const A = [-k[0], p.c12, p.c21, -k[1]];
+  const B = p.ch.filter(c => c.on).map(c => {
+    const th = c.theta * Math.PI / 180;
+    return [c.g * gs * Math.cos(th), c.g * gs * Math.sin(th)];
+  });
+  return { A, B, U, x0, xT: p.xT, k, gs, grow };
+}
+
+// Precompute Phi(tau_j) and the impulse responses g_k(tau_j) = Phi(tau_j) b_k on the grid tau_j = j H.
+function grid(eff, T) {
+  const N = Math.max(1, Math.round(T / H));
+  const Ph = expm(eff.A, H);
+  const Phi = new Array(N + 1); Phi[0] = I2;
+  for (let j = 0; j < N; j++) Phi[j + 1] = mm(Ph, Phi[j]);
+  const g = eff.B.map(b => Phi.map(P => mv(P, b)));
+  return { N, Ph, Phi, g };
+}
+const wt = (j, N) => (j === 0 || j === N) ? H / 2 : H;
+
+// Controllability Gramian W(tau_N) by trapezoid; optionally the running W at every grid point.
+function gramian(G, N, running) {
+  const F = j => { let a = 0, b = 0, c = 0; for (const gk of G.g) { const v = gk[j]; a += v[0]*v[0]; b += v[0]*v[1]; c += v[1]*v[1]; } return [a, b, c]; };
+  let W = [0, 0, 0], prev = F(0); const out = [W];
+  for (let j = 1; j <= N; j++) {
+    const f = F(j);
+    W = [0, 1, 2].map(i => W[i] + H / 2 * (prev[i] + f[i]));
+    if (running) out.push(W);
+    prev = f;
+  }
+  return running ? out : W;
+}
+
+// Minimum quadratic effort d' W^+ d, Infinity when d leaves range(W).
+function minEnergy(Wabc, d) {
+  const e = eigSym(Wabc[0], Wabc[1], Wabc[2]);
+  const scale = Math.max(e.w[0], 1e-300);
+  const proj = e.q.map(q => q[0]*d[0] + q[1]*d[1]);
+  const modes = [0, 1].map(i => {
+    const w = e.w[i];
+    if (w <= 1e-10 * scale) return Math.abs(proj[i]) < 1e-7 * (1 + Math.hypot(d[0], d[1])) ? 0 : Infinity;
+    return proj[i] * proj[i] / w;
+  });
+  const lam = [0, 0];
+  for (let i = 0; i < 2; i++) if (e.w[i] > 1e-10 * scale) {
+    const s = proj[i] / e.w[i]; lam[0] += s * e.q[i][0]; lam[1] += s * e.q[i][1];
+  }
+  return { E: modes[0] + modes[1], modes, eig: e, proj, lam, singular: e.w[1] <= 1e-10 * scale };
+}
+
+// Support function of the dose-capped reachable displacement set  { int Phi B u : |u_k| <= U }.
+function support(G, N, U, eta) {
+  let h = 0;
+  for (const gk of G.g) for (let j = 0; j <= N; j++) { const v = gk[j]; h += wt(j, N) * Math.abs(eta[0]*v[0] + eta[1]*v[1]); }
+  return U * h;
+}
+function capFeasible(G, N, U, d, nDir) {
+  let worst = Infinity;
+  for (let i = 0; i < nDir; i++) {
+    const th = 2 * Math.PI * i / nDir, eta = [Math.cos(th), Math.sin(th)];
+    const m = support(G, N, U, eta) - (eta[0]*d[0] + eta[1]*d[1]);
+    if (m < worst) worst = m;
+  }
+  return worst; // > 0 feasible (to sampling accuracy)
+}
+function capBoundary(G, N, U, nDir) {
+  const pts = [];
+  for (let i = 0; i < nDir; i++) {
+    const th = 2 * Math.PI * i / nDir, eta = [Math.cos(th), Math.sin(th)];
+    let x = 0, y = 0;
+    for (const gk of G.g) for (let j = 0; j <= N; j++) {
+      const v = gk[j], s = eta[0]*v[0] + eta[1]*v[1], w = wt(j, N) * U * Math.sign(s);
+      x += w * v[0]; y += w * v[1];
+    }
+    pts.push([x, y]);
+  }
+  return pts;
+}
+
+// Minimum-energy control with |u_k| <= U. Dual Newton: u_k(t) = clip(lambda' Phi(T-t) b_k, +-U).
+function solveCapped(G, N, U, d, lam0) {
+  const evalAt = lam => {
+    let D = lam[0]*d[0] + lam[1]*d[1]; const Gv = [0, 0]; const Hm = [0, 0, 0];
+    for (const gk of G.g) for (let j = 0; j <= N; j++) {
+      const v = gk[j], w = wt(j, N), s = lam[0]*v[0] + lam[1]*v[1];
+      if (Math.abs(s) <= U) {
+        D -= w * s * s / 2; Gv[0] += w * s * v[0]; Gv[1] += w * s * v[1];
+        Hm[0] += w * v[0]*v[0]; Hm[1] += w * v[0]*v[1]; Hm[2] += w * v[1]*v[1];
+      } else {
+        const sg = Math.sign(s); D -= w * (U * Math.abs(s) - U * U / 2);
+        Gv[0] += w * U * sg * v[0]; Gv[1] += w * U * sg * v[1];
+      }
+    }
+    return { D, Gv, Hm };
+  };
+  let lam = lam0.slice(), cur = evalAt(lam), ok = false;
+  const tol = 1e-7 * (1 + Math.hypot(d[0], d[1]));
+  for (let it = 0; it < 300; it++) {
+    const r = [d[0] - cur.Gv[0], d[1] - cur.Gv[1]];
+    if (Math.hypot(r[0], r[1]) < tol) { ok = true; break; }
+    const mu = 1e-9 * (cur.Hm[0] + cur.Hm[2]) + 1e-12;
+    const a = cur.Hm[0] + mu, b = cur.Hm[1], c = cur.Hm[2] + mu, det = a*c - b*b;
+    let st = [(c*r[0] - b*r[1]) / det, (a*r[1] - b*r[0]) / det];
+    if (!isFinite(st[0]) || !isFinite(st[1])) st = r;
+    let t = 1, next;
+    const slope = r[0]*st[0] + r[1]*st[1];
+    while (true) {
+      const cand = [lam[0] + t*st[0], lam[1] + t*st[1]];
+      next = evalAt(cand);
+      if (next.D >= cur.D + 1e-4 * t * slope || t < 1e-10) { lam = cand; break; }
+      t /= 2;
+    }
+    cur = next;
+  }
+  return { lam, ok };
+}
+
+// Control signals on t_i = i H and the state trajectory they produce.
+function controls(G, N, lam, U) {
+  return G.g.map(gk => {
+    const u = new Array(N + 1);
+    for (let i = 0; i <= N; i++) { const v = gk[N - i], s = lam[0]*v[0] + lam[1]*v[1]; u[i] = Math.max(-U, Math.min(U, s)); }
+    return u;
+  });
+}
+function simulate(G, N, B, x0, u) {
+  const xs = [x0.slice()]; let x = x0.slice();
+  const Bu = i => { let a = 0, b = 0; B.forEach((bk, k) => { a += bk[0] * u[k][i]; b += bk[1] * u[k][i]; }); return [a, b]; };
+  for (let i = 0; i < N; i++) {
+    const p = mv(G.Ph, x), q = mv(G.Ph, Bu(i)), r = Bu(i + 1);
+    x = [p[0] + H / 2 * (q[0] + r[0]), p[1] + H / 2 * (q[1] + r[1])];
+    xs.push(x);
+  }
+  return xs;
+}
+function effort(u, N) { let e = 0; for (const uk of u) for (let i = 0; i <= N; i++) e += wt(i, N) * uk[i] * uk[i]; return e; }
+
+// Full analysis of one configuration.
+function analyze(eff, T, opts = {}) {
+  const G = grid(eff, T), N = G.N;
+  const xf = mv(G.Phi[N], eff.x0);
+  const d = [eff.xT[0] - xf[0], eff.xT[1] - xf[1]];
+  const W = eff.B.length ? gramian(G, N) : [0, 0, 0];
+  const me = minEnergy(W, d);
+  const res = { G, N, xf, d, W, me, E: me.E, U: eff.U, eff };
+  if (!eff.B.length) { res.V = Math.hypot(d[0], d[1]) < 1e-9 ? 0 : Infinity; res.feasible = res.V === 0; return res; }
+  if (isFinite(me.E)) {
+    res.uFree = controls(G, N, me.lam, Infinity);
+    res.peak = Math.max(...res.uFree.map(uk => Math.max(...uk.map(Math.abs))));
+  } else res.peak = Infinity;
+  if (eff.U === Infinity) {
+    res.feasible = isFinite(me.E); res.V = me.E; res.u = res.uFree;
+  } else {
+    const margin = capFeasible(G, N, eff.U, d, opts.nDir || 360);
+    res.margin = margin;
+    if (margin <= 1e-9 || !isFinite(me.E)) { res.feasible = false; res.V = Infinity; }
+    else if (res.peak <= eff.U) { res.feasible = true; res.V = me.E; res.u = res.uFree; }
+    else {
+      const sol = solveCapped(G, N, eff.U, d, me.lam);
+      res.feasible = true; res.converged = sol.ok;
+      res.u = controls(G, N, sol.lam, eff.U); res.V = effort(res.u, N);
+    }
+    if (opts.boundary) res.capSet = capBoundary(G, N, eff.U, opts.boundary).map(p => [xf[0] + p[0], xf[1] + p[1]]);
+  }
+  if (opts.traj) {
+    if (res.u) res.traj = simulate(G, N, eff.B, eff.x0, res.u);
+    if (res.uFree && res.u !== res.uFree) res.trajFree = simulate(G, N, eff.B, eff.x0, res.uFree);
+    const zero = eff.B.map(() => new Array(N + 1).fill(0));
+    res.trajNone = simulate(G, N, eff.B.length ? eff.B : [[0, 0]], eff.x0, eff.B.length ? zero : [new Array(N + 1).fill(0)]);
+  }
+  return res;
+}
+
+// Sweeps for the two small charts.
+function sweepAge(p, T) {
+  const out = [];
+  for (let i = 0; i <= 40; i++) {
+    const a = i / 40, r = analyze(effective(p, a), T, { nDir: 180 });
+    out.push({ a, E: r.E, V: r.V, wmin: r.me.eig.w[1], wmax: r.me.eig.w[0] });
+  }
+  return out;
+}
+function sweepHorizon(p, a) {
+  const eff = effective(p, a), Gall = grid(eff, TMAX), Nall = Gall.N;
+  const Wrun = eff.B.length ? gramian(Gall, Nall, true) : null;
+  const out = [];
+  for (let j = 5; j <= Nall; j += 5) {
+    const T = j * H, xf = mv(Gall.Phi[j], eff.x0), d = [eff.xT[0] - xf[0], eff.xT[1] - xf[1]];
+    const W = Wrun ? Wrun[j] : [0, 0, 0], me = minEnergy(W, d);
+    const row = { T, E: me.E, wmin: me.eig.w[1], wmax: me.eig.w[0], V: me.E };
+    if (eff.U !== Infinity && j % 15 === 0 && eff.B.length) {
+      const sub = { ...Gall, N: j };
+      const m = isFinite(me.E) ? capFeasible(sub, j, eff.U, d, 120) : -1;
+      if (m <= 1e-9) row.V = Infinity;
+      else {
+        const peak = Math.max(...controls(sub, j, me.lam, Infinity).map(uk => Math.max(...uk.map(Math.abs))));
+        row.V = peak <= eff.U ? me.E : effort(controls(sub, j, solveCapped(sub, j, eff.U, d, me.lam).lam, eff.U), j);
+      }
+      row.capped = true;
+    }
+    out.push(row);
+  }
+  return out;
+}
+// ---- ENGINE END ----
+
+
+// ---------- state ----------
+const ALL = { repair: true, suscept: true, cap: true, damage: true };
+const NONE = { repair: false, suscept: false, cap: false, damage: false };
+const YOUNG = {
+  k1: 1.6, k2: 1.2, c21: 0.4, c12: 0,
+  ch: [{ on: true, theta: 0, g: 1.2 }, { on: true, theta: 90, g: 0.8 }],
+  T: 2, capOn: true, U: 1.5, x0: [1.2, 0.9], xT: [0, 0], age: 0, hyp: { ...ALL }, Eb: 1, safeOn: false, smax: 2.6
+};
+const PRESETS = {
+  young: { ...YOUNG },
+  middle: { ...YOUNG, age: 0.3 },
+  frail: { ...YOUNG, age: 0.5 },
+  terminal: { ...YOUNG, age: 0.75 },
+  paradox: { k1: 1, k2: 1, c21: 0, c12: 0, ch: [{ on: true, theta: 0, g: 1 }, { on: true, theta: 90, g: 1 }],
+    T: 1, capOn: false, U: 1.5, x0: [1, 1], xT: [0, 0], age: 0.6, hyp: { ...NONE, repair: true }, Eb: 1, safeOn: false, smax: 2.6 },
+  onedrug: { k1: 1, k2: 1, c21: 1.2, c12: 0, ch: [{ on: true, theta: 0, g: 1.2 }, { on: false, theta: 90, g: 0.8 }],
+    T: 2, capOn: false, U: 1.5, x0: [0.3, 1.4], xT: [0, 0], age: 0, hyp: { ...NONE }, Eb: 0.5, safeOn: true, smax: 2.6 },
+  redundant: { k1: 1, k2: 1, c21: 0, c12: 0, ch: [{ on: true, theta: 15, g: 1 }, { on: true, theta: 30, g: 1 }],
+    T: 1.5, capOn: false, U: 1.5, x0: [0.4, 1.4], xT: [0, 0], age: 0, hyp: { ...NONE }, Eb: 1, safeOn: false, smax: 2.6 },
+  runaway: { k1: 0.8, k2: -0.25, c21: 0.6, c12: 0, ch: [{ on: true, theta: 0, g: 1.2 }, { on: true, theta: 90, g: 0.5 }],
+    T: 1.6, capOn: true, U: 1.2, x0: [0.8, 0.6], xT: [0, 0], age: 0.2, hyp: { ...NONE, repair: true, damage: true }, Eb: 1, safeOn: true, smax: 2.6 }
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+let P = clone(PRESETS.young);
+let activePreset = 'young';
+
+// ---------- controls ----------
+const f2 = v => v.toFixed(2);
+const GROUPS = [
+  { title: 'Age', items: [
+    { id: 'age', label: 'Age a', min: 0, max: 1, step: 0.01, get: () => P.age, set: v => P.age = v, fmt: f2, note: 'ageNote' },
+    { type: 'hyps' }
+  ]},
+  { title: 'Body on its own · A', items: [
+    { id: 'k1', label: 'Repair of x₁ (k₁)', min: -0.5, max: 3, step: 0.05, get: () => P.k1, set: v => P.k1 = v, fmt: f2 },
+    { id: 'k2', label: 'Repair of x₂ (k₂)', min: -0.5, max: 3, step: 0.05, get: () => P.k2, set: v => P.k2 = v, fmt: f2 },
+    { id: 'c21', label: 'x₁ drives x₂', min: -2, max: 2, step: 0.05, get: () => P.c21, set: v => P.c21 = v, fmt: f2 },
+    { id: 'c12', label: 'x₂ drives x₁', min: -2, max: 2, step: 0.05, get: () => P.c12, set: v => P.c12 = v, fmt: f2 }
+  ]},
+  { title: 'Drugs · columns of B', items: [
+    { id: 'th1', label: 'Drug 1 push angle', min: 0, max: 179, step: 1, get: () => P.ch[0].theta, set: v => P.ch[0].theta = v, fmt: v => v.toFixed(0) + '°' },
+    { id: 'g1', label: 'Drug 1 strength', min: 0, max: 2, step: 0.05, get: () => P.ch[0].g, set: v => P.ch[0].g = v, fmt: f2 },
+    { type: 'check', id: 'on2', label: 'Drug 2 available', get: () => P.ch[1].on, set: v => P.ch[1].on = v },
+    { id: 'th2', label: 'Drug 2 push angle', min: 0, max: 179, step: 1, get: () => P.ch[1].theta, set: v => P.ch[1].theta = v, fmt: v => v.toFixed(0) + '°' },
+    { id: 'g2', label: 'Drug 2 strength', min: 0, max: 2, step: 0.05, get: () => P.ch[1].g, set: v => P.ch[1].g = v, fmt: f2 }
+  ]},
+  { title: 'Task and limits', items: [
+    { id: 'T', label: 'Horizon T', min: 0.2, max: 5, step: 0.05, get: () => P.T, set: v => P.T = v, fmt: f2 },
+    { type: 'check', id: 'capOn', label: 'Cap each dose at |u| ≤ U', get: () => P.capOn, set: v => P.capOn = v },
+    { id: 'U', label: 'Dose cap U', min: 0.1, max: 4, step: 0.05, get: () => P.U, set: v => P.U = v, fmt: f2, note: 'capNote' },
+    { type: 'check', id: 'safeOn', label: 'Flag states outside a safe box', get: () => P.safeOn, set: v => P.safeOn = v },
+    { id: 'smax', label: 'Safe box |xᵢ| ≤', min: 0.8, max: 3, step: 0.05, get: () => P.smax, set: v => P.smax = v, fmt: f2 },
+    { id: 'Eb', label: 'Ellipse effort budget', min: 0.1, max: 5, step: 0.05, get: () => P.Eb, set: v => P.Eb = v, fmt: f2 }
+  ]}
+];
+const HYPS = [
+  ['repair', 'Repair weakens'], ['suscept', 'Drugs bite less'], ['cap', 'Dose window narrows'], ['damage', 'Damage accumulates']
+];
+const ctlRefs = {};
+function buildControls() {
+  const root = document.getElementById('controls');
+  for (const g of GROUPS) {
+    const fs = document.createElement('fieldset');
+    const lg = document.createElement('legend'); lg.innerHTML = `<h3>${g.title}</h3>`; fs.appendChild(lg);
+    for (const it of g.items) {
+      if (it.type === 'hyps') {
+        const box = document.createElement('div'); box.className = 'hyps';
+        for (const [k, lab] of HYPS) {
+          const l = document.createElement('label'); l.className = 'check';
+          l.innerHTML = `<input type="checkbox" id="h-${k}"> ${lab}`;
+          const inp = l.querySelector('input');
+          inp.addEventListener('change', () => { P.hyp[k] = inp.checked; changed(); });
+          ctlRefs['h-' + k] = { el: inp, get: () => P.hyp[k], check: true };
+          box.appendChild(l);
+        }
+        fs.appendChild(box);
+      } else if (it.type === 'check') {
+        const l = document.createElement('label'); l.className = 'check';
+        l.innerHTML = `<input type="checkbox" id="${it.id}"> ${it.label}`;
+        const inp = l.querySelector('input');
+        inp.addEventListener('change', () => { it.set(inp.checked); changed(); });
+        ctlRefs[it.id] = { el: inp, get: it.get, check: true };
+        fs.appendChild(l);
+      } else {
+        const row = document.createElement('div'); row.className = 'row';
+        row.innerHTML = `<label for="${it.id}">${it.label}</label><output id="${it.id}-o" for="${it.id}"></output>` +
+          `<input type="range" id="${it.id}" min="${it.min}" max="${it.max}" step="${it.step}">` +
+          (it.note ? `<span class="note" id="${it.note}"></span>` : '');
+        const inp = row.querySelector('input'), out = row.querySelector('output');
+        inp.addEventListener('input', () => { it.set(+inp.value); out.textContent = it.fmt(+inp.value); changed(); });
+        ctlRefs[it.id] = { el: inp, out, get: it.get, fmt: it.fmt };
+        fs.appendChild(row);
+      }
+    }
+    root.appendChild(fs);
+  }
+}
+function syncControls() {
+  for (const r of Object.values(ctlRefs)) {
+    if (r.check) r.el.checked = r.get();
+    else { r.el.value = r.get(); r.out.textContent = r.fmt(r.get()); }
+  }
+  ctlRefs.U.el.disabled = !P.capOn; ctlRefs.smax.el.disabled = !P.safeOn;
+  ctlRefs.th2.el.disabled = ctlRefs.g2.el.disabled = !P.ch[1].on;
+}
+
+// ---------- theme ----------
+let C = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ['bg', 'panel', 'ink', 'muted', 'rule', 'grid', 'reach', 'cap', 'plan', 'u2', 'free', 'bad', 'good', 'warn'])
+    C[k] = cs.getPropertyValue('--' + k).trim();
+  C.mono = cs.getPropertyValue('--f-mono').trim();
+  C.body = cs.getPropertyValue('--f-body').trim();
+}
+function alpha(hex, a) {
+  const h = hex.replace('#', ''), n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+// ---------- canvases ----------
+function fit(cv) {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const w = Math.max(10, Math.round(r.width * dpr)), h = Math.max(10, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+const VIEW = { x0: -1.6, x1: 3.2, y0: -1.6, y1: 3.2 };
+let plane = null;
+const toPx = (p, s) => [s.pad + (p[0] - VIEW.x0) / (VIEW.x1 - VIEW.x0) * s.size, s.pad + (VIEW.y1 - p[1]) / (VIEW.y1 - VIEW.y0) * s.size];
+const fromPx = (q, s) => [VIEW.x0 + (q[0] - s.pad) / s.size * (VIEW.x1 - VIEW.x0), VIEW.y1 - (q[1] - s.pad) / s.size * (VIEW.y1 - VIEW.y0)];
+
+function arrow(ctx, a, b, head) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+  if (L < 1) return;
+  const ux = dx / L, uy = dy / L;
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0] - ux * head * 0.6, b[1] - uy * head * 0.6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(b[0], b[1]);
+  ctx.lineTo(b[0] - ux * head - uy * head * 0.45, b[1] - uy * head + ux * head * 0.45);
+  ctx.lineTo(b[0] - ux * head + uy * head * 0.45, b[1] - uy * head - ux * head * 0.45);
+  ctx.closePath(); ctx.fill();
+}
+
+// ---------- compute ----------
+let R = null, AGE = null, HOR = null;
+function compute() {
+  const eff = effective(P, P.age);
+  R = analyze(eff, P.T, { traj: true, boundary: 240 });
+  AGE = sweepAge(P, P.T);
+  HOR = sweepHorizon(P, P.age);
+}
+
+const fmt = v => {
+  if (v === Infinity) return '∞';
+  if (!isFinite(v)) return '–';
+  const a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 1e4 || a < 1e-3) return v.toExponential(1).replace('e', '×10^').replace('+', '');
+  return a >= 100 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : v.toFixed(a < 0.1 ? 3 : 2);
+};
+
+function stageOf(V) {
+  if (V === Infinity) return [3, 'Unreachable with this toolkit · “terminal”'];
+  if (V < 0.25) return [0, 'Repair-led · “young”'];
+  if (V < 1.5) return [1, 'Needs intervention · “middle-aged”'];
+  return [2, 'Narrow margins · “frail”'];
+}
+
+function updateGauges() {
+  const eff = R.eff;
+  document.getElementById('v-label').textContent = P.capOn ? 'Restoration cost V (dose-capped)' : 'Restoration cost V (no cap)';
+  document.getElementById('v-num').innerHTML = fmt(R.V) + `<small>∫|u|² dt</small>`;
+  const [s, txt] = stageOf(R.V);
+  const chip = document.getElementById('stage'); chip.className = 'chip s' + s; chip.textContent = txt;
+  document.getElementById('o-E').textContent = fmt(R.E);
+  document.getElementById('o-peak').textContent = isFinite(R.peak) ? fmt(R.peak) + (P.capOn ? (R.peak > eff.U ? ' > U' : ' ≤ U') : '') : '–';
+  const gap0 = Math.hypot(eff.x0[0] - eff.xT[0], eff.x0[1] - eff.xT[1]), gap1 = Math.hypot(R.d[0], R.d[1]);
+  document.getElementById('o-share').textContent = gap0 > 1e-9 ? (gap1 <= gap0 ? Math.round(100 * (1 - gap1 / gap0)) + '%' : 'pushes ' + Math.round(100 * (gap1 / gap0 - 1)) + '% further') : '–';
+  const ea = eigGen(eff.A);
+  document.getElementById('o-eigA').textContent = ea.im[0] ? `${ea.re[0].toFixed(2)} ± ${Math.abs(ea.im[0]).toFixed(2)}i` : `${ea.re[0].toFixed(2)}, ${ea.re[1].toFixed(2)}`;
+  // Kalman rank of [B AB]
+  const cols = []; eff.B.forEach(b => { cols.push(b); cols.push(mv(eff.A, b)); });
+  let rank = cols.some(c => Math.hypot(c[0], c[1]) > 1e-9) ? 1 : 0;
+  for (let i = 0; i < cols.length; i++) for (let j = i + 1; j < cols.length; j++)
+    if (Math.abs(cols[i][0] * cols[j][1] - cols[i][1] * cols[j][0]) > 1e-6) rank = 2;
+  document.getElementById('o-kalman').textContent = rank + (rank === 2 ? ' · controllable' : ' · not controllable');
+  const W = R.W;
+  document.getElementById('o-W').innerHTML = [W[0], W[1], W[1], W[2]].map(v => `<span>${v.toFixed(3)}</span>`).join('');
+  const w = R.me.eig.w;
+  document.getElementById('o-wvals').innerHTML = `w₁ ${fmt(w[0])}<br>w₂ ${fmt(Math.max(0, w[1]))}<br>κ ${w[1] > 1e-12 ? fmt(w[0] / w[1]) : '∞'}`;
+  const m = R.me.modes, tot = m[0] + m[1];
+  [0, 1].forEach(i => {
+    const share = tot === Infinity ? (m[i] === Infinity ? 1 : 0) : tot > 0 ? m[i] / tot : 0;
+    document.getElementById(`m${i + 1}v`).textContent = m[i] === Infinity ? '∞ · unreachable' : `${fmt(m[i])} · ${Math.round(share * 100)}%`;
+    document.getElementById(`m${i + 1}b`).style.width = (share * 100).toFixed(1) + '%';
+  });
+  // notes under sliders
+  const ageBits = [];
+  if (P.hyp.repair) ageBits.push(`k ${P.k1.toFixed(2)}→${eff.k[0].toFixed(2)}, ${P.k2.toFixed(2)}→${eff.k[1].toFixed(2)}`);
+  if (P.hyp.suscept) ageBits.push(`B ×${eff.gs.toFixed(2)}`);
+  if (P.hyp.damage) ageBits.push(`x₀ ×${eff.grow.toFixed(2)}`);
+  if (P.hyp.cap && P.capOn) ageBits.push(`U→${eff.U.toFixed(2)}`);
+  document.getElementById('ageNote').textContent = ageBits.length ? ageBits.join(' · ') : 'no ageing hypothesis ticked';
+  document.getElementById('capNote').textContent = P.capOn ? `effective cap at this age: ${eff.U.toFixed(2)}` : 'cap off: V = E*';
+  // safety
+  const sEl = document.getElementById('safety');
+  let msg = '', bad = false;
+  if (!R.feasible) {
+    bad = true;
+    msg = P.capOn && isFinite(R.E)
+      ? 'No plan within the dose cap reaches the target by T. The target lies outside the violet set. Raise U, lengthen T, or add a drug.'
+      : 'The correction needs a direction no drug can reach (W is singular there).';
+  } else if (P.safeOn && R.traj) {
+    const i = R.traj.findIndex(x => Math.abs(x[0]) > P.smax || Math.abs(x[1]) > P.smax);
+    if (i >= 0) { bad = true; msg = `The cheapest plan leaves the safe box at t = ${(i * H).toFixed(2)}. This lab does not re-optimise around it, so treat the plan as unacceptable.`; }
+    else msg = 'Plan stays inside the safe box the whole way.';
+  } else msg = R.converged === false ? 'Target is barely inside the capped set; the solver stopped short, so V is approximate.' : 'A plan exists. Safe-box check is off.';
+  sEl.textContent = msg; sEl.className = 'status ' + (bad ? 'bad' : 'ok');
+}
+
+// ---------- plane ----------
+function drawPlane(frac) {
+  const cv = document.getElementById('plane');
+  const { ctx, w, h } = fit(cv);
+  const pad = 28, size = Math.min(w, h) - pad * 1.6;
+  const s = { pad, size }; plane = s;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = C.panel; ctx.fillRect(0, 0, w, h);
+  const P2 = p => toPx(p, s);
+  // grid
+  ctx.lineWidth = 1; ctx.strokeStyle = C.grid;
+  for (let v = Math.ceil(VIEW.x0 * 2) / 2; v <= VIEW.x1 + 1e-9; v += 0.5) {
+    const a = P2([v, VIEW.y0]), b = P2([v, VIEW.y1]); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    const c = P2([VIEW.x0, v]), d = P2([VIEW.x1, v]); ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.stroke();
+  }
+  ctx.strokeStyle = C.rule; ctx.lineWidth = 1.2;
+  let a = P2([0, VIEW.y0]), b = P2([0, VIEW.y1]); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  a = P2([VIEW.x0, 0]); b = P2([VIEW.x1, 0]); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  ctx.fillStyle = C.muted; ctx.font = `11px ${C.mono}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let v = -1; v <= 3; v++) { const q = P2([v, VIEW.y0]); ctx.fillText(v, q[0], q[1] + 4); }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let v = -1; v <= 3; v++) { const q = P2([VIEW.x0, v]); ctx.fillText(v, q[0] - 5, q[1]); }
+  ctx.font = `12px ${C.body}`; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+  const xl = P2([VIEW.x1, 0]); ctx.fillText('x₁ inflammatory load →', xl[0] - 4, xl[1] - 4);
+  ctx.save(); const yl = P2([0, VIEW.y1]); ctx.translate(yl[0] + 14, yl[1] + 4); ctx.rotate(Math.PI / 2); ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.fillText('x₂ tissue damage →', 0, 0); ctx.restore();
+
+  ctx.save();
+  ctx.beginPath(); const c0 = P2([VIEW.x0, VIEW.y1]); ctx.rect(c0[0], c0[1], size, size); ctx.clip();
+  const eff = R.eff;
+  // safe box
+  if (P.safeOn) {
+    const p0 = P2([-P.smax, P.smax]), p1 = P2([P.smax, -P.smax]);
+    ctx.fillStyle = alpha(C.bad, 0.07);
+    ctx.beginPath(); ctx.rect(c0[0], c0[1], size, size); ctx.rect(p0[0], p0[1], p1[0] - p0[0], p1[1] - p0[1]); ctx.fill('evenodd');
+    ctx.strokeStyle = alpha(C.bad, 0.5); ctx.setLineDash([2, 4]); ctx.strokeRect(p0[0], p0[1], p1[0] - p0[0], p1[1] - p0[1]); ctx.setLineDash([]);
+  }
+  // vector field of A
+  ctx.strokeStyle = alpha(C.free, 0.35); ctx.fillStyle = alpha(C.free, 0.35); ctx.lineWidth = 1;
+  for (let i = 0; i <= 12; i++) for (let j = 0; j <= 12; j++) {
+    const x = [VIEW.x0 + (i + 0.5) * (VIEW.x1 - VIEW.x0) / 13, VIEW.y0 + (j + 0.5) * (VIEW.y1 - VIEW.y0) / 13];
+    const v = mv(eff.A, x), L = Math.hypot(v[0], v[1]);
+    if (L < 1e-9) continue;
+    const len = 0.13 * Math.min(1, 0.35 + 0.35 * Math.log1p(L));
+    const pA = P2(x), pB = P2([x[0] + v[0] / L * len, x[1] + v[1] / L * len]);
+    arrow(ctx, pA, pB, 4);
+  }
+  // capped set
+  if (R.capSet) {
+    ctx.beginPath(); R.capSet.forEach((p, i) => { const q = P2(p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.closePath();
+    ctx.fillStyle = alpha(C.cap, 0.08); ctx.fill();
+    ctx.strokeStyle = C.cap; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // W ellipse around untreated endpoint
+  const e = R.me.eig, xf = R.xf;
+  if (eff.B.length) {
+    const r1 = Math.sqrt(P.Eb * Math.max(0, e.w[0])), r2 = Math.sqrt(P.Eb * Math.max(0, e.w[1]));
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const t = i / 120 * 2 * Math.PI, c = Math.cos(t) * r1, sn = Math.sin(t) * r2;
+      const q = P2([xf[0] + c * e.q[0][0] + sn * e.q[1][0], xf[1] + c * e.q[0][1] + sn * e.q[1][1]]);
+      i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]);
+    }
+    ctx.closePath(); ctx.fillStyle = alpha(C.reach, 0.16); ctx.fill(); ctx.strokeStyle = C.reach; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.strokeStyle = alpha(C.reach, 0.8);
+    [[r1, e.q[0], 'q₁'], [r2, e.q[1], 'q₂']].forEach(([r, q, lab]) => {
+      const A1 = P2([xf[0] - r * q[0], xf[1] - r * q[1]]), A2 = P2([xf[0] + r * q[0], xf[1] + r * q[1]]);
+      ctx.beginPath(); ctx.moveTo(A1[0], A1[1]); ctx.lineTo(A2[0], A2[1]); ctx.stroke();
+      if (r * s.size / (VIEW.x1 - VIEW.x0) > 18) { ctx.fillStyle = C.reach; ctx.font = `11px ${C.mono}`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(lab, A2[0] + 3, A2[1] - 2); }
+    });
+    ctx.setLineDash([]);
+  }
+  // untreated path
+  if (R.trajNone) {
+    ctx.strokeStyle = C.free; ctx.lineWidth = 1.6; ctx.setLineDash([5, 4]);
+    ctx.beginPath(); R.trajNone.forEach((x, i) => { const q = P2(x); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); ctx.setLineDash([]);
+    const q = P2(xf); ctx.beginPath(); ctx.arc(q[0], q[1], 5, 0, 2 * Math.PI); ctx.fillStyle = C.panel; ctx.fill(); ctx.strokeStyle = C.free; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.fillStyle = C.free; ctx.font = `11px ${C.mono}`; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('untreated end', q[0] + 7, q[1] + 3);
+  }
+  // correction d
+  { const qa = P2(xf), qb = P2(eff.xT); ctx.strokeStyle = alpha(C.plan, 0.7); ctx.fillStyle = alpha(C.plan, 0.7); ctx.lineWidth = 1.2; ctx.setLineDash([2, 3]); arrow(ctx, qa, qb, 7); ctx.setLineDash([]);
+    const mid = [(qa[0] + qb[0]) / 2, (qa[1] + qb[1]) / 2]; ctx.font = `italic 13px ${C.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText('d', mid[0] + 5, mid[1] - 3); }
+  // uncapped plan ghost
+  if (R.trajFree) {
+    ctx.strokeStyle = alpha(C.plan, 0.6); ctx.lineWidth = 1.3; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); R.trajFree.forEach((x, i) => { const q = P2(x); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // plan
+  const tr = R.traj;
+  if (tr) {
+    ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+    for (let i = 1; i < tr.length; i++) {
+      const out = P.safeOn && (Math.abs(tr[i][0]) > P.smax || Math.abs(tr[i][1]) > P.smax);
+      ctx.strokeStyle = out ? C.bad : C.plan;
+      const qa = P2(tr[i - 1]), qb = P2(tr[i]); ctx.beginPath(); ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); ctx.stroke();
+    }
+    ctx.lineCap = 'butt';
+    const k = Math.min(tr.length - 1, Math.round(frac * (tr.length - 1)));
+    const q = P2(tr[k]); ctx.beginPath(); ctx.arc(q[0], q[1], 5.5, 0, 2 * Math.PI); ctx.fillStyle = C.plan; ctx.fill();
+    ctx.strokeStyle = C.panel; ctx.lineWidth = 2; ctx.stroke();
+  }
+  // drug pushes from x0
+  const q0 = P2(eff.x0);
+  eff.B.forEach((bk, i) => {
+    const col = i === 0 ? C.plan : C.u2, sc = 0.45;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.6;
+    const tip = P2([eff.x0[0] - bk[0] * sc, eff.x0[1] - bk[1] * sc]);
+    arrow(ctx, q0, tip, 7);
+    ctx.font = `11px ${C.mono}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('b' + (i + 1 === 1 ? '₁' : '₂'), tip[0] + (tip[0] - q0[0]) * 0.25, tip[1] + (tip[1] - q0[1]) * 0.25 + (tip[1] === q0[1] ? -9 : 0));
+  });
+  ctx.restore();
+  // handles
+  ctx.fillStyle = C.ink; ctx.strokeStyle = C.panel; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(q0[0] - 6.5, q0[1] - 6.5, 13, 13); ctx.fill(); ctx.stroke();
+  const qt = P2(eff.xT);
+  ctx.strokeStyle = C.panel; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(qt[0] - 9, qt[1]); ctx.lineTo(qt[0] + 9, qt[1]); ctx.moveTo(qt[0], qt[1] - 9); ctx.lineTo(qt[0], qt[1] + 9); ctx.stroke();
+  ctx.strokeStyle = C.good; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = `12px ${C.body}`; ctx.fillStyle = C.ink; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.fillText('x₀', q0[0] + 9, q0[1] - 6);
+  ctx.fillStyle = C.good; ctx.textBaseline = 'top'; ctx.fillText('target', qt[0] + 10, qt[1] + 4);
+}
+
+// ---------- strip charts ----------
+function frame(ctx, w, h, xr, yr, opts) {
+  const m = { l: 44, r: 12, t: 10, b: 26 };
+  const X = x => m.l + (x - xr[0]) / (xr[1] - xr[0]) * (w - m.l - m.r);
+  const Y = opts.log
+    ? y => m.t + (Math.log10(yr[1]) - Math.log10(y)) / (Math.log10(yr[1]) - Math.log10(yr[0])) * (h - m.t - m.b)
+    : y => m.t + (yr[1] - y) / (yr[1] - yr[0]) * (h - m.t - m.b);
+  ctx.clearRect(0, 0, w, h); ctx.fillStyle = C.panel; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = C.grid; ctx.lineWidth = 1; ctx.font = `10.5px ${C.mono}`; ctx.fillStyle = C.muted;
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const t of opts.yt) { const y = Y(t); ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(w - m.r, y); ctx.stroke(); ctx.fillText(opts.yf(t), m.l - 6, y); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const t of opts.xt) { const x = X(t); ctx.fillText(opts.xf(t), x, h - m.b + 6); }
+  return { X, Y, m };
+}
+function line(ctx, pts, X, Y, col, wd, dash) {
+  ctx.strokeStyle = col; ctx.lineWidth = wd; ctx.setLineDash(dash || []); ctx.beginPath();
+  let pen = false;
+  for (const [x, y] of pts) { if (!isFinite(y)) { pen = false; continue; } const px = X(x), py = Y(y); pen ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pen = true; }
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function tag(ctx, text, x, y, col) { ctx.fillStyle = col; ctx.font = `11px ${C.mono}`; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(text, x, y - 2); }
+function logRange(vals) {
+  const f = vals.filter(v => isFinite(v) && v > 0);
+  let lo = Math.min(...f), hi = Math.max(...f);
+  if (!f.length) { lo = 0.01; hi = 10; }
+  lo = Math.max(1e-4, Math.pow(10, Math.floor(Math.log10(lo)))); hi = Math.min(1e5, Math.pow(10, Math.ceil(Math.log10(hi))));
+  if (hi <= lo) hi = lo * 10;
+  return [lo, hi];
+}
+const decades = r => { const t = []; for (let e = Math.log10(r[0]); e <= Math.log10(r[1]) + 1e-9; e++) t.push(Math.pow(10, Math.round(e))); return t; };
+const sci = v => v >= 1 && v < 1e4 ? String(v) : v >= 0.01 && v < 1 ? String(+v.toPrecision(1)) : '1e' + Math.round(Math.log10(v));
+
+function drawU(frac) {
+  const { ctx, w, h } = fit(document.getElementById('c-u'));
+  const N = R.N, T = P.T;
+  let ymax = 0.5;
+  [R.u, R.uFree].forEach(us => us && us.forEach(uk => uk.forEach(v => { if (isFinite(v)) ymax = Math.max(ymax, Math.abs(v)); })));
+  if (P.capOn) ymax = Math.max(ymax, R.eff.U);
+  ymax *= 1.12;
+  const step = ymax > 4 ? 2 : ymax > 2 ? 1 : 0.5, yt = [];
+  for (let v = -Math.floor(ymax / step) * step; v <= ymax; v += step) yt.push(+v.toFixed(2));
+  const { X, Y, m } = frame(ctx, w, h, [0, T], [-ymax, ymax], { yt, yf: v => v, xt: [0, T / 2, T], xf: v => v.toFixed(2), xl: 't' });
+  if (P.capOn && isFinite(R.eff.U)) {
+    ctx.fillStyle = alpha(C.cap, 0.08);
+    ctx.fillRect(m.l, Y(ymax), w - m.l - m.r, Y(R.eff.U) - Y(ymax));
+    ctx.fillRect(m.l, Y(-R.eff.U), w - m.l - m.r, Y(-ymax) - Y(-R.eff.U));
+    line(ctx, [[0, R.eff.U], [T, R.eff.U]], X, Y, C.cap, 1, [5, 4]);
+    line(ctx, [[0, -R.eff.U], [T, -R.eff.U]], X, Y, C.cap, 1, [5, 4]);
+  }
+  line(ctx, [[0, 0], [T, 0]], X, Y, C.rule, 1);
+  const cols = [C.plan, C.u2];
+  if (R.uFree && R.u !== R.uFree) R.uFree.forEach((uk, k) => line(ctx, uk.map((v, i) => [i * H, v]), X, Y, alpha(cols[k], 0.65), 1.3, [4, 4]));
+  if (R.u) R.u.forEach((uk, k) => line(ctx, uk.map((v, i) => [i * H, v]), X, Y, cols[k], 2.2));
+  if (!R.u) { ctx.fillStyle = C.bad; ctx.font = `12px ${C.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('No admissible plan', (m.l + w - m.r) / 2, h / 2 - 12); }
+  if (R.u) {
+    R.u.forEach((uk, k) => tag(ctx, 'u' + (k ? '₂' : '₁'), w - m.r - k * 26, m.t + 14, cols[k]));
+    const x = X(frac * T); ctx.strokeStyle = alpha(C.ink, 0.35); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, m.t); ctx.lineTo(x, h - m.b); ctx.stroke();
+  }
+}
+
+function drawSweep(id, data, xKey, xr, cur, xl, xt) {
+  const { ctx, w, h } = fit(document.getElementById(id));
+  const yr = logRange(data.flatMap(d => [d.E, d.V, d.wmin, d.wmax]));
+  const { X, Y, m } = frame(ctx, w, h, xr, yr, { log: true, yt: decades(yr), yf: sci, xt, xf: v => String(v), xl });
+  // infeasible shading
+  ctx.fillStyle = alpha(C.bad, 0.09);
+  const capRows = data.filter(d => d.capped !== false && (xKey === 'a' || d.capped));
+  for (let i = 0; i < capRows.length; i++) if (capRows[i].V === Infinity) {
+    const x0 = X(i ? (capRows[i - 1][xKey] + capRows[i][xKey]) / 2 : xr[0]);
+    const x1 = X(i < capRows.length - 1 ? (capRows[i][xKey] + capRows[i + 1][xKey]) / 2 : xr[1]);
+    ctx.fillRect(x0, m.t, x1 - x0, h - m.t - m.b);
+  }
+  line(ctx, data.map(d => [d[xKey], Math.max(yr[0], d.wmax)]), X, Y, alpha(C.reach, 0.45), 1.4);
+  line(ctx, data.map(d => [d[xKey], d.wmin > 0 ? Math.max(yr[0], d.wmin) : NaN]), X, Y, C.reach, 2);
+  line(ctx, data.map(d => [d[xKey], d.E]), X, Y, C.plan, 1.4, [4, 4]);
+  if (P.capOn) line(ctx, capRows.map(d => [d[xKey], d.V]), X, Y, C.plan, 2.2);
+  const xc = X(cur); ctx.strokeStyle = alpha(C.ink, 0.5); ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+  ctx.beginPath(); ctx.moveTo(xc, m.t); ctx.lineTo(xc, h - m.b); ctx.stroke(); ctx.setLineDash([]);
+  // labels at right edge
+  const last = data[data.length - 1];
+  const lab = [];
+  if (isFinite(last.wmin) && last.wmin > 0) lab.push(['w₂ (min)', Y(Math.max(yr[0], last.wmin)), C.reach]);
+  lab.push(['w₁', Y(Math.max(yr[0], last.wmax)), alpha(C.reach, 0.8)]);
+  if (isFinite(last.E)) lab.push([P.capOn ? 'E*' : 'E* = V', Y(last.E), C.plan]);
+  const lastV = capRows.length ? capRows[capRows.length - 1].V : NaN;
+  if (P.capOn && isFinite(lastV)) lab.push(['V', Y(lastV), C.plan]);
+  lab.sort((p, q) => p[1] - q[1]);
+  for (let i = 1; i < lab.length; i++) if (lab[i][1] - lab[i - 1][1] < 12) lab[i][1] = lab[i - 1][1] + 12;
+  for (const [t, y, c] of lab) tag(ctx, t, w - m.r - 2, Math.min(h - m.b, Math.max(m.t + 12, y)), c);
+  if (P.capOn && capRows.some(d => d.V === Infinity)) {
+    ctx.fillStyle = C.bad; ctx.font = `11px ${C.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    const i = capRows.findIndex(d => d.V === Infinity);
+    ctx.fillText('V = ∞', X(capRows[i][xKey]) + 4, m.t + 2);
+  }
+}
+
+// ---------- loop ----------
+let dirty = true, playing = true, t0 = performance.now();
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+if (reduce.matches) playing = false;
+function changed(presetKeep) {
+  if (!presetKeep) { activePreset = null; markPreset(); }
+  syncControls(); dirty = true;
+}
+function markPreset() {
+  document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === activePreset)));
+}
+function frameLoop(now) {
+  if (dirty) { compute(); updateGauges(); dirty = 'charts'; }
+  const period = 3200, frac = playing ? Math.min(1, ((now - t0) % (period + 700)) / period) : 1;
+  drawPlane(frac);
+  drawU(frac);
+  if (dirty === 'charts') {
+    drawSweep('c-age', AGE, 'a', [0, 1], P.age, 'age a', [0, 0.5, 1]);
+    drawSweep('c-T', HOR, 'T', [0, 6], P.T, 'horizon T', [0, 2, 4, 6]);
+    dirty = false;
+  }
+  requestAnimationFrame(frameLoop);
+}
+
+// ---------- interaction ----------
+let drag = null;
+function pointerPos(ev) { const r = ev.currentTarget.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+const cvPlane = document.getElementById('plane');
+cvPlane.addEventListener('pointerdown', ev => {
+  if (!R || !plane) return;
+  const p = pointerPos(ev), q0 = toPx(R.eff.x0, plane), qt = toPx(R.eff.xT, plane);
+  const d0 = Math.hypot(p[0] - q0[0], p[1] - q0[1]), dt = Math.hypot(p[0] - qt[0], p[1] - qt[1]);
+  if (Math.min(d0, dt) > 22) return;
+  drag = d0 <= dt ? 'x0' : 'xT';
+  cvPlane.setPointerCapture(ev.pointerId); ev.preventDefault();
+});
+cvPlane.addEventListener('pointermove', ev => {
+  if (!plane || !R) return;
+  const p = pointerPos(ev);
+  if (!drag) {
+    const q0 = toPx(R.eff.x0, plane), qt = toPx(R.eff.xT, plane);
+    cvPlane.style.cursor = Math.min(Math.hypot(p[0] - q0[0], p[1] - q0[1]), Math.hypot(p[0] - qt[0], p[1] - qt[1])) < 22 ? 'grab' : 'crosshair';
+    return;
+  }
+  let x = fromPx(p, plane);
+  x = [Math.max(VIEW.x0, Math.min(VIEW.x1, x[0])), Math.max(VIEW.y0, Math.min(VIEW.y1, x[1]))].map(v => Math.round(v * 100) / 100);
+  if (drag === 'x0') { const g = R.eff.grow || 1; P.x0 = [x[0] / g, x[1] / g]; } else P.xT = x;
+  changed(); t0 = performance.now();
+});
+const endDrag = () => { drag = null; };
+cvPlane.addEventListener('pointerup', endDrag); cvPlane.addEventListener('pointercancel', endDrag);
+
+document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+  P = clone(PRESETS[b.dataset.preset]); activePreset = b.dataset.preset; markPreset(); changed(true); t0 = performance.now();
+}));
+const playBtn = document.getElementById('play');
+function syncPlay() { playBtn.textContent = playing ? 'Pause' : 'Play'; playBtn.setAttribute('aria-pressed', String(playing)); }
+playBtn.addEventListener('click', () => { playing = !playing; t0 = performance.now(); syncPlay(); });
+
+const retheme = () => { readTheme(); dirty = dirty || 'charts'; };
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+window.addEventListener('resize', () => { dirty = dirty || 'charts'; });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { dirty = dirty || 'charts'; });
+
+buildControls(); readTheme(); syncControls(); markPreset(); syncPlay();
+requestAnimationFrame(frameLoop);
+</script>
+
+</body>
+</html>
