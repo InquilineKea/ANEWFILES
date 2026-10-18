@@ -2,6 +2,8 @@
 
 A directory of research experiments, interactive demonstrations, and analysis code.
 
+**Across GitHub:** [Browse all 66 public repositories by subject](REPOSITORIES.md) · [Repository inventory JSON](repository-catalog.json)
+
 **Start here:** projects currently live on separate branches. The default branch is an index and archive; cloning it does not put every project into your working directory.
 
 ## Projects
